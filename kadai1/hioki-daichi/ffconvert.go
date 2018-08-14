@@ -26,6 +26,8 @@ const (
 
 func main() {
 	JOpt := flag.Bool("J", false, "Convert from JPEG")
+	POpt := flag.Bool("P", false, "Convert from PNG")
+	jOpt := flag.Bool("j", false, "Convert to JPEG")
 	pOpt := flag.Bool("p", false, "Convert to PNG")
 
 	flag.Parse()
@@ -34,12 +36,16 @@ func main() {
 	switch {
 	case *JOpt:
 		in = Jpeg
+	case *POpt:
+		in = Png
 	default:
 		in = Jpeg
 	}
 
 	var out FileFormat
 	switch {
+	case *jOpt:
+		out = Jpeg
 	case *pOpt:
 		out = Png
 	default:
@@ -83,6 +89,8 @@ DIRNAMES_LOOP:
 			switch in {
 			case Jpeg:
 				isApplicable = myfileutil.IsJpeg(fp)
+			case Png:
+				isApplicable = myfileutil.IsPng(fp)
 			}
 			if !isApplicable {
 				return nil
@@ -90,6 +98,8 @@ DIRNAMES_LOOP:
 
 			var extname string
 			switch out {
+			case Jpeg:
+				extname = "jpg"
 			case Png:
 				extname = "png"
 			}
@@ -104,6 +114,8 @@ DIRNAMES_LOOP:
 			switch in {
 			case Jpeg:
 				img, err = jpeg.Decode(fp)
+			case Png:
+				img, err = png.Decode(fp)
 			}
 			if err != nil {
 				return err
@@ -115,6 +127,8 @@ DIRNAMES_LOOP:
 			}
 
 			switch out {
+			case Jpeg:
+				err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
 			case Png:
 				err = png.Encode(dstFile, img)
 			}
