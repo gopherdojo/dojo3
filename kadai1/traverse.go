@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// Traverse is converting image files recursively in the specified directory
 func Traverse(srcDir, fromExt, toExt string) error {
 	return filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 

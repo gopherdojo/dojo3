@@ -14,6 +14,8 @@ type ImageConverter struct {
 	data *image.Image
 }
 
+// decode reads a JPG/GIF/PNG image from r and returns the first embedded
+// image as an image.Image.
 func (ic *ImageConverter) decode(r io.Reader, fromExt string) error {
 
 	if ic == nil {
@@ -43,6 +45,7 @@ func (ic *ImageConverter) decode(r io.Reader, fromExt string) error {
 	return nil
 }
 
+// Encode writes the Image m to w in JPG/GIF/PNG format.
 func (ic *ImageConverter) encode(w io.Writer, toExt string) error {
 
 	if ic == nil {
@@ -71,6 +74,7 @@ func (ic *ImageConverter) encode(w io.Writer, toExt string) error {
 	return nil
 }
 
+// Convert the image to the specified format.
 func (ic *ImageConverter) Convert(r io.Reader, w io.Writer, fromExt, toExt string) error {
 
 	if ic == nil {

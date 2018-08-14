@@ -16,6 +16,7 @@ const (
 	traverseError
 )
 
+// Run command
 func (c *CLI) Run(args []string) int {
 	var fromExt, toExt string
 
