@@ -36,6 +36,8 @@ func main() {
 	pOpt := flag.Bool("p", false, "Convert to PNG")
 	gOpt := flag.Bool("g", false, "Convert to GIF")
 
+	fOpt := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
+
 	flag.Parse()
 
 	var in FileFormat
@@ -62,7 +64,7 @@ func main() {
 		out = Png
 	}
 
-	ok := execute(flag.Args(), in, out)
+	ok := execute(flag.Args(), in, out, *fOpt)
 	if ok {
 		os.Exit(0)
 	} else {
@@ -70,7 +72,7 @@ func main() {
 	}
 }
 
-func execute(dirnames []string, in FileFormat, out FileFormat) (ok bool) {
+func execute(dirnames []string, in FileFormat, out FileFormat, force bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
 		fmt.Println("Specify filenames as an arguments")
@@ -120,7 +122,7 @@ DIRNAMES_LOOP:
 
 			dstName := myfileutil.DropExtname(path) + "." + extname
 
-			if myfileutil.Exists(dstName) {
+			if !force && myfileutil.Exists(dstName) {
 				return errors.New("File already exists: " + dstName)
 			}
 
