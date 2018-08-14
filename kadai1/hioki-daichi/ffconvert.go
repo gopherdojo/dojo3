@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"image"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -12,9 +13,40 @@ import (
 	"github.com/hioki-daichi/myfileutil"
 )
 
+// FileFormat provides file formats like JPEG, PNG, GIF
+type FileFormat int
+
+const (
+	// Jpeg is JPEG format
+	Jpeg FileFormat = iota
+
+	// Png is PNG format
+	Png
+)
+
 func main() {
+	JOpt := flag.Bool("J", false, "Convert from JPEG")
+	pOpt := flag.Bool("p", false, "Convert to PNG")
+
 	flag.Parse()
-	ok := execute(flag.Args())
+
+	var in FileFormat
+	switch {
+	case *JOpt:
+		in = Jpeg
+	default:
+		in = Jpeg
+	}
+
+	var out FileFormat
+	switch {
+	case *pOpt:
+		out = Png
+	default:
+		out = Png
+	}
+
+	ok := execute(flag.Args(), in, out)
 	if ok {
 		os.Exit(0)
 	} else {
@@ -22,7 +54,7 @@ func main() {
 	}
 }
 
-func execute(dirnames []string) (ok bool) {
+func execute(dirnames []string, in FileFormat, out FileFormat) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
 		fmt.Println("Specify filenames as an arguments")
@@ -47,11 +79,20 @@ DIRNAMES_LOOP:
 			}
 			defer fp.Close()
 
-			if !myfileutil.IsJpeg(fp) {
+			var isApplicable bool
+			switch in {
+			case Jpeg:
+				isApplicable = myfileutil.IsJpeg(fp)
+			}
+			if !isApplicable {
 				return nil
 			}
 
-			extname := "png"
+			var extname string
+			switch out {
+			case Png:
+				extname = "png"
+			}
 
 			dstName := myfileutil.DropExtname(path) + "." + extname
 
@@ -59,7 +100,11 @@ DIRNAMES_LOOP:
 				return errors.New("File already exists: " + dstName)
 			}
 
-			img, err := jpeg.Decode(fp)
+			var img image.Image
+			switch in {
+			case Jpeg:
+				img, err = jpeg.Decode(fp)
+			}
 			if err != nil {
 				return err
 			}
@@ -69,8 +114,10 @@ DIRNAMES_LOOP:
 				return err
 			}
 
-			err = png.Encode(dstFile, img)
-
+			switch out {
+			case Png:
+				err = png.Encode(dstFile, img)
+			}
 			if err != nil {
 				return err
 			}
