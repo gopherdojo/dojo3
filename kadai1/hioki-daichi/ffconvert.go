@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -22,13 +23,18 @@ const (
 
 	// Png is PNG format
 	Png
+
+	// Gif is GIF format
+	Gif
 )
 
 func main() {
 	JOpt := flag.Bool("J", false, "Convert from JPEG")
 	POpt := flag.Bool("P", false, "Convert from PNG")
+	GOpt := flag.Bool("G", false, "Convert from GIF")
 	jOpt := flag.Bool("j", false, "Convert to JPEG")
 	pOpt := flag.Bool("p", false, "Convert to PNG")
+	gOpt := flag.Bool("g", false, "Convert to GIF")
 
 	flag.Parse()
 
@@ -38,6 +44,8 @@ func main() {
 		in = Jpeg
 	case *POpt:
 		in = Png
+	case *GOpt:
+		in = Gif
 	default:
 		in = Jpeg
 	}
@@ -48,6 +56,8 @@ func main() {
 		out = Jpeg
 	case *pOpt:
 		out = Png
+	case *gOpt:
+		out = Gif
 	default:
 		out = Png
 	}
@@ -91,6 +101,8 @@ DIRNAMES_LOOP:
 				isApplicable = myfileutil.IsJpeg(fp)
 			case Png:
 				isApplicable = myfileutil.IsPng(fp)
+			case Gif:
+				isApplicable = myfileutil.IsGif(fp)
 			}
 			if !isApplicable {
 				return nil
@@ -102,6 +114,8 @@ DIRNAMES_LOOP:
 				extname = "jpg"
 			case Png:
 				extname = "png"
+			case Gif:
+				extname = "gif"
 			}
 
 			dstName := myfileutil.DropExtname(path) + "." + extname
@@ -116,6 +130,8 @@ DIRNAMES_LOOP:
 				img, err = jpeg.Decode(fp)
 			case Png:
 				img, err = png.Decode(fp)
+			case Gif:
+				img, err = gif.Decode(fp)
 			}
 			if err != nil {
 				return err
@@ -131,6 +147,8 @@ DIRNAMES_LOOP:
 				err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
 			case Png:
 				err = png.Encode(dstFile, img)
+			case Gif:
+				err = gif.Encode(dstFile, img, &gif.Options{NumColors: 256})
 			}
 			if err != nil {
 				return err
