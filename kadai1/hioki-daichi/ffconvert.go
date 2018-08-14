@@ -37,6 +37,7 @@ func main() {
 	gOpt := flag.Bool("g", false, "Convert to GIF")
 
 	fOpt := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
+	vOpt := flag.Bool("v", false, "Verbose Mode")
 
 	flag.Parse()
 
@@ -64,7 +65,7 @@ func main() {
 		out = Png
 	}
 
-	ok := execute(flag.Args(), in, out, *fOpt)
+	ok := execute(flag.Args(), in, out, *fOpt, *vOpt)
 	if ok {
 		os.Exit(0)
 	} else {
@@ -72,7 +73,7 @@ func main() {
 	}
 }
 
-func execute(dirnames []string, in FileFormat, out FileFormat, force bool) (ok bool) {
+func execute(dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
 		fmt.Println("Specify filenames as an arguments")
@@ -88,6 +89,9 @@ DIRNAMES_LOOP:
 			}
 
 			if info.IsDir() {
+				if verbose {
+					fmt.Printf("Skipped because the path is directory: %q\n", path)
+				}
 				return nil
 			}
 
@@ -107,6 +111,9 @@ DIRNAMES_LOOP:
 				isApplicable = myfileutil.IsGif(fp)
 			}
 			if !isApplicable {
+				if verbose {
+					fmt.Printf("Skipped because the file is not applicable: %q\n", path)
+				}
 				return nil
 			}
 
@@ -154,6 +161,10 @@ DIRNAMES_LOOP:
 			}
 			if err != nil {
 				return err
+			}
+
+			if verbose {
+				fmt.Printf("Converted: %q\n", dstName)
 			}
 
 			return nil
