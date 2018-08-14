@@ -6,6 +6,7 @@ import (
 	"io"
 )
 
+// CLI struct for main
 type CLI struct {
 	OutStream, ErrStream io.Writer
 }
