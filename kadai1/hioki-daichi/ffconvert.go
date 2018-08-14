@@ -1,10 +1,15 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"image/jpeg"
+	"image/png"
 	"os"
 	"path/filepath"
+
+	"github.com/hioki-daichi/myfileutil"
 )
 
 func main() {
@@ -42,7 +47,33 @@ DIRNAMES_LOOP:
 			}
 			defer fp.Close()
 
-			fmt.Println(path)
+			if !myfileutil.IsJpeg(fp) {
+				return nil
+			}
+
+			extname := "png"
+
+			dstName := myfileutil.DropExtname(path) + "." + extname
+
+			if myfileutil.Exists(dstName) {
+				return errors.New("File already exists: " + dstName)
+			}
+
+			img, err := jpeg.Decode(fp)
+			if err != nil {
+				return err
+			}
+
+			dstFile, err := os.Create(dstName)
+			if err != nil {
+				return err
+			}
+
+			err = png.Encode(dstFile, img)
+
+			if err != nil {
+				return err
+			}
 
 			return nil
 		})
