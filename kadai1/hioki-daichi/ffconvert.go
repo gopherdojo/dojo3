@@ -8,6 +8,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -70,7 +71,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ok := execute(flag.Args(), in, out, *fOpt, *vOpt)
+	ok := execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
 	if ok {
 		os.Exit(0)
 	} else {
@@ -78,10 +79,10 @@ func main() {
 	}
 }
 
-func execute(dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
+func execute(w io.Writer, dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
-		fmt.Println("Specify filenames as an arguments")
+		fmt.Fprintln(w, "Specify filenames as an arguments")
 		ok = false
 		return
 	}
@@ -95,7 +96,7 @@ DIRNAMES_LOOP:
 
 			if info.IsDir() {
 				if verbose {
-					fmt.Printf("Skipped because the path is directory: %q\n", path)
+					fmt.Fprintf(w, "Skipped because the path is directory: %q\n", path)
 				}
 				return nil
 			}
@@ -117,7 +118,7 @@ DIRNAMES_LOOP:
 			}
 			if !isApplicable {
 				if verbose {
-					fmt.Printf("Skipped because the file is not applicable: %q\n", path)
+					fmt.Fprintf(w, "Skipped because the file is not applicable: %q\n", path)
 				}
 				return nil
 			}
@@ -169,14 +170,14 @@ DIRNAMES_LOOP:
 			}
 
 			if verbose {
-				fmt.Printf("Converted: %q\n", dstName)
+				fmt.Fprintf(w, "Converted: %q\n", dstName)
 			}
 
 			return nil
 		})
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(w, err)
 			ok = false
 			break DIRNAMES_LOOP
 		}
