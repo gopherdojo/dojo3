@@ -1,4 +1,4 @@
-package kadai1
+package shimastripe
 
 import (
 	"flag"

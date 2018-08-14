@@ -24,7 +24,7 @@
  ## document
  
  ```bash
- $ godoc github.com/gopherdojo/dojo3/kadai1
+ $ godoc github.com/gopherdojo/dojo3/kadai1/shimastripe
  ```
 
  ## Detail
