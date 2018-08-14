@@ -25,6 +25,7 @@
  
  ```bash
  $ godoc github.com/gopherdojo/dojo3/kadai1/shimastripe
+ $ godoc github.com/gopherdojo/dojo3/kadai1/shimastripe/imgconv
  ```
 
  ## Detail

@@ -1,4 +1,4 @@
-package shimastripe
+package imgconv
 
 import (
 	"errors"

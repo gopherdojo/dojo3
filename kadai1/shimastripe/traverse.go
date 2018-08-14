@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gopherdojo/dojo3/kadai1/shimastripe/imgconv"
 )
 
 // Traverse is converting image files recursively in the specified directory
@@ -35,9 +37,9 @@ func Traverse(srcDir, fromExt, toExt string) error {
 		}
 		defer w.Close()
 
-		imgconv := ImageConverter{}
+		iconv := imgconv.ImageConverter{}
 
-		if err := imgconv.Convert(r, w, fromExt, toExt); err != nil {
+		if err := iconv.Convert(r, w, fromExt, toExt); err != nil {
 			return err
 		}
 
