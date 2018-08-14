@@ -65,6 +65,11 @@ func main() {
 		out = Png
 	}
 
+	if in == out {
+		fmt.Println("You must specify a different file format before and after conversion.")
+		os.Exit(1)
+	}
+
 	ok := execute(flag.Args(), in, out, *fOpt, *vOpt)
 	if ok {
 		os.Exit(0)
