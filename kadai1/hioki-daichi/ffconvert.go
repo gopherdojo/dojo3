@@ -39,109 +39,101 @@ const (
 )
 
 // Execute executes main processing.
-func (c *CLI) Execute(dirnames []string) (ok bool) {
+func (c *CLI) Execute(dirname string) (ok bool) {
 	ok = true
-	if len(dirnames) == 0 {
-		fmt.Fprintln(c.ErrStream, "Specify filenames as an arguments")
-		ok = false
-		return
-	}
 
-DIRNAMES_LOOP:
-	for _, dirname := range dirnames {
-		err := filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			if info.IsDir() {
-				if c.verbose {
-					fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
-				}
-				return nil
-			}
-
-			fp, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			defer fp.Close()
-
-			var isApplicable bool
-			switch c.in {
-			case Jpeg:
-				isApplicable = myfileutil.IsJpeg(fp)
-			case Png:
-				isApplicable = myfileutil.IsPng(fp)
-			case Gif:
-				isApplicable = myfileutil.IsGif(fp)
-			}
-			if !isApplicable {
-				if c.verbose {
-					fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
-				}
-				return nil
-			}
-
-			var extname string
-			switch c.out {
-			case Jpeg:
-				extname = "jpg"
-			case Png:
-				extname = "png"
-			case Gif:
-				extname = "gif"
-			}
-
-			dstName := myfileutil.DropExtname(path) + "." + extname
-
-			if !c.force && myfileutil.Exists(dstName) {
-				return errors.New("File already exists: " + dstName)
-			}
-
-			var img image.Image
-			switch c.in {
-			case Jpeg:
-				img, err = jpeg.Decode(fp)
-			case Png:
-				img, err = png.Decode(fp)
-			case Gif:
-				img, err = gif.Decode(fp)
-			}
-			if err != nil {
-				return err
-			}
-
-			dstFile, err := os.Create(dstName)
-			if err != nil {
-				return err
-			}
-
-			switch c.out {
-			case Jpeg:
-				err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
-			case Png:
-				err = png.Encode(dstFile, img)
-			case Gif:
-				err = gif.Encode(dstFile, img, &gif.Options{NumColors: 256})
-			}
-			if err != nil {
-				return err
-			}
-
-			if c.verbose {
-				fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
-			}
-
-			return nil
-		})
-
+	err := filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Fprintln(c.ErrStream, err)
-			ok = false
-			break DIRNAMES_LOOP
+			return err
 		}
+
+		if info.IsDir() {
+			if c.verbose {
+				fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
+			}
+			return nil
+		}
+
+		fp, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer fp.Close()
+
+		var isApplicable bool
+		switch c.in {
+		case Jpeg:
+			isApplicable = myfileutil.IsJpeg(fp)
+		case Png:
+			isApplicable = myfileutil.IsPng(fp)
+		case Gif:
+			isApplicable = myfileutil.IsGif(fp)
+		}
+		if !isApplicable {
+			if c.verbose {
+				fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
+			}
+			return nil
+		}
+
+		var extname string
+		switch c.out {
+		case Jpeg:
+			extname = "jpg"
+		case Png:
+			extname = "png"
+		case Gif:
+			extname = "gif"
+		}
+
+		dstName := myfileutil.DropExtname(path) + "." + extname
+
+		if !c.force && myfileutil.Exists(dstName) {
+			return errors.New("File already exists: " + dstName)
+		}
+
+		var img image.Image
+		switch c.in {
+		case Jpeg:
+			img, err = jpeg.Decode(fp)
+		case Png:
+			img, err = png.Decode(fp)
+		case Gif:
+			img, err = gif.Decode(fp)
+		}
+		if err != nil {
+			return err
+		}
+
+		dstFile, err := os.Create(dstName)
+		if err != nil {
+			return err
+		}
+
+		switch c.out {
+		case Jpeg:
+			err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
+		case Png:
+			err = png.Encode(dstFile, img)
+		case Gif:
+			err = gif.Encode(dstFile, img, &gif.Options{NumColors: 256})
+		}
+		if err != nil {
+			return err
+		}
+
+		if c.verbose {
+			fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Fprintln(c.ErrStream, err)
+		ok = false
 	}
+
 	return
 }
 
@@ -188,7 +180,16 @@ func main() {
 	}
 
 	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: *fOpt, verbose: *vOpt}
-	ok := cli.Execute(flag.Args())
+
+	dirnames := flag.Args()
+
+	if len(dirnames) == 0 {
+		fmt.Fprintln(cli.ErrStream, "Specify filenames as an arguments")
+		os.Exit(1)
+	}
+
+	ok := cli.Execute(dirnames[0])
+
 	if ok {
 		os.Exit(0)
 	} else {
