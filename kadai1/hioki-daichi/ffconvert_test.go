@@ -21,7 +21,8 @@ func TestJpegToPng(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng/2018"`)
@@ -48,7 +49,8 @@ func TestJpegToGif(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif/2018"`)
@@ -75,7 +77,8 @@ func TestPngToJpeg(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg/2018"`)
@@ -102,7 +105,8 @@ func TestPngToGif(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif/2018"`)
@@ -129,7 +133,8 @@ func TestGifToJpeg(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg/2018"`)
@@ -156,7 +161,8 @@ func TestGifToPng(t *testing.T) {
 	force := true
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, force, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, force, verbose)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng"`)
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng/2018"`)
@@ -173,7 +179,8 @@ func TestNoArgs(t *testing.T) {
 	t.Parallel()
 
 	buf := &bytes.Buffer{}
-	Execute(buf, []string{}, Jpeg, Png, true, true)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{}, Jpeg, Png, true, true)
 	expectToMatchBuffer(t, buf, "Specify filenames as an arguments")
 }
 
@@ -190,8 +197,9 @@ func TestConflict(t *testing.T) {
 	buf := &bytes.Buffer{}
 	verbose := true
 
-	Execute(buf, []string{tmpdir}, in, out, true, verbose)
-	Execute(buf, []string{tmpdir}, in, out, false, verbose)
+	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli.Execute([]string{tmpdir}, in, out, true, verbose)
+	cli.Execute([]string{tmpdir}, in, out, false, verbose)
 
 	expectToMatchBuffer(t, buf, "File already exists: test/TestConflict/2018/07/001.png")
 }

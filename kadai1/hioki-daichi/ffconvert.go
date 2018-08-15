@@ -15,6 +15,11 @@ import (
 	"github.com/hioki-daichi/myfileutil"
 )
 
+// CLI has Out/Err stream.
+type CLI struct {
+	OutStream, ErrStream io.Writer
+}
+
 // FileFormat provides file formats like JPEG, PNG, GIF
 type FileFormat int
 
@@ -29,10 +34,11 @@ const (
 	Gif
 )
 
-func Execute(w io.Writer, dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
+// Execute executes main processing.
+func (c *CLI) Execute(dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
-		fmt.Fprintln(w, "Specify filenames as an arguments")
+		fmt.Fprintln(c.ErrStream, "Specify filenames as an arguments")
 		ok = false
 		return
 	}
@@ -46,7 +52,7 @@ DIRNAMES_LOOP:
 
 			if info.IsDir() {
 				if verbose {
-					fmt.Fprintf(w, "Skipped because the path is directory: %q\n", path)
+					fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
 				}
 				return nil
 			}
@@ -68,7 +74,7 @@ DIRNAMES_LOOP:
 			}
 			if !isApplicable {
 				if verbose {
-					fmt.Fprintf(w, "Skipped because the file is not applicable: %q\n", path)
+					fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
 				}
 				return nil
 			}
@@ -120,14 +126,14 @@ DIRNAMES_LOOP:
 			}
 
 			if verbose {
-				fmt.Fprintf(w, "Converted: %q\n", dstName)
+				fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
 			}
 
 			return nil
 		})
 
 		if err != nil {
-			fmt.Fprintln(w, err)
+			fmt.Fprintln(c.ErrStream, err)
 			ok = false
 			break DIRNAMES_LOOP
 		}
@@ -177,7 +183,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	ok := Execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr}
+	ok := cli.Execute(flag.Args(), in, out, *fOpt, *vOpt)
 	if ok {
 		os.Exit(0)
 	} else {
