@@ -177,6 +177,27 @@ func init() {
 	flag.BoolVar(&verbose, "v", false, "Verbose Mode")
 }
 
+func main() {
+	flag.Parse()
+
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat(), force: force, verbose: verbose}
+
+	args := flag.Args()
+
+	if len(args) == 0 {
+		fmt.Fprintln(cli.OutStream, usage)
+		os.Exit(0)
+	}
+
+	ok := cli.Execute(args[0])
+
+	if ok {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
+}
+
 func inputFileFormat() FileFormat {
 	switch {
 	case fromJpeg:
@@ -200,26 +221,5 @@ func outputFileFormat() FileFormat {
 		return Gif
 	default:
 		return Png
-	}
-}
-
-func main() {
-	flag.Parse()
-
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat(), force: force, verbose: verbose}
-
-	args := flag.Args()
-
-	if len(args) == 0 {
-		fmt.Fprintln(cli.OutStream, usage)
-		os.Exit(0)
-	}
-
-	ok := cli.Execute(args[0])
-
-	if ok {
-		os.Exit(0)
-	} else {
-		os.Exit(1)
 	}
 }
