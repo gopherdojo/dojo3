@@ -186,15 +186,7 @@ func outputFileFormat() FileFormat {
 func main() {
 	flag.Parse()
 
-	in := inputFileFormat()
-	out := outputFileFormat()
-
-	if in == out {
-		fmt.Println("You must specify a different file format before and after conversion.")
-		os.Exit(1)
-	}
-
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: force, verbose: verbose}
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat(), force: force, verbose: verbose}
 
 	dirnames := flag.Args()
 
