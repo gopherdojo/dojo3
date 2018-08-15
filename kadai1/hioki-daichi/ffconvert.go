@@ -71,7 +71,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ok := execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
+	ok := Execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
 	if ok {
 		os.Exit(0)
 	} else {
@@ -79,7 +79,7 @@ func main() {
 	}
 }
 
-func execute(w io.Writer, dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
+func Execute(w io.Writer, dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
 		fmt.Fprintln(w, "Specify filenames as an arguments")
