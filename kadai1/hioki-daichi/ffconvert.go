@@ -208,14 +208,14 @@ func main() {
 
 	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat(), force: force, verbose: verbose}
 
-	dirnames := flag.Args()
+	args := flag.Args()
 
-	if len(dirnames) == 0 {
+	if len(args) == 0 {
 		fmt.Fprintln(cli.OutStream, usage)
 		os.Exit(0)
 	}
 
-	ok := cli.Execute(dirnames[0])
+	ok := cli.Execute(args[0])
 
 	if ok {
 		os.Exit(0)
