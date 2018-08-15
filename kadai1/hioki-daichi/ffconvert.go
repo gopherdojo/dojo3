@@ -15,9 +15,13 @@ import (
 	"github.com/hioki-daichi/myfileutil"
 )
 
-// CLI has Out/Err stream.
+// CLI has streams and command line options.
 type CLI struct {
 	OutStream, ErrStream io.Writer
+	in                   FileFormat
+	out                  FileFormat
+	force                bool
+	verbose              bool
 }
 
 // FileFormat provides file formats like JPEG, PNG, GIF
@@ -35,7 +39,7 @@ const (
 )
 
 // Execute executes main processing.
-func (c *CLI) Execute(dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
+func (c *CLI) Execute(dirnames []string) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
 		fmt.Fprintln(c.ErrStream, "Specify filenames as an arguments")
@@ -51,7 +55,7 @@ DIRNAMES_LOOP:
 			}
 
 			if info.IsDir() {
-				if verbose {
+				if c.verbose {
 					fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
 				}
 				return nil
@@ -64,7 +68,7 @@ DIRNAMES_LOOP:
 			defer fp.Close()
 
 			var isApplicable bool
-			switch in {
+			switch c.in {
 			case Jpeg:
 				isApplicable = myfileutil.IsJpeg(fp)
 			case Png:
@@ -73,14 +77,14 @@ DIRNAMES_LOOP:
 				isApplicable = myfileutil.IsGif(fp)
 			}
 			if !isApplicable {
-				if verbose {
+				if c.verbose {
 					fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
 				}
 				return nil
 			}
 
 			var extname string
-			switch out {
+			switch c.out {
 			case Jpeg:
 				extname = "jpg"
 			case Png:
@@ -91,12 +95,12 @@ DIRNAMES_LOOP:
 
 			dstName := myfileutil.DropExtname(path) + "." + extname
 
-			if !force && myfileutil.Exists(dstName) {
+			if !c.force && myfileutil.Exists(dstName) {
 				return errors.New("File already exists: " + dstName)
 			}
 
 			var img image.Image
-			switch in {
+			switch c.in {
 			case Jpeg:
 				img, err = jpeg.Decode(fp)
 			case Png:
@@ -113,7 +117,7 @@ DIRNAMES_LOOP:
 				return err
 			}
 
-			switch out {
+			switch c.out {
 			case Jpeg:
 				err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
 			case Png:
@@ -125,7 +129,7 @@ DIRNAMES_LOOP:
 				return err
 			}
 
-			if verbose {
+			if c.verbose {
 				fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
 			}
 
@@ -183,8 +187,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr}
-	ok := cli.Execute(flag.Args(), in, out, *fOpt, *vOpt)
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: *fOpt, verbose: *vOpt}
+	ok := cli.Execute(flag.Args())
 	if ok {
 		os.Exit(0)
 	} else {
