@@ -59,8 +59,28 @@ const (
 )
 
 // Execute executes main processing.
-func (c *CLI) Execute(dirname string) (ok bool) {
-	ok = true
+func (c *CLI) Execute(dirname string) bool {
+	paths, err := c.search(dirname)
+
+	if err != nil {
+		fmt.Fprintln(c.ErrStream, err)
+		return false
+	}
+
+	for _, path := range paths {
+		err = c.convert(path)
+
+		if err != nil {
+			fmt.Fprintln(c.ErrStream, err)
+			return false
+		}
+	}
+
+	return true
+}
+
+func (c *CLI) search(dirname string) ([]string, error) {
+	var paths []string
 
 	err := filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -96,65 +116,72 @@ func (c *CLI) Execute(dirname string) (ok bool) {
 			return nil
 		}
 
-		var extname string
-		switch c.out {
-		case Jpeg:
-			extname = "jpg"
-		case Png:
-			extname = "png"
-		case Gif:
-			extname = "gif"
-		}
-
-		dstName := myfileutil.DropExtname(path) + "." + extname
-
-		if !c.force && myfileutil.Exists(dstName) {
-			return errors.New("File already exists: " + dstName)
-		}
-
-		var img image.Image
-		switch c.in {
-		case Jpeg:
-			img, err = jpeg.Decode(fp)
-		case Png:
-			img, err = png.Decode(fp)
-		case Gif:
-			img, err = gif.Decode(fp)
-		}
-		if err != nil {
-			return err
-		}
-
-		dstFile, err := os.Create(dstName)
-		if err != nil {
-			return err
-		}
-
-		switch c.out {
-		case Jpeg:
-			err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
-		case Png:
-			err = png.Encode(dstFile, img)
-		case Gif:
-			err = gif.Encode(dstFile, img, &gif.Options{NumColors: 256})
-		}
-		if err != nil {
-			return err
-		}
-
-		if c.verbose {
-			fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
-		}
+		paths = append(paths, path)
 
 		return nil
 	})
 
-	if err != nil {
-		fmt.Fprintln(c.ErrStream, err)
-		ok = false
+	return paths, err
+}
+
+func (c *CLI) convert(path string) error {
+	var extname string
+	switch c.out {
+	case Jpeg:
+		extname = "jpg"
+	case Png:
+		extname = "png"
+	case Gif:
+		extname = "gif"
 	}
 
-	return
+	dstName := myfileutil.DropExtname(path) + "." + extname
+
+	if !c.force && myfileutil.Exists(dstName) {
+		return errors.New("File already exists: " + dstName)
+	}
+
+	fp, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+
+	var img image.Image
+	switch c.in {
+	case Jpeg:
+		img, err = jpeg.Decode(fp)
+	case Png:
+		img, err = png.Decode(fp)
+	case Gif:
+		img, err = gif.Decode(fp)
+	}
+	if err != nil {
+		return err
+	}
+
+	dstFile, err := os.Create(dstName)
+	if err != nil {
+		return err
+	}
+
+	switch c.out {
+	case Jpeg:
+		err = jpeg.Encode(dstFile, img, &jpeg.Options{Quality: 100})
+	case Png:
+		err = png.Encode(dstFile, img)
+	case Gif:
+		err = gif.Encode(dstFile, img, &gif.Options{NumColors: 256})
+	}
+	if err != nil {
+		return err
+	}
+
+	if c.verbose {
+		fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
+	}
+
+	return nil
 }
 
 var fromJpeg bool
