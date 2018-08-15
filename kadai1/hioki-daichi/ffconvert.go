@@ -137,26 +137,36 @@ func (c *CLI) Execute(dirname string) (ok bool) {
 	return
 }
 
+var JOpt bool
+var POpt bool
+var GOpt bool
+var jOpt bool
+var pOpt bool
+var gOpt bool
+var fOpt bool
+var vOpt bool
+
+func init() {
+	flag.BoolVar(&JOpt, "J", false, "Convert from JPEG")
+	flag.BoolVar(&POpt, "P", false, "Convert from PNG")
+	flag.BoolVar(&GOpt, "G", false, "Convert from GIF")
+	flag.BoolVar(&jOpt, "j", false, "Convert to JPEG")
+	flag.BoolVar(&pOpt, "p", false, "Convert to PNG")
+	flag.BoolVar(&gOpt, "g", false, "Convert to GIF")
+	flag.BoolVar(&fOpt, "f", false, "Overwrite when the converted file name duplicates.")
+	flag.BoolVar(&vOpt, "v", false, "Verbose Mode")
+}
+
 func main() {
-	JOpt := flag.Bool("J", false, "Convert from JPEG")
-	POpt := flag.Bool("P", false, "Convert from PNG")
-	GOpt := flag.Bool("G", false, "Convert from GIF")
-	jOpt := flag.Bool("j", false, "Convert to JPEG")
-	pOpt := flag.Bool("p", false, "Convert to PNG")
-	gOpt := flag.Bool("g", false, "Convert to GIF")
-
-	fOpt := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
-	vOpt := flag.Bool("v", false, "Verbose Mode")
-
 	flag.Parse()
 
 	var in FileFormat
 	switch {
-	case *JOpt:
+	case JOpt:
 		in = Jpeg
-	case *POpt:
+	case POpt:
 		in = Png
-	case *GOpt:
+	case GOpt:
 		in = Gif
 	default:
 		in = Jpeg
@@ -164,11 +174,11 @@ func main() {
 
 	var out FileFormat
 	switch {
-	case *jOpt:
+	case jOpt:
 		out = Jpeg
-	case *pOpt:
+	case pOpt:
 		out = Png
-	case *gOpt:
+	case gOpt:
 		out = Gif
 	default:
 		out = Png
@@ -179,7 +189,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: *fOpt, verbose: *vOpt}
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: fOpt, verbose: vOpt}
 
 	dirnames := flag.Args()
 
