@@ -15,6 +15,26 @@ import (
 	"github.com/hioki-daichi/myfileutil"
 )
 
+const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
+
+-J
+    Input file format is JPEG
+-P
+    Input file format is PNG
+-G
+    Input file format is GIF
+-j
+    Output file format is JPEG
+-p
+    Output file format is PNG
+-g
+    Output file format is GIF
+-f
+    Overwrite when the converted file name duplicates.
+-v
+    Verbose Mode
+`
+
 // CLI has streams and command line options.
 type CLI struct {
 	OutStream, ErrStream io.Writer
@@ -191,8 +211,8 @@ func main() {
 	dirnames := flag.Args()
 
 	if len(dirnames) == 0 {
-		fmt.Fprintln(cli.ErrStream, "Specify filenames as an arguments")
-		os.Exit(1)
+		fmt.Fprintln(cli.OutStream, usage)
+		os.Exit(0)
 	}
 
 	ok := cli.Execute(dirnames[0])
