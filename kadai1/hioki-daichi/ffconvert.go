@@ -29,56 +29,6 @@ const (
 	Gif
 )
 
-func main() {
-	JOpt := flag.Bool("J", false, "Convert from JPEG")
-	POpt := flag.Bool("P", false, "Convert from PNG")
-	GOpt := flag.Bool("G", false, "Convert from GIF")
-	jOpt := flag.Bool("j", false, "Convert to JPEG")
-	pOpt := flag.Bool("p", false, "Convert to PNG")
-	gOpt := flag.Bool("g", false, "Convert to GIF")
-
-	fOpt := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
-	vOpt := flag.Bool("v", false, "Verbose Mode")
-
-	flag.Parse()
-
-	var in FileFormat
-	switch {
-	case *JOpt:
-		in = Jpeg
-	case *POpt:
-		in = Png
-	case *GOpt:
-		in = Gif
-	default:
-		in = Jpeg
-	}
-
-	var out FileFormat
-	switch {
-	case *jOpt:
-		out = Jpeg
-	case *pOpt:
-		out = Png
-	case *gOpt:
-		out = Gif
-	default:
-		out = Png
-	}
-
-	if in == out {
-		fmt.Println("You must specify a different file format before and after conversion.")
-		os.Exit(1)
-	}
-
-	ok := Execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
-	if ok {
-		os.Exit(0)
-	} else {
-		os.Exit(1)
-	}
-}
-
 func Execute(w io.Writer, dirnames []string, in FileFormat, out FileFormat, force bool, verbose bool) (ok bool) {
 	ok = true
 	if len(dirnames) == 0 {
@@ -183,4 +133,54 @@ DIRNAMES_LOOP:
 		}
 	}
 	return
+}
+
+func main() {
+	JOpt := flag.Bool("J", false, "Convert from JPEG")
+	POpt := flag.Bool("P", false, "Convert from PNG")
+	GOpt := flag.Bool("G", false, "Convert from GIF")
+	jOpt := flag.Bool("j", false, "Convert to JPEG")
+	pOpt := flag.Bool("p", false, "Convert to PNG")
+	gOpt := flag.Bool("g", false, "Convert to GIF")
+
+	fOpt := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
+	vOpt := flag.Bool("v", false, "Verbose Mode")
+
+	flag.Parse()
+
+	var in FileFormat
+	switch {
+	case *JOpt:
+		in = Jpeg
+	case *POpt:
+		in = Png
+	case *GOpt:
+		in = Gif
+	default:
+		in = Jpeg
+	}
+
+	var out FileFormat
+	switch {
+	case *jOpt:
+		out = Jpeg
+	case *pOpt:
+		out = Png
+	case *gOpt:
+		out = Gif
+	default:
+		out = Png
+	}
+
+	if in == out {
+		fmt.Println("You must specify a different file format before and after conversion.")
+		os.Exit(1)
+	}
+
+	ok := Execute(os.Stdout, flag.Args(), in, out, *fOpt, *vOpt)
+	if ok {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
 }
