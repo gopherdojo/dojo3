@@ -137,59 +137,64 @@ func (c *CLI) Execute(dirname string) (ok bool) {
 	return
 }
 
-var JOpt bool
-var POpt bool
-var GOpt bool
-var jOpt bool
-var pOpt bool
-var gOpt bool
-var fOpt bool
-var vOpt bool
+var fromJpeg bool
+var fromPng bool
+var fromGif bool
+var toJpeg bool
+var toPng bool
+var toGif bool
+var force bool
+var verbose bool
 
 func init() {
-	flag.BoolVar(&JOpt, "J", false, "Convert from JPEG")
-	flag.BoolVar(&POpt, "P", false, "Convert from PNG")
-	flag.BoolVar(&GOpt, "G", false, "Convert from GIF")
-	flag.BoolVar(&jOpt, "j", false, "Convert to JPEG")
-	flag.BoolVar(&pOpt, "p", false, "Convert to PNG")
-	flag.BoolVar(&gOpt, "g", false, "Convert to GIF")
-	flag.BoolVar(&fOpt, "f", false, "Overwrite when the converted file name duplicates.")
-	flag.BoolVar(&vOpt, "v", false, "Verbose Mode")
+	flag.BoolVar(&fromJpeg, "J", false, "Convert from JPEG")
+	flag.BoolVar(&fromPng, "P", false, "Convert from PNG")
+	flag.BoolVar(&fromGif, "G", false, "Convert from GIF")
+	flag.BoolVar(&toJpeg, "j", false, "Convert to JPEG")
+	flag.BoolVar(&toPng, "p", false, "Convert to PNG")
+	flag.BoolVar(&toGif, "g", false, "Convert to GIF")
+	flag.BoolVar(&force, "f", false, "Overwrite when the converted file name duplicates.")
+	flag.BoolVar(&verbose, "v", false, "Verbose Mode")
+}
+
+func inputFileFormat() FileFormat {
+	switch {
+	case fromJpeg:
+		return Jpeg
+	case fromPng:
+		return Png
+	case fromGif:
+		return Gif
+	default:
+		return Jpeg
+	}
+}
+
+func outputFileFormat() FileFormat {
+	switch {
+	case toJpeg:
+		return Jpeg
+	case toPng:
+		return Png
+	case toGif:
+		return Gif
+	default:
+		return Png
+	}
 }
 
 func main() {
 	flag.Parse()
 
-	var in FileFormat
-	switch {
-	case JOpt:
-		in = Jpeg
-	case POpt:
-		in = Png
-	case GOpt:
-		in = Gif
-	default:
-		in = Jpeg
-	}
-
-	var out FileFormat
-	switch {
-	case jOpt:
-		out = Jpeg
-	case pOpt:
-		out = Png
-	case gOpt:
-		out = Gif
-	default:
-		out = Png
-	}
+	in := inputFileFormat()
+	out := outputFileFormat()
 
 	if in == out {
 		fmt.Println("You must specify a different file format before and after conversion.")
 		os.Exit(1)
 	}
 
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: fOpt, verbose: vOpt}
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: in, out: out, force: force, verbose: verbose}
 
 	dirnames := flag.Args()
 
