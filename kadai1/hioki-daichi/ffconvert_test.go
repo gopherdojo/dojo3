@@ -178,9 +178,12 @@ func TestConflict(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
 	cli.Execute(tmpdir)
 	cli = &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: false, verbose: true}
-	cli.Execute(tmpdir)
+	err := cli.Execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, "File already exists: test/TestConflict/2018/07/001.png")
+	expected := "File already exists: test/TestConflict/2018/07/001.png"
+	if err.Error() != expected {
+		t.Errorf("expected: %s, actual: %s", expected, err)
+	}
 }
 
 func expectToMatchBuffer(t *testing.T, buffer *bytes.Buffer, expected string) {

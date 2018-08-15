@@ -59,24 +59,22 @@ const (
 )
 
 // Execute executes main processing.
-func (c *CLI) Execute(dirname string) bool {
+func (c *CLI) Execute(dirname string) error {
 	paths, err := c.search(dirname)
 
 	if err != nil {
-		fmt.Fprintln(c.ErrStream, err)
-		return false
+		return err
 	}
 
 	for _, path := range paths {
 		err = c.convert(path)
 
 		if err != nil {
-			fmt.Fprintln(c.ErrStream, err)
-			return false
+			return err
 		}
 	}
 
-	return true
+	return nil
 }
 
 func (c *CLI) search(dirname string) ([]string, error) {
@@ -216,13 +214,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	ok := cli.Execute(args[0])
+	err := cli.Execute(args[0])
 
-	if ok {
-		os.Exit(0)
-	} else {
+	if err != nil {
+		fmt.Fprintln(cli.ErrStream, err)
 		os.Exit(1)
 	}
+
+	os.Exit(0)
 }
 
 func inputFileFormat() FileFormat {
