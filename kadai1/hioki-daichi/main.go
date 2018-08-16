@@ -10,9 +10,10 @@ import (
 	"image/png"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/gathering"
 	"github.com/hioki-daichi/myfileutil"
 )
 
@@ -56,51 +57,6 @@ const (
 	// Gif is GIF format
 	Gif
 )
-
-func (c *CLI) search(dirname string) ([]string, error) {
-	var paths []string
-
-	err := filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			if cliopt.Verbose {
-				fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
-			}
-			return nil
-		}
-
-		fp, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer fp.Close()
-
-		var isApplicable bool
-		switch c.in {
-		case Jpeg:
-			isApplicable = myfileutil.IsJpeg(fp)
-		case Png:
-			isApplicable = myfileutil.IsPng(fp)
-		case Gif:
-			isApplicable = myfileutil.IsGif(fp)
-		}
-		if !isApplicable {
-			if cliopt.Verbose {
-				fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
-			}
-			return nil
-		}
-
-		paths = append(paths, path)
-
-		return nil
-	})
-
-	return paths, err
-}
 
 func (c *CLI) convert(path string) error {
 	var extname string
@@ -196,8 +152,11 @@ func main() {
 }
 
 func (c *CLI) execute(dirname string) error {
-	paths, err := c.search(dirname)
+	outStream := c.OutStream
+	decoder := deriveDecoder()
 
+	gatherer := &gathering.Gatherer{Decoder: decoder, OutStream: outStream}
+	paths, err := gatherer.Gather(dirname)
 	if err != nil {
 		return err
 	}
@@ -211,6 +170,19 @@ func (c *CLI) execute(dirname string) error {
 	}
 
 	return nil
+}
+
+func deriveDecoder() conversion.Decoder {
+	switch {
+	case cliopt.FromJpeg:
+		return &conversion.Jpeg{}
+	case cliopt.FromPng:
+		return &conversion.Png{}
+	case cliopt.FromGif:
+		return &conversion.Gif{}
+	default:
+		return &conversion.Jpeg{}
+	}
 }
 
 func inputFileFormat() FileFormat {

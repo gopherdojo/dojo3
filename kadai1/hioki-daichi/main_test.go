@@ -21,8 +21,9 @@ func TestJpegToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromJpeg = true
+	cliopt.ToPng = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -50,8 +51,9 @@ func TestJpegToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromJpeg = true
+	cliopt.ToGif = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -79,8 +81,9 @@ func TestPngToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromPng = true
+	cliopt.ToJpeg = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -108,8 +111,9 @@ func TestPngToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromPng = true
+	cliopt.ToGif = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -137,8 +141,9 @@ func TestGifToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromGif = true
+	cliopt.ToJpeg = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -166,8 +171,9 @@ func TestGifToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cliopt.Verbose = true
-	cliopt.Force = true
+	initCliopt()
+	cliopt.FromGif = true
+	cliopt.ToPng = true
 
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.execute(tmpdir)
@@ -195,6 +201,10 @@ func TestConflict(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
+	initCliopt()
+	cliopt.FromJpeg = true
+	cliopt.ToPng = true
+
 	cliopt.Verbose = true
 	cliopt.Force = true
 	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
@@ -209,6 +219,17 @@ func TestConflict(t *testing.T) {
 	if err.Error() != expected {
 		t.Errorf("expected: %s, actual: %s", expected, err)
 	}
+}
+
+func initCliopt() {
+	cliopt.FromJpeg = false
+	cliopt.FromPng = false
+	cliopt.FromGif = false
+	cliopt.ToJpeg = false
+	cliopt.ToPng = false
+	cliopt.ToGif = false
+	cliopt.Verbose = true
+	cliopt.Force = true
 }
 
 func expectToMatchBuffer(t *testing.T, buffer *bytes.Buffer, expected string) {
