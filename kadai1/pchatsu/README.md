@@ -14,7 +14,33 @@ mainパッケージと分離する
 GoDocを生成してみる
 ```
 
+# Build
+```
+go build cmd/imgconv.go
+```
+
 # Usage
 ```
-imgconv ./ -from png -to jpg
+./imgconv -d ./ -from png -to jpg
 ```
+
+# Description
+## 課題で明文化されていた部分の実装について
+* 引数によるディレクトリ、変換フォーマットの指定
+  * `flags`パッケージを利用しました
+* 画像変換
+  * `image`パッケージを利用しました
+* ディレクトリ以下は再帰的処理
+  * `filepath`パッケージの`Walk()`を利用しました
+* mainパッケージと分離する
+  * `imgconv`を作成し、変換処理の実装はそこのパッケージに書きました
+* ユーザ定義型を作ってみる
+  * `Img`型を作成しました
+* GoDocを生成してみる
+  * `doc.go`を作成しました
+
+## その他の実装について
+* 変換処理の平行処理
+  * 画像の変換処理はgoroutineにして並行処理するようにしました
+  * WaitGroupにより各goroutineの終了を制御しました
+  * あるgoroutineでエラーが起きても、他のgoroutineは止めずに実行するようにしました
