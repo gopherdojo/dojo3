@@ -15,7 +15,7 @@ import (
 
 // Convert converts the format of image files.
 // d is the target dir and it's children images are recursively converted except hidden files.
-// When a converting process occurs error, the others don't stop.
+// When a converting process occurs error, errgroup.Group as a supervisor makes the others stop.
 func Convert(d string, src string, dst string) error {
 	eg := errgroup.Group{}
 	if err := filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
