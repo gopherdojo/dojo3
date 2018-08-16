@@ -193,19 +193,19 @@ func init() {
 }
 
 func main() {
+	outStream := os.Stdout
+	errStream := os.Stderr
+
 	flag.Parse()
 
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat()}
-
 	args := flag.Args()
-
 	if len(args) == 0 {
-		fmt.Fprintln(cli.OutStream, usage)
+		fmt.Fprintln(outStream, usage)
 		os.Exit(0)
 	}
 
+	cli := &CLI{OutStream: outStream, ErrStream: errStream, in: inputFileFormat(), out: outputFileFormat()}
 	err := cli.Execute(args[0])
-
 	if err != nil {
 		fmt.Fprintln(cli.ErrStream, err)
 		os.Exit(1)
