@@ -10,32 +10,53 @@ import (
 	"io"
 )
 
+type supportFormat string
+
+const (
+	gifType supportFormat = "gif"
+	jpgType supportFormat = "jpg"
+	pngType supportFormat = "png"
+)
+
+func (sf supportFormat) decode(r io.Reader) (image.Image, error) {
+	switch sf {
+	case gifType:
+		return gif.Decode(r)
+	case jpgType:
+		return jpeg.Decode(r)
+	case pngType:
+		return png.Decode(r)
+	default:
+		return nil, fmt.Errorf("%v is not supported.", sf)
+	}
+}
+
+func (sf supportFormat) encode(w io.Writer, img image.Image) error {
+	switch sf {
+	case gifType:
+		return gif.Encode(w, img, nil)
+	case jpgType:
+		return jpeg.Encode(w, img, nil)
+	case pngType:
+		return png.Encode(w, img)
+	default:
+		return fmt.Errorf("%v is not supported.", sf)
+	}
+}
+
 type ImageConverter struct {
 	data *image.Image
 }
 
 // decode reads a JPG/GIF/PNG image from r and returns the first embedded
 // image as an image.Image.
-func (ic *ImageConverter) decode(r io.Reader, fromExt string) error {
+func (ic *ImageConverter) decode(r io.Reader, fromExt supportFormat) error {
 
 	if ic == nil {
 		return errors.New("ImageConverter is nil receiver.")
 	}
 
-	var img image.Image
-	var err error
-
-	switch fromExt {
-	case "gif":
-		img, err = gif.Decode(r)
-	case "jpg":
-		img, err = jpeg.Decode(r)
-	case "png":
-		img, err = png.Decode(r)
-	default:
-		return fmt.Errorf("%v is not supported.", fromExt)
-	}
-
+	img, err := fromExt.decode(r)
 	if err != nil {
 		return err
 	}
@@ -46,7 +67,7 @@ func (ic *ImageConverter) decode(r io.Reader, fromExt string) error {
 }
 
 // Encode writes the Image m to w in JPG/GIF/PNG format.
-func (ic *ImageConverter) encode(w io.Writer, toExt string) error {
+func (ic *ImageConverter) encode(w io.Writer, toExt supportFormat) error {
 
 	if ic == nil {
 		return errors.New("ImageConverter is nil receiver.")
@@ -56,18 +77,7 @@ func (ic *ImageConverter) encode(w io.Writer, toExt string) error {
 		return errors.New("Image data is nil.")
 	}
 
-	var err error
-
-	switch toExt {
-	case "gif":
-		err = gif.Encode(w, *ic.data, nil)
-	case "jpg":
-		err = jpeg.Encode(w, *ic.data, nil)
-	case "png":
-		err = png.Encode(w, *ic.data)
-	}
-
-	if err != nil {
+	if err := toExt.encode(w, *ic.data); err != nil {
 		return err
 	}
 
@@ -81,11 +91,11 @@ func (ic *ImageConverter) Convert(r io.Reader, w io.Writer, fromExt, toExt strin
 		return errors.New("ImageConverter is nil receiver.")
 	}
 
-	if err := ic.decode(r, fromExt); err != nil {
+	if err := ic.decode(r, supportFormat(fromExt)); err != nil {
 		return err
 	}
 
-	if err := ic.encode(w, toExt); err != nil {
+	if err := ic.encode(w, supportFormat(toExt)); err != nil {
 		return err
 	}
 
