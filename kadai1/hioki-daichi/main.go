@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 	"github.com/hioki-daichi/myfileutil"
 )
 
@@ -40,8 +41,6 @@ type CLI struct {
 	OutStream, ErrStream io.Writer
 	in                   FileFormat
 	out                  FileFormat
-	force                bool
-	verbose              bool
 }
 
 // FileFormat provides file formats like JPEG, PNG, GIF
@@ -86,7 +85,7 @@ func (c *CLI) search(dirname string) ([]string, error) {
 		}
 
 		if info.IsDir() {
-			if c.verbose {
+			if cliopt.Verbose {
 				fmt.Fprintf(c.OutStream, "Skipped because the path is directory: %q\n", path)
 			}
 			return nil
@@ -108,7 +107,7 @@ func (c *CLI) search(dirname string) ([]string, error) {
 			isApplicable = myfileutil.IsGif(fp)
 		}
 		if !isApplicable {
-			if c.verbose {
+			if cliopt.Verbose {
 				fmt.Fprintf(c.OutStream, "Skipped because the file is not applicable: %q\n", path)
 			}
 			return nil
@@ -135,7 +134,7 @@ func (c *CLI) convert(path string) error {
 
 	dstName := myfileutil.DropExtname(path) + "." + extname
 
-	if !c.force && myfileutil.Exists(dstName) {
+	if !cliopt.Force && myfileutil.Exists(dstName) {
 		return errors.New("File already exists: " + dstName)
 	}
 
@@ -175,37 +174,28 @@ func (c *CLI) convert(path string) error {
 		return err
 	}
 
-	if c.verbose {
+	if cliopt.Verbose {
 		fmt.Fprintf(c.OutStream, "Converted: %q\n", dstName)
 	}
 
 	return nil
 }
 
-var fromJpeg bool
-var fromPng bool
-var fromGif bool
-var toJpeg bool
-var toPng bool
-var toGif bool
-var force bool
-var verbose bool
-
 func init() {
-	flag.BoolVar(&fromJpeg, "J", false, "Convert from JPEG")
-	flag.BoolVar(&fromPng, "P", false, "Convert from PNG")
-	flag.BoolVar(&fromGif, "G", false, "Convert from GIF")
-	flag.BoolVar(&toJpeg, "j", false, "Convert to JPEG")
-	flag.BoolVar(&toPng, "p", false, "Convert to PNG")
-	flag.BoolVar(&toGif, "g", false, "Convert to GIF")
-	flag.BoolVar(&force, "f", false, "Overwrite when the converted file name duplicates.")
-	flag.BoolVar(&verbose, "v", false, "Verbose Mode")
+	flag.BoolVar(&cliopt.FromJpeg, "J", false, "Convert from JPEG")
+	flag.BoolVar(&cliopt.FromPng, "P", false, "Convert from PNG")
+	flag.BoolVar(&cliopt.FromGif, "G", false, "Convert from GIF")
+	flag.BoolVar(&cliopt.ToJpeg, "j", false, "Convert to JPEG")
+	flag.BoolVar(&cliopt.ToPng, "p", false, "Convert to PNG")
+	flag.BoolVar(&cliopt.ToGif, "g", false, "Convert to GIF")
+	flag.BoolVar(&cliopt.Force, "f", false, "Overwrite when the converted file name duplicates.")
+	flag.BoolVar(&cliopt.Verbose, "v", false, "Verbose Mode")
 }
 
 func main() {
 	flag.Parse()
 
-	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat(), force: force, verbose: verbose}
+	cli := &CLI{OutStream: os.Stdout, ErrStream: os.Stderr, in: inputFileFormat(), out: outputFileFormat()}
 
 	args := flag.Args()
 
@@ -226,11 +216,11 @@ func main() {
 
 func inputFileFormat() FileFormat {
 	switch {
-	case fromJpeg:
+	case cliopt.FromJpeg:
 		return Jpeg
-	case fromPng:
+	case cliopt.FromPng:
 		return Png
-	case fromGif:
+	case cliopt.FromGif:
 		return Gif
 	default:
 		return Jpeg
@@ -239,11 +229,11 @@ func inputFileFormat() FileFormat {
 
 func outputFileFormat() FileFormat {
 	switch {
-	case toJpeg:
+	case cliopt.ToJpeg:
 		return Jpeg
-	case toPng:
+	case cliopt.ToPng:
 		return Png
-	case toGif:
+	case cliopt.ToGif:
 		return Gif
 	default:
 		return Png

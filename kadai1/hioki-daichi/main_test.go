@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"regexp"
 	"testing"
+
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 )
 
 func TestJpegToPng(t *testing.T) {
@@ -19,7 +21,10 @@ func TestJpegToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng"`)
@@ -45,7 +50,10 @@ func TestJpegToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif"`)
@@ -71,7 +79,10 @@ func TestPngToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg"`)
@@ -97,7 +108,10 @@ func TestPngToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif"`)
@@ -123,7 +137,10 @@ func TestGifToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg"`)
@@ -149,7 +166,10 @@ func TestGifToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng"`)
@@ -175,9 +195,14 @@ func TestConflict(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: true, verbose: true}
+	cliopt.Verbose = true
+	cliopt.Force = true
+	cli := &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	cli.Execute(tmpdir)
-	cli = &CLI{OutStream: buf, ErrStream: buf, in: in, out: out, force: false, verbose: true}
+
+	cliopt.Verbose = true
+	cliopt.Force = false
+	cli = &CLI{OutStream: buf, ErrStream: buf, in: in, out: out}
 	err := cli.Execute(tmpdir)
 
 	expected := "File already exists: test/TestConflict/2018/07/001.png"
