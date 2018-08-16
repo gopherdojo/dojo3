@@ -57,25 +57,6 @@ const (
 	Gif
 )
 
-// Execute executes main processing.
-func (c *CLI) Execute(dirname string) error {
-	paths, err := c.search(dirname)
-
-	if err != nil {
-		return err
-	}
-
-	for _, path := range paths {
-		err = c.convert(path)
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (c *CLI) search(dirname string) ([]string, error) {
 	var paths []string
 
@@ -205,13 +186,31 @@ func main() {
 	}
 
 	cli := &CLI{OutStream: outStream, ErrStream: errStream, in: inputFileFormat(), out: outputFileFormat()}
-	err := cli.Execute(args[0])
+	err := cli.execute(args[0])
 	if err != nil {
 		fmt.Fprintln(cli.ErrStream, err)
 		os.Exit(1)
 	}
 
 	os.Exit(0)
+}
+
+func (c *CLI) execute(dirname string) error {
+	paths, err := c.search(dirname)
+
+	if err != nil {
+		return err
+	}
+
+	for _, path := range paths {
+		err = c.convert(path)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func inputFileFormat() FileFormat {
