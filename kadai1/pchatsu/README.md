@@ -42,5 +42,4 @@ go build cmd/imgconv.go
 ## その他の実装について
 * 変換処理の平行処理
   * 画像の変換処理はgoroutineにして並行処理するようにしました
-  * WaitGroupにより各goroutineの終了を制御しました
-  * あるgoroutineでエラーが起きても、他のgoroutineは止めずに実行するようにしました
+  * `errorgroup.Group`によってgoroutineの終了待機とエラーハンドリングをするようにしました

@@ -10,47 +10,41 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
-)
-
-var (
-	// ErrUnMatchedFormat is returned when Img has a difference between the expected format and the actual format.
-	ErrUnMatchedFormat = fmt.Errorf("unmatched with the target format")
-	// ErrUnknownFormat is returned when Convert method is given unknown format.
-	ErrUnknownFormat = fmt.Errorf("unknown format")
+	"golang.org/x/sync/errgroup"
 )
 
 // Convert converts the format of image files.
 // d is the target dir and it's children images are recursively converted except hidden files.
 // When a converting process occurs error, the others don't stop.
-func Convert(d string, src string, dst string) {
-	wg := &sync.WaitGroup{}
-	filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
+func Convert(d string, src string, dst string) error {
+	eg := errgroup.Group{}
+	if err := filepath.Walk(d, func(path string, info os.FileInfo, err error) error {
 		if !isTargetFile(info, path, src) {
 			return nil
 		}
 
-		wg.Add(1)
-		go func() {
+		eg.Go(func() error {
 			img, err := NewImg(path, src)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "imgconv:", err.Error(), path)
-				wg.Done()
-				return
+				return err
 			}
 
 			if err := img.Convert(dst); err != nil {
-				fmt.Fprintln(os.Stderr, "imgconv:", err.Error(), path)
-				wg.Done()
-				return
+				return err
 			}
-
-			wg.Done()
-		}()
+			return nil
+		})
 
 		return nil
-	})
-	wg.Wait()
+	}); err != nil {
+		return err
+	}
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // isTargetFile returns a boolean indicating whether the file should be converted.
@@ -98,7 +92,7 @@ func NewImg(path string, format string) (*Img, error) {
 	}
 
 	if magic != format {
-		return nil, ErrUnMatchedFormat
+		return nil, fmt.Errorf("%s unmatched with the target format", path)
 	}
 
 	ext := filepath.Ext(path)
@@ -154,7 +148,7 @@ func (i *Img) Encode(w io.Writer, dst string) error {
 		}
 
 	default:
-		return ErrUnknownFormat
+		return fmt.Errorf("%s unknown format", dst)
 	}
 
 	return nil

@@ -21,15 +21,21 @@ var (
 
 func main() {
 	flag.Parse()
-	Run(*srcDir, *srcExt, *dstExt)
-}
-
-func Run(path string, src string, dst string) {
-	if err := validate(path, src, dst); err != nil {
+	if err := Run(*srcDir, *srcExt, *dstExt); err != nil {
 		fmt.Fprintln(os.Stderr, "imgconv:", err.Error())
 		os.Exit(1)
 	}
-	imgconv.Convert(path, src, dst)
+}
+
+func Run(path string, src string, dst string) error {
+	if err := validate(path, src, dst); err != nil {
+		return err
+	}
+	if err := imgconv.Convert(path, src, dst); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func validate(path string, srcExt string, dstExt string) error {
