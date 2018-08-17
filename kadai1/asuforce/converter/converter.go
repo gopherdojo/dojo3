@@ -18,6 +18,7 @@ type image struct {
 	ext  string
 }
 
+// Convert image functon
 func Convert(path string) error {
 	var (
 		c converter
