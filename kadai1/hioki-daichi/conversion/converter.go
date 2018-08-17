@@ -6,8 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-
-	"github.com/hioki-daichi/myfileutil"
 )
 
 // Encoder can encode images.
@@ -44,8 +42,11 @@ func (c *Converter) Convert(path string, force bool) (*os.File, error) {
 
 	dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
-	if !force && myfileutil.Exists(dstPath) {
-		return nil, errors.New("File already exists: " + dstPath)
+	if !force {
+		_, err := os.Stat(dstPath)
+		if err == nil {
+			return nil, errors.New("File already exists: " + dstPath)
+		}
 	}
 
 	dstFile, err := os.Create(dstPath)
