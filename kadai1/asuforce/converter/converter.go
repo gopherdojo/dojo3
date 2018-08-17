@@ -55,12 +55,19 @@ func (c *Converter) Convert(i Image) error {
 
 // CrawlFile function found image file and append Converter.Files
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
-	if filepath.Ext(path) == ("." + c.FromExt) {
+	if checkExtension(filepath.Ext(path)) == ("." + c.FromExt) {
 		if !info.IsDir() {
 			c.Files = append(c.Files, newImage(path))
 		}
 	}
 	return nil
+}
+
+func checkExtension(path string) string {
+	if path == ".jpeg" {
+		return ".jpg"
+	}
+	return path
 }
 
 func (c *Converter) encodeImage(file io.Writer, img image.Image) error {
