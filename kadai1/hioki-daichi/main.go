@@ -14,7 +14,7 @@ import (
 const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
 
 -J
-    Input file format is JPEG
+    Input file format is JPEG (default)
 -P
     Input file format is PNG
 -G
@@ -22,7 +22,7 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
 -j
     Output file format is JPEG
 -p
-    Output file format is PNG
+    Output file format is PNG (default)
 -g
     Output file format is GIF
 -f
