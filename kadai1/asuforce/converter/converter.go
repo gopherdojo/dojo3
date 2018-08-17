@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"fmt"
 	"image/jpeg"
 	"image/png"
 	"os"
@@ -14,35 +13,34 @@ type converter struct {
 	ext  string
 }
 
-func Convert(path string) {
+func Convert(path string) error {
 	var c converter
 	c.path = path
 	c.ext = filepath.Ext(path)
 
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println("[Error]", err)
-		return
+		return err
 	}
 	defer file.Close()
 
 	img, err := jpeg.Decode(file)
 	if err != nil {
-		fmt.Println("[Error]", err)
-		return
+		return err
 	}
 
 	outputFile, err := os.Create(c.getFileName())
 	if err != nil {
-		fmt.Println("[Error]", err)
-		return
+		return err
 	}
 	defer outputFile.Close()
 
 	err = png.Encode(outputFile, img)
 	if err != nil {
-		fmt.Println("[Error]", err)
+		return err
 	}
+
+	return nil
 }
 
 func (c *converter) getFileName() string {
