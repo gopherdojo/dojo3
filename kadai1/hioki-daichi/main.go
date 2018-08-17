@@ -83,9 +83,13 @@ func (c *CLI) execute(dirname string) error {
 	converter := &conversion.Converter{Decoder: decoder, Encoder: encoder, OutStream: outStream}
 
 	for _, path := range paths {
-		err = converter.Convert(path)
+		fp, err := converter.Convert(path)
 		if err != nil {
 			return err
+		}
+
+		if cliopt.Verbose {
+			fmt.Fprintf(c.OutStream, "Converted: %q\n", fp.Name())
 		}
 	}
 

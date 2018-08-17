@@ -2,7 +2,6 @@ package conversion
 
 import (
 	"errors"
-	"fmt"
 	"image"
 	"io"
 	"os"
@@ -32,37 +31,33 @@ type Converter struct {
 }
 
 // Convert converts the specified path from own Decoder to own Encoder.
-func (c *Converter) Convert(path string) error {
+func (c *Converter) Convert(path string) (*os.File, error) {
 	fp, err := os.Open(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer fp.Close()
 
 	img, err := c.Decoder.Decode(fp)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
 	if !cliopt.Force && myfileutil.Exists(dstPath) {
-		return errors.New("File already exists: " + dstPath)
+		return nil, errors.New("File already exists: " + dstPath)
 	}
 
 	dstFile, err := os.Create(dstPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = c.Encoder.Encode(dstFile, img)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if cliopt.Verbose {
-		fmt.Fprintf(c.OutStream, "Converted: %q\n", dstPath)
-	}
-
-	return nil
+	return dstFile, nil
 }
