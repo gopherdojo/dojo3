@@ -20,14 +20,10 @@ type image struct {
 
 // Convert image functon
 func Convert(path string) error {
-	var (
-		c converter
-		i image
-	)
+	var c converter
 
 	c.path = path
-	i.new(c.path)
-	c.files = append(c.files, i)
+	var i = newImage(c.path)
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -54,10 +50,15 @@ func Convert(path string) error {
 	return nil
 }
 
-func (i *image) new(path string) {
-	i.ext = filepath.Ext(path)
-	rep := regexp.MustCompile(i.ext + "$")
-	i.name = filepath.Base(rep.ReplaceAllString(path, ""))
+func newImage(path string) image {
+	ext := filepath.Ext(path)
+	rep := regexp.MustCompile(ext + "$")
+	name := filepath.Base(rep.ReplaceAllString(path, ""))
+
+	return image{
+		name: name,
+		ext:  ext,
+	}
 }
 
 func (i *image) getFileName() string {
