@@ -13,9 +13,10 @@ import (
 
 // Converter struct
 type Converter struct {
-	Path  string
-	Files []Image
-	ToExt string
+	Path    string
+	Files   []Image
+	FromExt string
+	ToExt   string
 }
 
 // Image information struct
@@ -54,7 +55,7 @@ func (c *Converter) Convert(i Image) error {
 
 // CrawlFile function found image file and append Converter.Files
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
-	if filepath.Ext(path) == ".jpg" {
+	if filepath.Ext(path) == ("." + c.FromExt) {
 		if !info.IsDir() {
 			var i = newImage(path)
 			c.Files = append(c.Files, i)
@@ -85,7 +86,7 @@ func (c *Converter) decodeImage(file io.Reader) (image.Image, error) {
 		img image.Image
 		err error
 	)
-	switch "jpg" {
+	switch c.FromExt {
 	case "jpeg", "jpg":
 		img, err = jpeg.Decode(file)
 	case "gif":

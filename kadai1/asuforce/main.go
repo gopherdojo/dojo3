@@ -12,6 +12,7 @@ import (
 var (
 	version = "1.0.0"
 	path    string
+	fromExt string
 	toExt   string
 )
 
@@ -19,6 +20,8 @@ func init() {
 	var showVersion bool
 	flag.BoolVar(&showVersion, "v", false, "Show version")
 	flag.BoolVar(&showVersion, "version", false, "Show version")
+	flag.StringVar(&fromExt, "f", "jpg", "Specify input image extension")
+	flag.StringVar(&fromExt, "from", "jpg", "Specify input image extension")
 	flag.StringVar(&toExt, "t", "png", "Specify output image extension")
 	flag.StringVar(&toExt, "to", "png", "Specify output image extension")
 	flag.Parse()
@@ -35,6 +38,7 @@ func main() {
 	var c converter.Converter
 
 	c.Path = path
+	c.FromExt = fromExt
 	c.ToExt = toExt
 	err := filepath.Walk(c.Path, c.CrawlFile)
 	if err != nil {
