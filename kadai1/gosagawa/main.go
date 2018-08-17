@@ -4,12 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"image"
-	"image/gif"
-	"image/jpeg"
-	"image/png"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"./converter"
 )
 
 func main() {
@@ -37,7 +36,7 @@ func main() {
 		if *dispLog {
 			fmt.Printf("%v => %v\n", path, dist)
 		}
-		convertImage(*outType, path, dist)
+		converter.ConvertImage(*outType, path, dist)
 	}
 }
 
@@ -54,7 +53,7 @@ func getConvertList(imageType string, dir string) []string {
 			continue
 		}
 		path := filepath.Join(dir, file.Name())
-		if imageType == getImageType(path) {
+		if imageType == converter.GetImageType(path) {
 			paths = append(paths, filepath.Join(dir, file.Name()))
 		}
 	}
@@ -78,36 +77,4 @@ func getImageType(path string) string {
 
 func getConvertToPath(outType string, path string) string {
 	return path[:len(path)-len(filepath.Ext(path))] + "." + outType
-}
-
-func convertImage(outType string, src string, dest string) {
-	f, err := os.Open(src)
-	if err != nil {
-		panic(err)
-	}
-	defer f.Close()
-
-	img, _, err := image.Decode(f)
-	if err != nil {
-		panic(err)
-	}
-
-	out, err := os.Create(dest)
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-
-	switch outType {
-	case "jpeg":
-		//TODO control by option
-		opts := &jpeg.Options{}
-		jpeg.Encode(out, img, opts)
-	case "png":
-		png.Encode(out, img)
-	case "gif":
-		//TODO control by option
-		opts := &gif.Options{}
-		gif.Encode(out, img, opts)
-	}
 }
