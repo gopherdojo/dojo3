@@ -9,14 +9,24 @@ import (
 )
 
 type converter struct {
-	path string
+	path  string
+	files []image
+}
+
+type image struct {
+	name string
 	ext  string
 }
 
 func Convert(path string) error {
-	var c converter
+	var (
+		c converter
+		i image
+	)
+
 	c.path = path
-	c.ext = filepath.Ext(path)
+	i.new(c.path)
+	c.files = append(c.files, i)
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -29,7 +39,7 @@ func Convert(path string) error {
 		return err
 	}
 
-	outputFile, err := os.Create(c.getFileName())
+	outputFile, err := os.Create(i.getFileName())
 	if err != nil {
 		return err
 	}
@@ -43,8 +53,12 @@ func Convert(path string) error {
 	return nil
 }
 
-func (c *converter) getFileName() string {
-	rep := regexp.MustCompile(c.ext + "$")
-	dest := filepath.Base(rep.ReplaceAllString(c.path, ""))
-	return dest + ".png"
+func (i *image) new(path string) {
+	i.ext = filepath.Ext(path)
+	rep := regexp.MustCompile(i.ext + "$")
+	i.name = filepath.Base(rep.ReplaceAllString(path, ""))
+}
+
+func (i *image) getFileName() string {
+	return i.name + ".png"
 }
