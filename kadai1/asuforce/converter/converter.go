@@ -44,7 +44,7 @@ func (c *Converter) Convert(i Image) error {
 	}
 	defer outputFile.Close()
 
-	err = c.decodeImage(outputFile, img)
+	err = c.ecodeImage(outputFile, img)
 	if err != nil {
 		return err
 	}
@@ -52,6 +52,7 @@ func (c *Converter) Convert(i Image) error {
 	return nil
 }
 
+// CrawlFile function found image file and append Converter.Files
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	if filepath.Ext(path) == ".jpg" {
 		if !info.IsDir() {
@@ -62,7 +63,7 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func (c *Converter) decodeImage(file io.Writer, img image.Image) error {
+func (c *Converter) ecodeImage(file io.Writer, img image.Image) error {
 	var err error
 	switch c.DestExt {
 	case "jpeg", "jpg":
