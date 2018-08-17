@@ -26,9 +26,6 @@ func (g *Gatherer) Gather(dirname string) ([]string, error) {
 		}
 
 		if info.IsDir() {
-			if cliopt.Verbose {
-				fmt.Fprintf(g.OutStream, "Skipped because the path is directory: %q\n", path)
-			}
 			return nil
 		}
 
