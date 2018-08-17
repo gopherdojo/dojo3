@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/gathering"
 )
@@ -34,20 +33,22 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
 // CLI has streams and command line options.
 type CLI struct {
 	OutStream, ErrStream io.Writer
-}
-
-func init() {
-	flag.BoolVar(&cliopt.FromJpeg, "J", false, "Convert from JPEG")
-	flag.BoolVar(&cliopt.FromPng, "P", false, "Convert from PNG")
-	flag.BoolVar(&cliopt.FromGif, "G", false, "Convert from GIF")
-	flag.BoolVar(&cliopt.ToJpeg, "j", false, "Convert to JPEG")
-	flag.BoolVar(&cliopt.ToPng, "p", false, "Convert to PNG")
-	flag.BoolVar(&cliopt.ToGif, "g", false, "Convert to GIF")
-	flag.BoolVar(&cliopt.Force, "f", false, "Overwrite when the converted file name duplicates.")
-	flag.BoolVar(&cliopt.Verbose, "v", false, "Verbose Mode")
+	Decoder              conversion.Decoder
+	Encoder              conversion.Encoder
+	Force                bool
+	Verbose              bool
 }
 
 func main() {
+	fromJpeg := flag.Bool("J", false, "Convert from JPEG")
+	fromPng := flag.Bool("P", false, "Convert from PNG")
+	fromGif := flag.Bool("G", false, "Convert from GIF")
+	toJpeg := flag.Bool("j", false, "Convert to JPEG")
+	toPng := flag.Bool("p", false, "Convert to PNG")
+	toGif := flag.Bool("g", false, "Convert to GIF")
+	force := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
+	verbose := flag.Bool("v", false, "Verbose Mode")
+
 	outStream := os.Stdout
 	errStream := os.Stderr
 
@@ -59,7 +60,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	cli := &CLI{OutStream: outStream, ErrStream: errStream}
+	decoder := deriveDecoder(fromJpeg, fromPng, fromGif)
+	encoder := deriveEncoder(toJpeg, toPng, toGif)
+
+	cli := &CLI{OutStream: outStream, ErrStream: errStream, Decoder: decoder, Encoder: encoder, Force: *force, Verbose: *verbose}
 	err := cli.execute(args[0])
 	if err != nil {
 		fmt.Fprintln(cli.ErrStream, err)
@@ -70,25 +74,21 @@ func main() {
 }
 
 func (c *CLI) execute(dirname string) error {
-	outStream := c.OutStream
-	decoder := deriveDecoder()
-
-	gatherer := &gathering.Gatherer{Decoder: decoder, OutStream: outStream}
+	gatherer := &gathering.Gatherer{Decoder: c.Decoder, OutStream: c.OutStream}
 	paths, err := gatherer.Gather(dirname)
 	if err != nil {
 		return err
 	}
 
-	encoder := deriveEncoder()
-	converter := &conversion.Converter{Decoder: decoder, Encoder: encoder, OutStream: outStream}
+	converter := &conversion.Converter{Decoder: c.Decoder, Encoder: c.Encoder, OutStream: c.OutStream}
 
 	for _, path := range paths {
-		fp, err := converter.Convert(path, cliopt.Force)
+		fp, err := converter.Convert(path, c.Force)
 		if err != nil {
 			return err
 		}
 
-		if cliopt.Verbose {
+		if c.Verbose {
 			fmt.Fprintf(c.OutStream, "Converted: %q\n", fp.Name())
 		}
 	}
@@ -96,26 +96,26 @@ func (c *CLI) execute(dirname string) error {
 	return nil
 }
 
-func deriveDecoder() conversion.Decoder {
+func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Decoder {
 	switch {
-	case cliopt.FromJpeg:
+	case *fromJpeg:
 		return &conversion.Jpeg{}
-	case cliopt.FromPng:
+	case *fromPng:
 		return &conversion.Png{}
-	case cliopt.FromGif:
+	case *fromGif:
 		return &conversion.Gif{}
 	default:
 		return &conversion.Jpeg{}
 	}
 }
 
-func deriveEncoder() conversion.Encoder {
+func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool) conversion.Encoder {
 	switch {
-	case cliopt.ToJpeg:
+	case *toJpeg:
 		return &conversion.Jpeg{}
-	case cliopt.ToPng:
+	case *toPng:
 		return &conversion.Png{}
-	case cliopt.ToGif:
+	case *toGif:
 		return &conversion.Gif{}
 	default:
 		return &conversion.Jpeg{}

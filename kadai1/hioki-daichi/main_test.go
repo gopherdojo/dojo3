@@ -6,10 +6,12 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 )
 
 func TestJpegToPng(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestJpegToPng"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -17,11 +19,7 @@ func TestJpegToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromJpeg = true
-	cliopt.ToPng = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToPng/2018/07/001.png"`)
@@ -29,6 +27,8 @@ func TestJpegToPng(t *testing.T) {
 }
 
 func TestJpegToGif(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestJpegToGif"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -36,11 +36,7 @@ func TestJpegToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromJpeg = true
-	cliopt.ToGif = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Gif{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToGif/2018/07/001.gif"`)
@@ -48,6 +44,8 @@ func TestJpegToGif(t *testing.T) {
 }
 
 func TestPngToJpeg(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestPngToJpeg"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -55,11 +53,7 @@ func TestPngToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromPng = true
-	cliopt.ToJpeg = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Jpeg{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToJpeg/2018/07/002.jpg"`)
@@ -67,6 +61,8 @@ func TestPngToJpeg(t *testing.T) {
 }
 
 func TestPngToGif(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestPngToGif"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -74,11 +70,7 @@ func TestPngToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromPng = true
-	cliopt.ToGif = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Gif{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToGif/2018/07/002.gif"`)
@@ -86,6 +78,8 @@ func TestPngToGif(t *testing.T) {
 }
 
 func TestGifToJpeg(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestGifToJpeg"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -93,17 +87,15 @@ func TestGifToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromGif = true
-	cliopt.ToJpeg = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Jpeg{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToJpeg/2018/08/003.jpg"`)
 }
 
 func TestGifToPng(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestGifToPng"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -111,17 +103,15 @@ func TestGifToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromGif = true
-	cliopt.ToPng = true
-
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToPng/2018/08/003.png"`)
 }
 
 func TestConflict(t *testing.T) {
+	t.Parallel()
+
 	tmpdir := "testdata/" + "TestConflict"
 
 	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
@@ -129,35 +119,16 @@ func TestConflict(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	initCliopt()
-	cliopt.FromJpeg = true
-	cliopt.ToPng = true
-
-	cliopt.Verbose = true
-	cliopt.Force = true
-	cli := &CLI{OutStream: buf, ErrStream: buf}
+	cli := &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
 	cli.execute(tmpdir)
 
-	cliopt.Verbose = true
-	cliopt.Force = false
-	cli = &CLI{OutStream: buf, ErrStream: buf}
+	cli = &CLI{OutStream: buf, ErrStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: false, Verbose: true}
 	err := cli.execute(tmpdir)
 
 	expected := "File already exists: testdata/TestConflict/2018/07/001.png"
 	if err.Error() != expected {
 		t.Errorf("expected: %s, actual: %s", expected, err)
 	}
-}
-
-func initCliopt() {
-	cliopt.FromJpeg = false
-	cliopt.FromPng = false
-	cliopt.FromGif = false
-	cliopt.ToJpeg = false
-	cliopt.ToPng = false
-	cliopt.ToGif = false
-	cliopt.Verbose = true
-	cliopt.Force = true
 }
 
 func expectToMatchBuffer(t *testing.T, buffer *bytes.Buffer, expected string) {
