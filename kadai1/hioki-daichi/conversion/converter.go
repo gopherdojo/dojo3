@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 	"github.com/hioki-daichi/myfileutil"
 )
 
@@ -31,7 +30,7 @@ type Converter struct {
 }
 
 // Convert converts the specified path from own Decoder to own Encoder.
-func (c *Converter) Convert(path string) (*os.File, error) {
+func (c *Converter) Convert(path string, force bool) (*os.File, error) {
 	fp, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -45,7 +44,7 @@ func (c *Converter) Convert(path string) (*os.File, error) {
 
 	dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
-	if !cliopt.Force && myfileutil.Exists(dstPath) {
+	if !force && myfileutil.Exists(dstPath) {
 		return nil, errors.New("File already exists: " + dstPath)
 	}
 
