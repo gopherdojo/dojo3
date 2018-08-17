@@ -44,7 +44,7 @@ func (c *Converter) Convert(i Image) error {
 	}
 	defer outputFile.Close()
 
-	err = c.ecodeImage(outputFile, img)
+	err = c.encodeImage(outputFile, img)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func (c *Converter) ecodeImage(file io.Writer, img image.Image) error {
+func (c *Converter) encodeImage(file io.Writer, img image.Image) error {
 	var err error
 	switch c.ToExt {
 	case "jpeg", "jpg":
