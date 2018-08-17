@@ -11,11 +11,13 @@ import (
 
 type converter struct {
 	path string
+	ext  string
 }
 
 func Convert(path string) {
 	var c converter
 	c.path = path
+	c.ext = filepath.Ext(path)
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -44,8 +46,7 @@ func Convert(path string) {
 }
 
 func (c *converter) getFileName() string {
-	ext := filepath.Ext(c.path)
-	rep := regexp.MustCompile(ext + "$")
+	rep := regexp.MustCompile(c.ext + "$")
 	dest := filepath.Base(rep.ReplaceAllString(c.path, ""))
 	return dest + ".png"
 }
