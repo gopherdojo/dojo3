@@ -8,9 +8,15 @@ import (
 	"os"
 )
 
-func main() {
+var path string
+
+func init() {
 	flag.Parse()
-	file, err := os.Open(flag.Arg(0))
+	path = flag.Arg(0)
+}
+
+func main() {
+	file, err := os.Open(path)
 	if err != nil {
 		fmt.Println("[Error]", err)
 		return
