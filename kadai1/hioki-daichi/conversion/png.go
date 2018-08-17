@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/png"
 	"os"
+	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
@@ -29,4 +30,9 @@ func (p *Png) Extname() string {
 // IsDecodable returns whether the file content is PNG
 func (p *Png) IsDecodable(fp *os.File) bool {
 	return fileutil.StartsContentsWith(fp, []uint8{137, 80, 78, 71, 13, 10, 26, 10})
+}
+
+// HasProcessableExtname returns whether the specified path has ".png"
+func (p *Png) HasProcessableExtname(path string) bool {
+	return filepath.Ext(path) == ".png"
 }

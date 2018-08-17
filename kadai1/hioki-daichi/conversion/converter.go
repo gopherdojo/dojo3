@@ -17,6 +17,7 @@ type Encoder interface {
 // Decoder can decode images.
 type Decoder interface {
 	Decode(*os.File) (image.Image, error)
+	HasProcessableExtname(string) bool
 	IsDecodable(*os.File) bool
 }
 

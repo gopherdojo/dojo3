@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/jpeg"
 	"os"
+	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
@@ -29,4 +30,10 @@ func (j *Jpeg) Extname() string {
 // IsDecodable returns whether the file content is JPEG
 func (j *Jpeg) IsDecodable(fp *os.File) bool {
 	return fileutil.StartsContentsWith(fp, []uint8{255, 216, 255})
+}
+
+// HasProcessableExtname returns whether the specified path has ".jpg" or ".jpeg"
+func (j *Jpeg) HasProcessableExtname(path string) bool {
+	ext := filepath.Ext(path)
+	return ext == ".jpg" || ext == ".jpeg"
 }

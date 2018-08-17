@@ -27,6 +27,10 @@ func (g *Gatherer) Gather(dirname string) ([]string, error) {
 			return nil
 		}
 
+		if !g.Decoder.HasProcessableExtname(path) {
+			return nil
+		}
+
 		fp, err := os.Open(path)
 		if err != nil {
 			return err
