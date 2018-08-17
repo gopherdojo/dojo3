@@ -33,7 +33,7 @@ func (c *Converter) Convert(i Image) error {
 	}
 	defer file.Close()
 
-	img, err := jpeg.Decode(file)
+	img, err := c.decodeImage(file)
 	if err != nil {
 		return err
 	}
@@ -78,6 +78,26 @@ func (c *Converter) encodeImage(file io.Writer, img image.Image) error {
 	}
 
 	return nil
+}
+
+func (c *Converter) decodeImage(file io.Reader) (image.Image, error) {
+	var (
+		img image.Image
+		err error
+	)
+	switch "jpg" {
+	case "jpeg", "jpg":
+		img, err = jpeg.Decode(file)
+	case "gif":
+		img, err = gif.Decode(file)
+	case "png":
+		img, err = png.Decode(file)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
 }
 
 func newImage(path string) Image {
