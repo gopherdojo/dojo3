@@ -6,6 +6,7 @@ import (
 	"image"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 	"github.com/hioki-daichi/myfileutil"
@@ -43,7 +44,7 @@ func (c *Converter) Convert(path string) error {
 		return err
 	}
 
-	dstPath := myfileutil.DropExtname(path) + "." + c.Encoder.Extname()
+	dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
 	if !cliopt.Force && myfileutil.Exists(dstPath) {
 		return errors.New("File already exists: " + dstPath)
