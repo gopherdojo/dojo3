@@ -21,7 +21,7 @@ type Encoder interface {
 // Decoder can decode images.
 type Decoder interface {
 	Decode(*os.File) (image.Image, error)
-	IsValid(*os.File) bool
+	IsDecodable(*os.File) bool
 }
 
 // Converter has Encoder and Decoder.

@@ -38,7 +38,7 @@ func (g *Gatherer) Gather(dirname string) ([]string, error) {
 		}
 		defer fp.Close()
 
-		if !g.Decoder.IsValid(fp) {
+		if !g.Decoder.IsDecodable(fp) {
 			if cliopt.Verbose {
 				fmt.Fprintf(g.OutStream, "Skipped because the file is not applicable: %q\n", path)
 			}

@@ -26,7 +26,7 @@ func (j *Jpeg) Extname() string {
 	return "jpg"
 }
 
-// IsValid returns whether the file content is JPEG
-func (j *Jpeg) IsValid(fp *os.File) bool {
+// IsDecodable returns whether the file content is JPEG
+func (j *Jpeg) IsDecodable(fp *os.File) bool {
 	return myfileutil.IsJpeg(fp)
 }

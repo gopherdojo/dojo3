@@ -26,7 +26,7 @@ func (g *Gif) Extname() string {
 	return "gif"
 }
 
-// IsValid returns whether the file content is GIF
-func (g *Gif) IsValid(fp *os.File) bool {
+// IsDecodable returns whether the file content is GIF
+func (g *Gif) IsDecodable(fp *os.File) bool {
 	return myfileutil.IsGif(fp)
 }

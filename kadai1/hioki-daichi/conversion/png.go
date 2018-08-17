@@ -26,7 +26,7 @@ func (p *Png) Extname() string {
 	return "png"
 }
 
-// IsValid returns whether the file content is PNG
-func (p *Png) IsValid(fp *os.File) bool {
+// IsDecodable returns whether the file content is PNG
+func (p *Png) IsDecodable(fp *os.File) bool {
 	return myfileutil.IsPng(fp)
 }
