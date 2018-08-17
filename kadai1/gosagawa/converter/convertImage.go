@@ -1,3 +1,4 @@
+//Package converter provides convert image
 package converter
 
 import (
@@ -9,6 +10,7 @@ import (
 	"os"
 )
 
+//ConvertImage is image for convert
 type ConvertImage struct {
 	outType string
 	inPath  string
@@ -16,6 +18,7 @@ type ConvertImage struct {
 	dispLog bool
 }
 
+//ConvertImage convert image
 func (ci *ConvertImage) ConvertImage() {
 
 	if ci.dispLog {
@@ -53,6 +56,7 @@ func (ci *ConvertImage) ConvertImage() {
 	}
 }
 
+//GetImageType get image type from path
 func GetImageType(path string) string {
 	f, err := os.Open(path)
 	if err != nil {
@@ -67,6 +71,7 @@ func GetImageType(path string) string {
 	return format
 }
 
+//IsValidImageType returns imageType is valid or not
 //XXX もっとスマートなやり方があるのでは
 func IsValidImageType(imageType string) bool {
 	var isValidType bool

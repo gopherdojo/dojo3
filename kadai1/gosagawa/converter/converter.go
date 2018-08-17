@@ -1,3 +1,4 @@
+//Package converter provides convert image
 package converter
 
 import (
@@ -5,6 +6,7 @@ import (
 	"path/filepath"
 )
 
+//Converter is information for convert images
 type Converter struct {
 	inType   string
 	outType  string
@@ -14,6 +16,7 @@ type Converter struct {
 	outPaths []string
 }
 
+//NewConverter create new converter
 func NewConverter(inType string, outType string, dir string, dispLog bool) *Converter {
 	c := Converter{}
 	c.inType = inType
@@ -25,13 +28,15 @@ func NewConverter(inType string, outType string, dir string, dispLog bool) *Conv
 	return &c
 }
 
+//ConvertImage convert image
 func (c *Converter) ConvertImage() {
 
-	for k, _ := range c.inPaths {
-		ci := ConvertImage{c.outType, c.inPaths[k], c.outPaths[k], c.dispLog}
+	for k, path := range c.inPaths {
+		ci := ConvertImage{c.outType, path, c.outPaths[k], c.dispLog}
 		ci.ConvertImage()
 	}
 }
+
 func (c *Converter) setPath() {
 
 	c.inPaths = getConvertList(c.inType, c.dir)

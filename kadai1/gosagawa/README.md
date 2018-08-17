@@ -13,12 +13,19 @@
 - ユーザ定義型を作ってみる
 - GoDocを生成してみる
 
+## install
+```
+make
+```
+
 ## usage
 
-imgconv [OPTION] dir_path
+```
+bin/imgconv [OPTION] dir_path
   -i string
     	変換対象の画像形式(jpeg|gif|png) (default "jpeg")
   -o string
     	変換語の画像形式(jpeg|gif|png) (default "png")
   -v	詳細なログを表示
+```
 

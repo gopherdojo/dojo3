@@ -1,5 +1,6 @@
 package main
 
+//
 import (
 	"flag"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"./converter"
 )
 
+//
 func main() {
 
 	var (
@@ -29,6 +31,7 @@ func main() {
 	c.ConvertImage()
 }
 
+//
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION] dir_path\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  -i string\n")
@@ -38,6 +41,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  -v	詳細なログを表示\n")
 }
 
+//
 func isValidInput(inType string, outType string, args []string) bool {
 	if len(args) != 1 {
 		return false
