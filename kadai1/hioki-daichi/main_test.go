@@ -10,9 +10,9 @@ import (
 )
 
 func TestJpegToPng(t *testing.T) {
-	tmpdir := "test/" + "TestJpegToPng"
+	tmpdir := "testdata/" + "TestJpegToPng"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -24,21 +24,21 @@ func TestJpegToPng(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng/2018/07"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestJpegToPng/2018/07/001.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToPng/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToPng/2018/08"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestJpegToPng/2018/08/001.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToPng/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToPng/2018/08/003.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToPng"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToPng/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToPng/2018/07"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToPng/2018/07/001.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/07/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToPng/2018/08"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToPng/2018/08/001.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/08/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/08/003.gif"`)
 }
 
 func TestJpegToGif(t *testing.T) {
-	tmpdir := "test/" + "TestJpegToGif"
+	tmpdir := "testdata/" + "TestJpegToGif"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -50,21 +50,21 @@ func TestJpegToGif(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif/2018/07"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestJpegToGif/2018/07/001.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToGif/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestJpegToGif/2018/08"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestJpegToGif/2018/08/001.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToGif/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestJpegToGif/2018/08/003.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToGif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToGif/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToGif/2018/07"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToGif/2018/07/001.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/07/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestJpegToGif/2018/08"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToGif/2018/08/001.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/08/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/08/003.gif"`)
 }
 
 func TestPngToJpeg(t *testing.T) {
-	tmpdir := "test/" + "TestPngToJpeg"
+	tmpdir := "testdata/" + "TestPngToJpeg"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -76,21 +76,21 @@ func TestPngToJpeg(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg/2018/07"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToJpeg/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestPngToJpeg/2018/07/002.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToJpeg/2018/08"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToJpeg/2018/08/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestPngToJpeg/2018/08/002.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToJpeg/2018/08/003.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToJpeg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToJpeg/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToJpeg/2018/07"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/07/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToJpeg/2018/07/002.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToJpeg/2018/08"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/08/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToJpeg/2018/08/002.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/08/003.gif"`)
 }
 
 func TestPngToGif(t *testing.T) {
-	tmpdir := "test/" + "TestPngToGif"
+	tmpdir := "testdata/" + "TestPngToGif"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -102,21 +102,21 @@ func TestPngToGif(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif/2018/07"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToGif/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestPngToGif/2018/07/002.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestPngToGif/2018/08"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToGif/2018/08/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestPngToGif/2018/08/002.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestPngToGif/2018/08/003.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToGif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToGif/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToGif/2018/07"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/07/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToGif/2018/07/002.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestPngToGif/2018/08"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/08/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToGif/2018/08/002.gif"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/08/003.gif"`)
 }
 
 func TestGifToJpeg(t *testing.T) {
-	tmpdir := "test/" + "TestGifToJpeg"
+	tmpdir := "testdata/" + "TestGifToJpeg"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -128,21 +128,21 @@ func TestGifToJpeg(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg/2018/07"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToJpeg/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToJpeg/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToJpeg/2018/08"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToJpeg/2018/08/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToJpeg/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestGifToJpeg/2018/08/003.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToJpeg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToJpeg/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToJpeg/2018/07"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/07/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/07/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToJpeg/2018/08"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/08/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/08/002.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToJpeg/2018/08/003.jpg"`)
 }
 
 func TestGifToPng(t *testing.T) {
-	tmpdir := "test/" + "TestGifToPng"
+	tmpdir := "testdata/" + "TestGifToPng"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -154,21 +154,21 @@ func TestGifToPng(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng/2018"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng/2018/07"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToPng/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToPng/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "test/TestGifToPng/2018/08"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToPng/2018/08/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "test/TestGifToPng/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Converted: "test/TestGifToPng/2018/08/003.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToPng"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToPng/2018"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToPng/2018/07"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/07/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/07/002.png"`)
+	expectToMatchBuffer(t, buf, `Skipped because the path is directory: "testdata/TestGifToPng/2018/08"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/08/001.jpg"`)
+	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/08/002.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToPng/2018/08/003.png"`)
 }
 
 func TestConflict(t *testing.T) {
-	tmpdir := "test/" + "TestConflict"
+	tmpdir := "testdata/" + "TestConflict"
 
-	exec.Command("cp", "-r", "test/images", tmpdir).Run()
+	exec.Command("cp", "-r", "testdata/images", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -187,7 +187,7 @@ func TestConflict(t *testing.T) {
 	cli = &CLI{OutStream: buf, ErrStream: buf}
 	err := cli.execute(tmpdir)
 
-	expected := "File already exists: test/TestConflict/2018/07/001.png"
+	expected := "File already exists: testdata/TestConflict/2018/07/001.png"
 	if err.Error() != expected {
 		t.Errorf("expected: %s, actual: %s", expected, err)
 	}

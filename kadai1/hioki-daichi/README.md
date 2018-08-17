@@ -43,10 +43,10 @@
 - `-f` オプションを指定しない場合、エラーになります。
 
 ```shell
-$ ./ffconvert test/images
-File already exists: test/images/2018/07/001.png
+$ ./ffconvert testdata/images
+File already exists: testdata/images/2018/07/001.png
 
-$ ./ffconvert -f test/images
+$ ./ffconvert -f testdata/images
 $
 ```
 
@@ -55,19 +55,13 @@ $
 `-v` を指定するとログを出力します。
 
 ```shell
-$ ./ffconvert -v test/images
-Skipped because the path is directory: "test/images"
-Skipped because the path is directory: "test/images/2018"
-Skipped because the path is directory: "test/images/2018/07"
-Converted: "test/images/2018/07/001.png"
-Skipped because the file is not applicable: "test/images/2018/07/001.png"
-Skipped because the file is not applicable: "test/images/2018/07/002.png"
-Skipped because the path is directory: "test/images/2018/08"
-Converted: "test/images/2018/08/001.png"
-Skipped because the file is not applicable: "test/images/2018/08/001.png"
-Skipped because the file is not applicable: "test/images/2018/08/002.png"
-Skipped because the file is not applicable: "test/images/2018/08/003.gif"
-
-$ ./ffconvert test/images
-$
+$ ./ffconvert -v testdata/images
+Skipped because the path is directory: "testdata/images"
+Skipped because the path is directory: "testdata/images/2018"
+Skipped because the path is directory: "testdata/images/2018/07"
+Skipped because the file is not applicable: "testdata/images/2018/07/002.png"
+Skipped because the path is directory: "testdata/images/2018/08"
+Skipped because the file is not applicable: "testdata/images/2018/08/002.png"
+Skipped because the file is not applicable: "testdata/images/2018/08/003.gif"
+File already exists: testdata/images/2018/07/001.jpg
 ```
