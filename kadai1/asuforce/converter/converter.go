@@ -5,6 +5,8 @@ import (
 	"image/jpeg"
 	"image/png"
 	"os"
+	"path/filepath"
+	"regexp"
 )
 
 func Convert(path string) {
@@ -21,7 +23,7 @@ func Convert(path string) {
 		return
 	}
 
-	outputFile, err := os.Create("output.png")
+	outputFile, err := os.Create(getFileName(path))
 	if err != nil {
 		fmt.Println("[Error]", err)
 		return
@@ -32,4 +34,11 @@ func Convert(path string) {
 	if err != nil {
 		fmt.Println("[Error]", err)
 	}
+}
+
+func getFileName(path string) string {
+	ext := filepath.Ext(path)
+	rep := regexp.MustCompile(ext + "$")
+	dest := filepath.Base(rep.ReplaceAllString(path, ""))
+	return dest + ".png"
 }
