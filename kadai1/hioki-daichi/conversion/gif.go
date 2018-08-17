@@ -5,7 +5,7 @@ import (
 	"image/gif"
 	"os"
 
-	"github.com/hioki-daichi/myfileutil"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Gif https://en.wikipedia.org/wiki/GIF
@@ -28,5 +28,5 @@ func (g *Gif) Extname() string {
 
 // IsDecodable returns whether the file content is GIF
 func (g *Gif) IsDecodable(fp *os.File) bool {
-	return myfileutil.IsGif(fp)
+	return fileutil.StartsContentsWith(fp, []uint8{71, 73, 70, 56, 55, 97}) || fileutil.StartsContentsWith(fp, []uint8{71, 73, 70, 56, 57, 97})
 }

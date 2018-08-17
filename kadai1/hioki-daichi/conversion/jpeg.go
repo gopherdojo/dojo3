@@ -5,7 +5,7 @@ import (
 	"image/jpeg"
 	"os"
 
-	"github.com/hioki-daichi/myfileutil"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Jpeg https://en.wikipedia.org/wiki/JPEG
@@ -28,5 +28,5 @@ func (j *Jpeg) Extname() string {
 
 // IsDecodable returns whether the file content is JPEG
 func (j *Jpeg) IsDecodable(fp *os.File) bool {
-	return myfileutil.IsJpeg(fp)
+	return fileutil.StartsContentsWith(fp, []uint8{255, 216, 255})
 }
