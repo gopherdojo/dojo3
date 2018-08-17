@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	version string
+	version = "1.0.0"
 	path    string
 	ext     string
 )
