@@ -25,10 +25,7 @@ func TestJpegToPng(t *testing.T) {
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToPng/2018/07/001.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/07/002.png"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToPng/2018/08/001.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToPng/2018/08/003.gif"`)
 }
 
 func TestJpegToGif(t *testing.T) {
@@ -47,10 +44,7 @@ func TestJpegToGif(t *testing.T) {
 	cli.execute(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToGif/2018/07/001.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/07/002.png"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestJpegToGif/2018/08/001.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/08/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestJpegToGif/2018/08/003.gif"`)
 }
 
 func TestPngToJpeg(t *testing.T) {
@@ -68,11 +62,8 @@ func TestPngToJpeg(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/07/001.jpg"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToJpeg/2018/07/002.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/08/001.jpeg"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToJpeg/2018/08/002.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToJpeg/2018/08/003.gif"`)
 }
 
 func TestPngToGif(t *testing.T) {
@@ -90,11 +81,8 @@ func TestPngToGif(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/07/001.jpg"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToGif/2018/07/002.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/08/001.jpeg"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestPngToGif/2018/08/002.gif"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestPngToGif/2018/08/003.gif"`)
 }
 
 func TestGifToJpeg(t *testing.T) {
@@ -112,10 +100,6 @@ func TestGifToJpeg(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/08/001.jpeg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToJpeg/2018/08/002.png"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToJpeg/2018/08/003.jpg"`)
 }
 
@@ -134,10 +118,6 @@ func TestGifToPng(t *testing.T) {
 	cli := &CLI{OutStream: buf, ErrStream: buf}
 	cli.execute(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/07/001.jpg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/07/002.png"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/08/001.jpeg"`)
-	expectToMatchBuffer(t, buf, `Skipped because the file is not applicable: "testdata/TestGifToPng/2018/08/002.png"`)
 	expectToMatchBuffer(t, buf, `Converted: "testdata/TestGifToPng/2018/08/003.png"`)
 }
 

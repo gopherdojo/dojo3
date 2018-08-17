@@ -1,12 +1,10 @@
 package gathering
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cliopt"
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 )
 
@@ -36,9 +34,6 @@ func (g *Gatherer) Gather(dirname string) ([]string, error) {
 		defer fp.Close()
 
 		if !g.Decoder.IsDecodable(fp) {
-			if cliopt.Verbose {
-				fmt.Fprintf(g.OutStream, "Skipped because the file is not applicable: %q\n", path)
-			}
 			return nil
 		}
 
