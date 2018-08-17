@@ -13,9 +13,9 @@ import (
 
 // Converter struct
 type Converter struct {
-	Path    string
-	Files   []Image
-	DestExt string
+	Path  string
+	Files []Image
+	ToExt string
 }
 
 // Image information struct
@@ -38,7 +38,7 @@ func (c *Converter) Convert(i Image) error {
 		return err
 	}
 
-	outputFile, err := os.Create(i.getFileName(c.DestExt))
+	outputFile, err := os.Create(i.getFileName(c.ToExt))
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 
 func (c *Converter) ecodeImage(file io.Writer, img image.Image) error {
 	var err error
-	switch c.DestExt {
+	switch c.ToExt {
 	case "jpeg", "jpg":
 		err = jpeg.Encode(file, img, nil)
 	case "gif":
