@@ -42,27 +42,11 @@ func isValidInput(inType string, outType string, args []string) bool {
 	if len(args) != 1 {
 		return false
 	}
-	if !isValidType(inType) {
+	if !converter.IsValidImageType(inType) {
 		return false
 	}
-	if !isValidType(outType) {
+	if !converter.IsValidImageType(outType) {
 		return false
 	}
 	return true
-}
-
-//XXX もっとスマートなやり方があるのでは
-func isValidType(imageType string) bool {
-	var isValidType bool
-	switch imageType {
-	case "jpeg":
-		isValidType = true
-	case "png":
-		isValidType = true
-	case "gif":
-		isValidType = true
-	default:
-		isValidType = false
-	}
-	return isValidType
 }
