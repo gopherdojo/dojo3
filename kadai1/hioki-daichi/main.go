@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/cmd"
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/gathering"
 )
 
 const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
@@ -29,15 +28,6 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
 -v
     Verbose Mode
 `
-
-// CLI has streams and command line options.
-type CLI struct {
-	OutStream, ErrStream io.Writer
-	Decoder              conversion.Decoder
-	Encoder              conversion.Encoder
-	Force                bool
-	Verbose              bool
-}
 
 func main() {
 	fromJpeg := flag.Bool("J", false, "Convert from JPEG")
@@ -63,37 +53,14 @@ func main() {
 	decoder := deriveDecoder(fromJpeg, fromPng, fromGif)
 	encoder := deriveEncoder(toJpeg, toPng, toGif)
 
-	cli := &CLI{OutStream: outStream, ErrStream: errStream, Decoder: decoder, Encoder: encoder, Force: *force, Verbose: *verbose}
-	err := cli.execute(args[0])
+	runner := &cmd.Runner{OutStream: outStream, ErrStream: errStream, Decoder: decoder, Encoder: encoder, Force: *force, Verbose: *verbose}
+	err := runner.Run(args[0])
 	if err != nil {
-		fmt.Fprintln(cli.ErrStream, err)
+		fmt.Fprintln(runner.ErrStream, err)
 		os.Exit(1)
 	}
 
 	os.Exit(0)
-}
-
-func (c *CLI) execute(dirname string) error {
-	gatherer := &gathering.Gatherer{Decoder: c.Decoder, OutStream: c.OutStream}
-	paths, err := gatherer.Gather(dirname)
-	if err != nil {
-		return err
-	}
-
-	converter := &conversion.Converter{Decoder: c.Decoder, Encoder: c.Encoder, OutStream: c.OutStream}
-
-	for _, path := range paths {
-		fp, err := converter.Convert(path, c.Force)
-		if err != nil {
-			return err
-		}
-
-		if c.Verbose {
-			fmt.Fprintf(c.OutStream, "Converted: %q\n", fp.Name())
-		}
-	}
-
-	return nil
 }
 
 func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Decoder {
