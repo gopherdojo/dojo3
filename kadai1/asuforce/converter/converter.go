@@ -1,8 +1,11 @@
 package converter
 
 import (
+	"image"
+	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -10,8 +13,9 @@ import (
 
 // Converter struct
 type Converter struct {
-	Path  string
-	Files []Image
+	Path    string
+	Files   []Image
+	DestExt string
 }
 
 // Image information struct
@@ -22,7 +26,7 @@ type Image struct {
 }
 
 // Convert image functon
-func Convert(i Image) error {
+func (c *Converter) Convert(i Image) error {
 	file, err := os.Open(i.path)
 	if err != nil {
 		return err
@@ -34,13 +38,13 @@ func Convert(i Image) error {
 		return err
 	}
 
-	outputFile, err := os.Create(i.getFileName())
+	outputFile, err := os.Create(i.getFileName(c.DestExt))
 	if err != nil {
 		return err
 	}
 	defer outputFile.Close()
 
-	err = png.Encode(outputFile, img)
+	err = c.decodeImage(outputFile, img)
 	if err != nil {
 		return err
 	}
@@ -58,6 +62,23 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
+func (c *Converter) decodeImage(file io.Writer, img image.Image) error {
+	var err error
+	switch c.DestExt {
+	case "jpeg", "jpg":
+		err = jpeg.Encode(file, img, nil)
+	case "gif":
+		err = gif.Encode(file, img, nil)
+	case "png":
+		err = png.Encode(file, img)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func newImage(path string) Image {
 	ext := filepath.Ext(path)
 	rep := regexp.MustCompile(ext + "$")
@@ -70,6 +91,6 @@ func newImage(path string) Image {
 	}
 }
 
-func (i *Image) getFileName() string {
-	return i.name + ".png"
+func (i *Image) getFileName(ext string) string {
+	return i.name + "." + ext
 }
