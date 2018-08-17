@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"image"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"./converter"
 )
@@ -18,63 +15,54 @@ func main() {
 		outType = flag.String("o", "png", "変換語の画像形式(jpeg|gif|png)")
 		dispLog = flag.Bool("v", false, "詳細なログを表示")
 	)
+	flag.Usage = usage
 	flag.Parse()
 	args := flag.Args()
 
-	fmt.Println(*inType)
-	fmt.Println(*outType)
-	fmt.Println(args[0])
-
-	//TODO check parameter
+	if !isValidInput(*inType, *outType, args) {
+		usage()
+		os.Exit(2)
+	}
 
 	dir := args[0]
-	convertPaths := getConvertList(*inType, dir)
-	for _, path := range convertPaths {
-		dist := getConvertToPath(*outType, path)
-
-		//TODO check file is already exist
-		if *dispLog {
-			fmt.Printf("%v => %v\n", path, dist)
-		}
-		converter.ConvertImage(*outType, path, dist)
-	}
+	c := converter.NewConverter(*inType, *outType, dir, *dispLog)
+	c.ConvertImage()
 }
 
-func getConvertList(imageType string, dir string) []string {
-	files, err := ioutil.ReadDir(dir)
-	if err != nil {
-		panic(err)
-	}
-
-	var paths []string
-	for _, file := range files {
-		if file.IsDir() {
-			paths = append(paths, getConvertList(imageType, filepath.Join(dir, file.Name()))...)
-			continue
-		}
-		path := filepath.Join(dir, file.Name())
-		if imageType == converter.GetImageType(path) {
-			paths = append(paths, filepath.Join(dir, file.Name()))
-		}
-	}
-
-	return paths
+func usage() {
+	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION] dir_path\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  -i string\n")
+	fmt.Fprintf(os.Stderr, "    	変換対象の画像形式(jpeg|gif|png) (default \"jpeg\")\n")
+	fmt.Fprintf(os.Stderr, "  -o string\n")
+	fmt.Fprintf(os.Stderr, "    	変換語の画像形式(jpeg|gif|png) (default \"png\")\n")
+	fmt.Fprintf(os.Stderr, "  -v	詳細なログを表示\n")
 }
 
-func getImageType(path string) string {
-	f, err := os.Open(path)
-	if err != nil {
-		panic(err)
+func isValidInput(inType string, outType string, args []string) bool {
+	if len(args) != 1 {
+		return false
 	}
-	defer f.Close()
-
-	_, format, err := image.DecodeConfig(f)
-	if err != nil {
-		return ""
+	if !isValidType(inType) {
+		return false
 	}
-	return format
+	if !isValidType(outType) {
+		return false
+	}
+	return true
 }
 
-func getConvertToPath(outType string, path string) string {
-	return path[:len(path)-len(filepath.Ext(path))] + "." + outType
+//XXX もっとスマートなやり方があるのでは
+func isValidType(imageType string) bool {
+	var isValidType bool
+	switch imageType {
+	case "jpeg":
+		isValidType = true
+	case "png":
+		isValidType = true
+	case "gif":
+		isValidType = true
+	default:
+		isValidType = false
+	}
+	return isValidType
 }
