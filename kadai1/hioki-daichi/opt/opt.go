@@ -47,6 +47,15 @@ func Parse() (string, *Options, error) {
 
 	force := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
 
+	// TODO: validate value from 1 to 100
+	quality := flag.Int("quality", 100, "JPEG Quality to be used with '-j' option")
+
+	// TODO: validate value from 1 to 256
+	numColors := flag.Int("num-colors", 256, "Maximum number of colors used in the image to be used with '-g' option")
+
+	// TODO: validate inclusion in "default", "no", "best-speed", "best-compression"
+	humanCompressionLevel := flag.String("compression-level", "default", "(selected from 'default', 'no', 'best-speed', 'best-compression') Options to specify the compression level of PNG to be used with '-p' option")
+
 	flag.Parse()
 
 	args := flag.Args()
@@ -56,7 +65,7 @@ func Parse() (string, *Options, error) {
 
 	options := &Options{
 		Decoder: deriveDecoder(fromJpeg, fromPng, fromGif),
-		Encoder: deriveEncoder(toJpeg, toPng, toGif),
+		Encoder: deriveEncoder(toJpeg, toPng, toGif, quality, numColors, humanCompressionLevel),
 		Force:   *force,
 	}
 
@@ -76,15 +85,30 @@ func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Deco
 	}
 }
 
-func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool) conversion.Encoder {
+func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool, quality *int, numColors *int, humanCompressionLevel *string) conversion.Encoder {
 	switch {
 	case *toPng:
-		return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}
+		return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: toCompressionLevel(humanCompressionLevel)}}
 	case *toGif:
-		return &conversion.Gif{Options: &gif.Options{NumColors: 256}}
+		return &conversion.Gif{Options: &gif.Options{NumColors: *numColors}}
 	case *toJpeg:
 		fallthrough
 	default:
-		return &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}
+		return &conversion.Jpeg{Options: &jpeg.Options{Quality: *quality}}
+	}
+}
+
+func toCompressionLevel(humanCompressionLevel *string) png.CompressionLevel {
+	switch *humanCompressionLevel {
+	case "no":
+		return png.NoCompression
+	case "best-speed":
+		return png.BestSpeed
+	case "best-compression":
+		return png.BestCompression
+	case "default":
+		fallthrough
+	default:
+		return png.DefaultCompression
 	}
 }
