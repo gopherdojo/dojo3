@@ -18,11 +18,11 @@ func init() {
 }
 
 // Decode returns error
-func (p Png) Decode(r io.Reader) (image.Image, error) {
+func (Png) Decode(r io.Reader) (image.Image, error) {
 	return png.Decode(r)
 }
 
 // Encode returns error
-func (p Png) Encode(w io.Writer, m image.Image) error {
+func (Png) Encode(w io.Writer, m image.Image) error {
 	return png.Encode(w, m)
 }

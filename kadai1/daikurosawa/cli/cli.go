@@ -31,7 +31,7 @@ type Option struct {
 }
 
 // Run command.
-func (c *Cli) Run(args []string) int {
+func (Cli) Run(args []string) int {
 	var (
 		from = flag.String("from", "jpg", "Input file extension.")
 		to   = flag.String("to", "png", "Output file extension.")

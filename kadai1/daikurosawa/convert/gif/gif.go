@@ -17,11 +17,11 @@ func init() {
 }
 
 // Decode returns error
-func (g Gif) Decode(r io.Reader) (image.Image, error) {
+func (Gif) Decode(r io.Reader) (image.Image, error) {
 	return gif.Decode(r)
 }
 
 // Encode returns error
-func (g Gif) Encode(w io.Writer, m image.Image) error {
+func (Gif) Encode(w io.Writer, m image.Image) error {
 	return gif.Encode(w, m, nil)
 }
