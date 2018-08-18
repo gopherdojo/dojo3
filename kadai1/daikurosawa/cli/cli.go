@@ -13,21 +13,24 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// exit code
+// Exit code.
 const (
 	ExitCodeOK = iota
 	ExitCodeProcessError
 )
 
+// Cli has Stdout and Stderr streams.
 type Cli struct {
 	OutStream, ErrStream io.Writer
 }
 
+// Option has command line options.
 type Option struct {
 	FromExtension string
 	ToExtension   string
 }
 
+// Run command.
 func (c *Cli) Run(args []string) int {
 	var (
 		from = flag.String("from", "jpg", "Input file extension.")

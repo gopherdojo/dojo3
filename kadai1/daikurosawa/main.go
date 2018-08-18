@@ -7,6 +7,7 @@ import (
 	_ "./convert/gif"
 	_ "./convert/jpg"
 	_ "./convert/png"
+	_ "github.com/dojo3/kadai1/daikurosawa/convert/gif"
 )
 
 func main() {

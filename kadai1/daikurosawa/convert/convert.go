@@ -22,12 +22,14 @@ func Register(key string, convert Converter) {
 	converts[key] = convert
 }
 
+// Convert has command line options.
 type Convert struct {
 	Path          string
 	FromExtension string
 	ToExtension   string
 }
 
+// Convert image.
 func (c *Convert) Convert() error {
 	convert, err := getConverter(c.FromExtension)
 	if err != nil {
