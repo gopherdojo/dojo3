@@ -40,7 +40,6 @@ func main() {
 	verbose := flag.Bool("v", false, "Verbose Mode")
 
 	outStream := os.Stdout
-	errStream := os.Stderr
 
 	flag.Parse()
 
@@ -53,10 +52,10 @@ func main() {
 	decoder := deriveDecoder(fromJpeg, fromPng, fromGif)
 	encoder := deriveEncoder(toJpeg, toPng, toGif)
 
-	runner := &cmd.Runner{OutStream: outStream, ErrStream: errStream, Decoder: decoder, Encoder: encoder, Force: *force, Verbose: *verbose}
+	runner := &cmd.Runner{OutStream: outStream, Decoder: decoder, Encoder: encoder, Force: *force, Verbose: *verbose}
 	err := runner.Run(args[0])
 	if err != nil {
-		fmt.Fprintln(runner.ErrStream, err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 

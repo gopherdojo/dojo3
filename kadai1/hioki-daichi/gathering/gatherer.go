@@ -1,7 +1,6 @@
 package gathering
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 
@@ -10,8 +9,7 @@ import (
 
 // Gatherer has Decoder.
 type Gatherer struct {
-	Decoder   conversion.Decoder
-	OutStream io.Writer
+	Decoder conversion.Decoder
 }
 
 // Gather gathers files whose format is own Decoder.

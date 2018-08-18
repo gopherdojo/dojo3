@@ -3,7 +3,6 @@ package conversion
 import (
 	"errors"
 	"image"
-	"io"
 	"os"
 	"path/filepath"
 )
@@ -23,9 +22,8 @@ type Decoder interface {
 
 // Converter has Encoder and Decoder.
 type Converter struct {
-	Encoder   Encoder
-	Decoder   Decoder
-	OutStream io.Writer
+	Encoder Encoder
+	Decoder Decoder
 }
 
 // Convert converts the specified path from own Decoder to own Encoder.

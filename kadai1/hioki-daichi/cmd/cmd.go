@@ -10,22 +10,22 @@ import (
 
 // Runner has streams and command line options.
 type Runner struct {
-	OutStream, ErrStream io.Writer
-	Decoder              conversion.Decoder
-	Encoder              conversion.Encoder
-	Force                bool
-	Verbose              bool
+	OutStream io.Writer
+	Decoder   conversion.Decoder
+	Encoder   conversion.Encoder
+	Force     bool
+	Verbose   bool
 }
 
 // Run runs command.
 func (r *Runner) Run(dirname string) error {
-	gatherer := &gathering.Gatherer{Decoder: r.Decoder, OutStream: r.OutStream}
+	gatherer := &gathering.Gatherer{Decoder: r.Decoder}
 	paths, err := gatherer.Gather(dirname)
 	if err != nil {
 		return err
 	}
 
-	converter := &conversion.Converter{Decoder: r.Decoder, Encoder: r.Encoder, OutStream: r.OutStream}
+	converter := &conversion.Converter{Decoder: r.Decoder, Encoder: r.Encoder}
 
 	for _, path := range paths {
 		fp, err := converter.Convert(path, r.Force)
