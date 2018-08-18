@@ -19,6 +19,15 @@ type Converter struct {
 	ToExt   string
 }
 
+// NewConverter is creating Converter struct
+func NewConverter(path string, fromExt string, toExt string) Converter {
+	return Converter{
+		Path:    path,
+		FromExt: fromExt,
+		ToExt:   toExt,
+	}
+}
+
 // FetchConverter is queuing image
 func (c *Converter) FetchConverter(q chan Image, wg *sync.WaitGroup) {
 	for {
