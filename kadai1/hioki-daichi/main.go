@@ -28,7 +28,6 @@ func execute() error {
 		Decoder:   options.Decoder,
 		Encoder:   options.Encoder,
 		Force:     options.Force,
-		Verbose:   options.Verbose,
 	}
 	err = runner.Run(dirname)
 	if err != nil {

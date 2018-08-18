@@ -14,7 +14,6 @@ type Runner struct {
 	Decoder   conversion.Decoder
 	Encoder   conversion.Encoder
 	Force     bool
-	Verbose   bool
 }
 
 // Run runs command.
@@ -33,9 +32,7 @@ func (r *Runner) Run(dirname string) error {
 			return err
 		}
 
-		if r.Verbose {
-			fmt.Fprintf(r.OutStream, "Converted: %q\n", fp.Name())
-		}
+		fmt.Fprintf(r.OutStream, "Converted: %q\n", fp.Name())
 	}
 
 	return nil

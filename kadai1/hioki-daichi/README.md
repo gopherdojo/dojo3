@@ -47,21 +47,7 @@ $ ./ffconvert testdata/images
 File already exists: testdata/images/2018/07/001.png
 
 $ ./ffconvert -f testdata/images
+Converted: "testdata/images/2018/07/001.jpg"
+Converted: "testdata/images/2018/08/001.jpg"
 $
-```
-
-## `-v` でログ出力
-
-`-v` を指定するとログを出力します。
-
-```shell
-$ ./ffconvert -v testdata/images
-Skipped because the path is directory: "testdata/images"
-Skipped because the path is directory: "testdata/images/2018"
-Skipped because the path is directory: "testdata/images/2018/07"
-Skipped because the file is not applicable: "testdata/images/2018/07/002.png"
-Skipped because the path is directory: "testdata/images/2018/08"
-Skipped because the file is not applicable: "testdata/images/2018/08/002.png"
-Skipped because the file is not applicable: "testdata/images/2018/08/003.gif"
-File already exists: testdata/images/2018/07/001.jpg
 ```

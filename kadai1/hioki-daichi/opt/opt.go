@@ -23,8 +23,6 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
     Output file format is GIF
 -f
     Overwrite when the converted file name duplicates.
--v
-    Verbose Mode
 `
 
 // Options has command line options.
@@ -32,7 +30,6 @@ type Options struct {
 	Decoder conversion.Decoder
 	Encoder conversion.Encoder
 	Force   bool
-	Verbose bool
 }
 
 // Parse parses and returns command line options.
@@ -46,7 +43,6 @@ func Parse() (string, *Options, error) {
 	toGif := flag.Bool("g", false, "Convert to GIF")
 
 	force := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
-	verbose := flag.Bool("v", false, "Verbose Mode")
 
 	flag.Parse()
 
@@ -59,7 +55,6 @@ func Parse() (string, *Options, error) {
 		Decoder: deriveDecoder(fromJpeg, fromPng, fromGif),
 		Encoder: deriveEncoder(toJpeg, toPng, toGif),
 		Force:   *force,
-		Verbose: *verbose,
 	}
 
 	return args[0], options, nil

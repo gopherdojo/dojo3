@@ -19,7 +19,7 @@ func TestJpegToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToPng/2018/07/001.png"`)
@@ -36,7 +36,7 @@ func TestJpegToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Gif{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Gif{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToGif/2018/07/001.gif"`)
@@ -53,7 +53,7 @@ func TestPngToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Jpeg{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Jpeg{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToJpeg/2018/07/002.jpg"`)
@@ -70,7 +70,7 @@ func TestPngToGif(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Gif{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Gif{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToGif/2018/07/002.gif"`)
@@ -87,7 +87,7 @@ func TestGifToJpeg(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Jpeg{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Jpeg{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestGifToJpeg/2018/08/003.jpg"`)
@@ -103,7 +103,7 @@ func TestGifToPng(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Png{}, Force: true}
 	runner.Run(tmpdir)
 
 	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestGifToPng/2018/08/003.png"`)
@@ -119,10 +119,10 @@ func TestConflict(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 
-	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true, Verbose: true}
+	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: true}
 	runner.Run(tmpdir)
 
-	runner = &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: false, Verbose: true}
+	runner = &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{}, Force: false}
 	err := runner.Run(tmpdir)
 
 	expected := "File already exists: ../testdata/TestConflict/2018/07/001.png"
