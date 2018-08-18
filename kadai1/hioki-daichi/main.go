@@ -9,10 +9,18 @@ import (
 )
 
 func main() {
-	dirname, options, err := opt.Parse()
+	err := execute()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
+	}
+	os.Exit(0)
+}
+
+func execute() error {
+	dirname, options, err := opt.Parse()
+	if err != nil {
+		return err
 	}
 
 	runner := &cmd.Runner{
@@ -24,9 +32,8 @@ func main() {
 	}
 	err = runner.Run(dirname)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
 
-	os.Exit(0)
+	return nil
 }
