@@ -6,7 +6,7 @@ import (
 
 	"image/png"
 
-	"../../convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
 )
 
 // Png implements convert.Converter

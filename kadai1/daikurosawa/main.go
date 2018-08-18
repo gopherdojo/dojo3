@@ -3,11 +3,10 @@ package main
 import (
 	"os"
 
-	c "./cli"
-	_ "./convert/gif"
-	_ "./convert/jpg"
-	_ "./convert/png"
-	_ "github.com/dojo3/kadai1/daikurosawa/convert/gif"
+	c "github.com/gopherdojo/dojo3/kadai1/daikurosawa/cli"
+	_ "github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert/gif"
+	_ "github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert/jpg"
+	_ "github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert/png"
 )
 
 func main() {

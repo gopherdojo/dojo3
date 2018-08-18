@@ -9,7 +9,7 @@ import (
 
 	"strings"
 
-	"../convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
 	"golang.org/x/sync/errgroup"
 )
 

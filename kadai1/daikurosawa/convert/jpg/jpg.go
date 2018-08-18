@@ -6,7 +6,7 @@ import (
 
 	"image/jpeg"
 
-	"../../convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
 )
 
 // Jpg implements convert.Converter

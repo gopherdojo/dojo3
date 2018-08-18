@@ -5,7 +5,7 @@ import (
 	"image/gif"
 	"io"
 
-	"../../convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
 )
 
 // Gif implements convert.Converter
