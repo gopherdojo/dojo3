@@ -10,11 +10,13 @@ import (
 )
 
 // Gif https://en.wikipedia.org/wiki/GIF
-type Gif struct{}
+type Gif struct {
+	Options *gif.Options
+}
 
 // Encode encodes the specified file to GIF
 func (g *Gif) Encode(fp *os.File, img image.Image) error {
-	return gif.Encode(fp, img, &gif.Options{NumColors: 256})
+	return gif.Encode(fp, img, g.Options)
 }
 
 // Decode decodes the specified GIF file

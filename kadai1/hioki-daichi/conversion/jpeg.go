@@ -10,11 +10,13 @@ import (
 )
 
 // Jpeg https://en.wikipedia.org/wiki/JPEG
-type Jpeg struct{}
+type Jpeg struct {
+	Options *jpeg.Options
+}
 
 // Encode encodes the specified file to JPEG
 func (j *Jpeg) Encode(fp *os.File, img image.Image) error {
-	return jpeg.Encode(fp, img, &jpeg.Options{Quality: 100})
+	return jpeg.Encode(fp, img, j.Options)
 }
 
 // Decode decodes the specified JPEG file

@@ -3,6 +3,9 @@ package opt
 import (
 	"errors"
 	"flag"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 )
@@ -62,12 +65,12 @@ func Parse() (string, *Options, error) {
 
 func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Decoder {
 	switch {
-	case *fromJpeg:
-		return &conversion.Jpeg{}
 	case *fromPng:
 		return &conversion.Png{}
 	case *fromGif:
 		return &conversion.Gif{}
+	case *fromJpeg:
+		fallthrough
 	default:
 		return &conversion.Jpeg{}
 	}
@@ -75,13 +78,13 @@ func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Deco
 
 func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool) conversion.Encoder {
 	switch {
-	case *toJpeg:
-		return &conversion.Jpeg{}
 	case *toPng:
-		return &conversion.Png{}
+		return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}
 	case *toGif:
-		return &conversion.Gif{}
+		return &conversion.Gif{Options: &gif.Options{NumColors: 256}}
+	case *toJpeg:
+		fallthrough
 	default:
-		return &conversion.Jpeg{}
+		return &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}
 	}
 }

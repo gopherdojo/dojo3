@@ -10,11 +10,13 @@ import (
 )
 
 // Png https://en.wikipedia.org/wiki/Portable_Network_Graphics
-type Png struct{}
+type Png struct {
+	Encoder *png.Encoder
+}
 
 // Encode encodes the specified file to PNG
 func (p *Png) Encode(fp *os.File, img image.Image) error {
-	return png.Encode(fp, img)
+	return p.Encoder.Encode(fp, img)
 }
 
 // Decode decodes the specified PNG file
