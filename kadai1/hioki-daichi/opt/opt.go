@@ -17,18 +17,36 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
 
 -J
     Input file format is JPEG (default)
+
 -P
     Input file format is PNG
+
 -G
     Input file format is GIF
+
 -j
     Output file format is JPEG
+
 -p
     Output file format is PNG (default)
+
 -g
     Output file format is GIF
+
 -f
     Overwrite when the converted file name duplicates.
+
+--quality
+    JPEG Quality to be used with '-j' option.
+    You can specify 1 to 100.
+
+--num-colors
+    Maximum number of colors used in the GIF image to be used with '-g' option.
+    You can specify 1 to 256.
+
+--compression-level
+    Options to specify the compression level of PNG to be used with '-p' option.
+    You can specify from 'default', 'no', 'best-speed', 'best-compression'.
 `
 
 // Options sets Decoder, Encoder and Force.
@@ -52,7 +70,7 @@ func Parse() (string, *Options, error) {
 
 	quality := flag.Int("quality", 100, "JPEG Quality to be used with '-j' option")
 
-	numColors := flag.Int("num-colors", 256, "Maximum number of colors used in the image to be used with '-g' option")
+	numColors := flag.Int("num-colors", 256, "Maximum number of colors used in the GIF image to be used with '-g' option")
 
 	humanCompressionLevel := flag.String("compression-level", "default", "(selected from 'default', 'no', 'best-speed', 'best-compression') Options to specify the compression level of PNG to be used with '-p' option")
 
