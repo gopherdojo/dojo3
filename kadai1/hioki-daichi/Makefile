@@ -17,5 +17,5 @@ clean:
 	rm -f `git ls-files --others testdata/`
 	git checkout HEAD testdata
 doc:
-	(sleep 0.5; open http://localhost:$(GODOCPORT)/pkg/github.com/gopherdojo/dojo3) &
+	(sleep 1; open http://localhost:$(GODOCPORT)/pkg/github.com/gopherdojo/dojo3) &
 	$(GODOCCMD) -http ":$(GODOCPORT)"

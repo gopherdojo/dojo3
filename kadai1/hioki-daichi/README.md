@@ -1,51 +1,79 @@
 # ffconvert
 
-`ffconvert` は指定したディレクトリ以下のファイルフォーマットを変換します。
+`ffconvert` is a command to convert the file format under the specified directory.
 
-デフォルトでは `JPEG` から `PNG` に変換します。
+By default, it converts from `JPEG` to `PNG`.
 
-## 画像形式の指定
+## How to try ffconvert
 
-画像形式を指定することもできます。
+```shell
+$ make build
+$ ./ffconvert -J -p -f --compression-level=best-speed testdata/
+$ ./ffconvert -P -g -f --num-colors=128 testdata/
+$ ./ffconvert -G -j -f --quality=50 testdata/
+$ make clean
+```
 
-**変換前の指定方法**
+## How to run the test
 
-| オプション | 画像形式 |
-| ---        | ---      |
-| `J`        | `JPEG`   |
-| `P`        | `PNG`    |
-| `G`        | `GIF`    |
+```shell
+$ make test
+```
 
-**変換後の指定方法**
+## How to read GoDoc
 
-| オプション | 画像形式 |
-| ---        | ---      |
-| `j`        | `JPEG`   |
-| `p`        | `PNG`    |
-| `g`        | `GIF`    |
+```shell
+$ make doc
+```
 
-取りうるパターンが少ないためパターンをまとめてみますと、以下の通りです。
+## How to specify the input/output file format
 
-| パターン             | オプション指定方法 |
-| ---                  | ---                |
-| `JPEG` から `PNG` へ | `-J -p`            |
-| `JPEG` から `GIF` へ | `-J -g`            |
-| `PNG` から `JPEG` へ | `-P -j`            |
-| `PNG` から `GIF` へ  | `-P -g`            |
-| `GIF` から `JPEG` へ | `-G -j`            |
-| `GIF` から `PNG` へ  | `-G -p`            |
+**Input file format**
 
-## `-f` で上書き
+Specify the option with uppercase initials.
 
-変換後の名前が重複する場合、
+| Option | File Format |
+| ---    | ---         |
+| `-J`   | `JPEG`      |
+| `-P`   | `PNG`       |
+| `-G`   | `GIF`       |
 
-- `-f` オプションを指定する場合、既存のファイルを上書きします。
-- `-f` オプションを指定しない場合、エラーになります。
+**Output file format**
+
+Specify the option with lowercase initials.
+
+| Option | File Format |
+| ---    | ---         |
+| `-j`   | `JPEG`      |
+| `-p`   | `PNG`       |
+| `-g`   | `GIF`       |
+
+For example, if you want to convert from GIF to JPEG, specify it like `-G -j`.
+
+## How to specify the encoding option
+
+As options for encoding, you can specify `--quality` for JPEG, `--num-colors` for GIF and `--compression-level` for PNG.
+
+| Option                | Possible Values                           | Description                                    |
+| ---                   | ---                                       | ---                                            |
+| `--quality`           | 1 to 100                                  | JPEG Quality                                   |
+| `--num-colors`        | 1 to 256                                  | Maximum number of colors used in the GIF image |
+| `--compression-level` | default, no, best-speed, best-compression | PNG Compression Level                          |
+
+## How to overwrite duplicate files
+
+If the generated file name is duplicated, if you specify the `-f` option, it will overwrite the existing file without causing an error.
+
+If `-f` is not specified, the following error will be displayed.
 
 ```shell
 $ ./ffconvert testdata/images
 File already exists: testdata/images/2018/07/001.png
+```
 
+`-f` overwrites them.
+
+```shell
 $ ./ffconvert -f testdata/images
 Converted: "testdata/images/2018/07/001.jpg"
 Converted: "testdata/images/2018/08/001.jpg"
