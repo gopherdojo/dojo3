@@ -47,16 +47,37 @@ func Parse() (string, *Options, error) {
 
 	force := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
 
-	// TODO: validate value from 1 to 100
 	quality := flag.Int("quality", 100, "JPEG Quality to be used with '-j' option")
 
-	// TODO: validate value from 1 to 256
 	numColors := flag.Int("num-colors", 256, "Maximum number of colors used in the image to be used with '-g' option")
 
-	// TODO: validate inclusion in "default", "no", "best-speed", "best-compression"
 	humanCompressionLevel := flag.String("compression-level", "default", "(selected from 'default', 'no', 'best-speed', 'best-compression') Options to specify the compression level of PNG to be used with '-p' option")
 
 	flag.Parse()
+
+	if *toJpeg {
+		if *quality < 1 {
+			return "", nil, errors.New("--quality must be greater than or equal to 1")
+		} else if *quality > 100 {
+			return "", nil, errors.New("--quality must be less than or equal to 100")
+		}
+	}
+
+	if *toGif {
+		if *numColors < 1 {
+			return "", nil, errors.New("--num-colors must be greater than or equal to 1")
+		} else if *numColors > 256 {
+			return "", nil, errors.New("--num-colors must be less than or equal to 256")
+		}
+	}
+
+	if *toPng {
+		switch *humanCompressionLevel {
+		case "default", "no", "best-speed", "best-compression":
+		default:
+			return "", nil, errors.New("--compression-level is not included in the list: \"default\", \"no\", \"best-speed\", \"best-compression\"")
+		}
+	}
 
 	args := flag.Args()
 	if len(args) == 0 {
