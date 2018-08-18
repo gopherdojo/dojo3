@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/gopherdojo/dojo3/kadai1/asuforce/converter"
 )
@@ -14,6 +15,7 @@ var (
 	path    string
 	fromExt string
 	toExt   string
+	wg      sync.WaitGroup
 )
 
 func init() {
@@ -46,11 +48,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	queue := make(chan converter.Image)
 	for _, image := range c.Files {
-		err := c.Convert(image)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
+		wg.Add(1)
+		go c.FetchConverter(queue, &wg)
+		queue <- image
 	}
+
+	close(queue)
+	wg.Wait()
 }
