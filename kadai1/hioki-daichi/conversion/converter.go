@@ -1,3 +1,8 @@
+/*
+Package conversion has the necessary processing to convert.
+
+File is divided for each file format.
+*/
 package conversion
 
 import (
@@ -7,26 +12,26 @@ import (
 	"path/filepath"
 )
 
-// Encoder can encode images.
+// Converter represents encodable and decodable.
+type Converter struct {
+	Encoder Encoder
+	Decoder Decoder
+}
+
+// Encoder configures encode-needed settings.
 type Encoder interface {
 	Encode(*os.File, image.Image) error
 	Extname() string
 }
 
-// Decoder can decode images.
+// Decoder configures decode-needed settings.
 type Decoder interface {
 	Decode(*os.File) (image.Image, error)
 	HasProcessableExtname(string) bool
 	IsDecodable(*os.File) bool
 }
 
-// Converter has Encoder and Decoder.
-type Converter struct {
-	Encoder Encoder
-	Decoder Decoder
-}
-
-// Convert converts the specified path from own Decoder to own Encoder.
+// Convert opens the file, decodes it, creates a file with a different extension, and writes the encoded result.
 func (c *Converter) Convert(path string, force bool) (*os.File, error) {
 	fp, err := os.Open(path)
 	if err != nil {

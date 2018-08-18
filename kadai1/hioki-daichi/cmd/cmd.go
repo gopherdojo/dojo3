@@ -1,3 +1,6 @@
+/*
+Package cmd is a package for executing various things after evaluating flag etc in main().
+*/
 package cmd
 
 import (
@@ -8,15 +11,20 @@ import (
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/gathering"
 )
 
-// Runner has streams and command line options.
+// Runner configures run-needed settings.
 type Runner struct {
+	// Usually, stdout is specified, and at the time of testing, buffer is specified.
 	OutStream io.Writer
-	Decoder   conversion.Decoder
-	Encoder   conversion.Encoder
-	Force     bool
+
+	// See conversion.{Jpeg,Png,Gif}.
+	Decoder conversion.Decoder
+	Encoder conversion.Encoder
+
+	// Overwrite when the converted file name duplicates.
+	Force bool
 }
 
-// Run runs command.
+// Run gathers and converts the target files.
 func (r *Runner) Run(dirname string) error {
 	gatherer := &gathering.Gatherer{Decoder: r.Decoder}
 	paths, err := gatherer.Gather(dirname)

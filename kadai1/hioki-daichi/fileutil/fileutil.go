@@ -1,3 +1,6 @@
+/*
+Package fileutil is a collection of convenient functions for manipulating files
+*/
 package fileutil
 
 import (

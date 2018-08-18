@@ -1,3 +1,6 @@
+/*
+Package gathering is a package that summarizes the processing necessary for collecting the files to be decoded.
+*/
 package gathering
 
 import (
@@ -7,12 +10,12 @@ import (
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 )
 
-// Gatherer has Decoder.
+// Gatherer represents decodable.
 type Gatherer struct {
 	Decoder conversion.Decoder
 }
 
-// Gather gathers files whose format is own Decoder.
+// Gather searches under the specified directory and collects files to be decoded.
 func (g *Gatherer) Gather(dirname string) ([]string, error) {
 	var paths []string
 

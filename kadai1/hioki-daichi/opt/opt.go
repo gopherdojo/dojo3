@@ -1,3 +1,6 @@
+/*
+Package opt is a package for parsing the command line option and building necessary information.
+*/
 package opt
 
 import (
@@ -28,14 +31,14 @@ const usage = `USAGE: ffconvert [-JPGjpgfv] [dirname]
     Overwrite when the converted file name duplicates.
 `
 
-// Options has command line options.
+// Options sets Decoder, Encoder and Force.
 type Options struct {
 	Decoder conversion.Decoder
 	Encoder conversion.Encoder
 	Force   bool
 }
 
-// Parse parses and returns command line options.
+// Parse parses the command line option, validates it, constructs the necessary information for the later conversion process and return it.
 func Parse() (string, *Options, error) {
 	fromJpeg := flag.Bool("J", false, "Convert from JPEG")
 	fromPng := flag.Bool("P", false, "Convert from PNG")
