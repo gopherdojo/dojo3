@@ -38,12 +38,12 @@ func NewCli(convert convert.Convert, option *option.Option) Cil {
 func (c *cli) Run() int {
 
 	if fileInfo, err := os.Stat(c.option.DirName); err != nil || fileInfo.IsDir() == false {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		return ExitCodeProcessError
 	}
 
 	if err := walkDirectory(c.option.DirName, c.option.FromExtension, c.convert); err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		return ExitCodeProcessError
 	}
 

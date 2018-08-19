@@ -13,7 +13,7 @@ type Converter interface {
 
 var converts = map[string]Converter{}
 
-// Register sets command to commands
+// Register sets command to converts.
 func Register(key string, convert Converter) {
 	converts[key] = convert
 }
