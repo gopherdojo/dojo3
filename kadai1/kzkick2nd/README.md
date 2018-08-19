@@ -7,3 +7,8 @@
 ```
 $ go run main.go [-i] [-o] <path/to/dir>
 ```
+
+## TODO
+- コマンドライン引数バリデーション作成
+- テスト作成
+- godocを//localhostに生成する
