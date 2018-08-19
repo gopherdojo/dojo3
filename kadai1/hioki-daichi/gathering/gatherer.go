@@ -12,13 +12,12 @@ import (
 
 // Gatherer represents decodable.
 type Gatherer struct {
-	Decoder conversion.Decoder
+	Decoder   conversion.Decoder
+	Pathnames []string
 }
 
 // Gather searches under the specified directory and collects files to be decoded.
 func (g *Gatherer) Gather(dirname string) ([]string, error) {
-	var paths []string
-
 	err := filepath.Walk(dirname, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -42,10 +41,10 @@ func (g *Gatherer) Gather(dirname string) ([]string, error) {
 			return nil
 		}
 
-		paths = append(paths, path)
+		g.Pathnames = append(g.Pathnames, path)
 
 		return nil
 	})
 
-	return paths, err
+	return g.Pathnames, err
 }
