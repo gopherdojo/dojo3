@@ -1,3 +1,4 @@
+// Package jpg is encode and decode to image.
 package jpg
 
 import (
@@ -9,20 +10,19 @@ import (
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
 )
 
-// Jpg implements convert.Converter
-type Jpg struct {
-}
+// Jpg implements convert.Converter.
+type Jpg struct{}
 
 func init() {
 	convert.Register("jpg", Jpg{})
 }
 
-// Decode returns error
+// Decode returns image and error.
 func (Jpg) Decode(r io.Reader) (image.Image, error) {
 	return jpeg.Decode(r)
 }
 
-// Encode returns error
+// Encode return error.
 func (Jpg) Encode(w io.Writer, m image.Image) error {
 	return jpeg.Encode(w, m, nil)
 }

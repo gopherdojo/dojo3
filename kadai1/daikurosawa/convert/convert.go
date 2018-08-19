@@ -1,49 +1,49 @@
+// Package convert is convert image extension.
 package convert
 
 import (
 	"errors"
 	"fmt"
 	"image"
-	"io"
 	"os"
 	"strings"
+
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/option"
 )
 
-// Converter Convert is interface that has Decode and Encode function.
-type Converter interface {
-	Decode(r io.Reader) (image.Image, error)
-	Encode(w io.Writer, m image.Image) error
+// Convert is interface that has Convert function.
+type Convert interface {
+	Convert(path string) error
 }
 
-var converts = map[string]Converter{}
-
-// Register sets command to commands
-func Register(key string, convert Converter) {
-	converts[key] = convert
+type convert struct {
+	option *option.Option
 }
 
-// Convert has command line options.
-type Convert struct {
-	Path          string
-	FromExtension string
-	ToExtension   string
+// NewConvert is Convert interface constructor.
+func NewConvert(option *option.Option) Convert {
+	return &convert{option: option}
 }
 
 // Convert image.
-func (c *Convert) Convert() error {
-	convert, err := getConverter(c.FromExtension)
+func (c *convert) Convert(path string) error {
+	fromConverter, err := getConverter(c.option.FromExtension)
 	if err != nil {
 		return err
 	}
-	image, err := decode(c.Path, convert)
+	image, err := decode(path, fromConverter)
 	if err != nil {
 		return err
 	}
 
-	if err := encode(image, convert, c); err != nil {
+	toConverter, err := getConverter(c.option.ToExtension)
+	if err != nil {
 		return err
 	}
-	fmt.Print(c.Path + " -> to " + c.ToExtension)
+	if err := encode(image, toConverter, path, c); err != nil {
+		return err
+	}
+	fmt.Print(path + " -> to " + c.option.ToExtension)
 	fmt.Printf("\x1b[32m%s\x1b[0m", "\tDONE\n")
 	return nil
 }
@@ -58,8 +58,8 @@ func decode(path string, converter Converter) (image.Image, error) {
 	return converter.Decode(file)
 }
 
-func encode(image image.Image, converter Converter, c *Convert) error {
-	output, err := os.Create(strings.TrimSuffix(c.Path, c.FromExtension) + c.ToExtension)
+func encode(image image.Image, converter Converter, path string, c *convert) error {
+	output, err := os.Create(strings.TrimSuffix(path, c.option.FromExtension) + c.option.ToExtension)
 	if err != nil {
 		return err
 	}

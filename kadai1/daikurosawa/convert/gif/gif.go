@@ -1,3 +1,4 @@
+// Package gif is encode and decode to image.
 package gif
 
 import (
@@ -9,19 +10,18 @@ import (
 )
 
 // Gif implements convert.Converter
-type Gif struct {
-}
+type Gif struct{}
 
 func init() {
 	convert.Register("gif", Gif{})
 }
 
-// Decode returns error
+// Decode returns image and error.
 func (Gif) Decode(r io.Reader) (image.Image, error) {
 	return gif.Decode(r)
 }
 
-// Encode returns error
+// Encode return error.
 func (Gif) Encode(w io.Writer, m image.Image) error {
 	return gif.Encode(w, m, nil)
 }

@@ -1,15 +1,15 @@
+// Package cli is image convert cli tool.
 package cli
 
 import (
-	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
 	"strings"
 
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/option"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -19,34 +19,30 @@ const (
 	ExitCodeProcessError
 )
 
-// Cli has Stdout and Stderr streams.
-type Cli struct {
-	OutStream, ErrStream io.Writer
+// Cil is interface that has Run function.
+type Cil interface {
+	Run() int
 }
 
-// Option has command line options.
-type Option struct {
-	FromExtension string
-	ToExtension   string
+type cli struct {
+	convert convert.Convert
+	option  *option.Option
+}
+
+// NewCli is Cli interface constructor.
+func NewCli(convert convert.Convert, option *option.Option) Cil {
+	return &cli{convert: convert, option: option}
 }
 
 // Run command.
-func (Cli) Run(args []string) int {
-	var (
-		from = flag.String("from", "jpg", "Input file extension.")
-		to   = flag.String("to", "png", "Output file extension.")
-	)
-	flag.Parse()
+func (c *cli) Run() int {
 
-	dirName := flag.Arg(0)
-	if fileInfo, err := os.Stat(dirName); err != nil || fileInfo.IsDir() == false {
+	if fileInfo, err := os.Stat(c.option.DirName); err != nil || fileInfo.IsDir() == false {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return ExitCodeProcessError
 	}
 
-	option := &Option{FromExtension: *from, ToExtension: *to}
-
-	if err := option.walkDirectory(dirName); err != nil {
+	if err := walkDirectory(c.option.DirName, c.option.FromExtension, c.convert); err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return ExitCodeProcessError
 	}
@@ -54,16 +50,13 @@ func (Cli) Run(args []string) int {
 	return ExitCodeOK
 }
 
-func (o *Option) walkDirectory(dirName string) error {
+func walkDirectory(dirName string, fromExtension string, convert convert.Convert) error {
 	eg := errgroup.Group{}
 
 	err := filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
-		if strings.TrimPrefix(filepath.Ext(path), ".") == o.FromExtension {
+		if strings.TrimPrefix(filepath.Ext(path), ".") == fromExtension {
 			eg.Go(func() error {
-				convert := &convert.Convert{Path: path,
-					FromExtension: o.FromExtension,
-					ToExtension:   o.ToExtension}
-				return convert.Convert()
+				return convert.Convert(path)
 			})
 		}
 		return nil
