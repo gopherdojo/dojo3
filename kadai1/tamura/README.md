@@ -1,12 +1,12 @@
-# $BBh(B1$B2s2]Bj!!2hA|JQ49%3%^%s%I$N:n@.(B
+# 第1回課題　画像変換コマンド
 
-## $B;H$$J}(B
-### jpg$B$+$i(Bpng$BJQ49(B
+## 使い方
+### jpgからpng変換
 ```
 $ go rum main.go -f sample.png sample.jpg
 ```
 
-### $B%G%#%l%/%H%jG[2<JQ49(B
+### ディレクトリ配下をpng変換
 ```
 $ go rum main.go -f jpg test/ "sample.png"
 ```
