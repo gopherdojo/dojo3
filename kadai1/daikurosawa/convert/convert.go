@@ -11,6 +11,8 @@ import (
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/option"
 )
 
+const greenColor = "\x1b[32m%s\x1b[0m"
+
 // Convert is interface that has Convert function.
 type Convert interface {
 	Convert(path string) error
@@ -40,11 +42,11 @@ func (c *convert) Convert(path string) error {
 	if err != nil {
 		return err
 	}
-	if err := encode(image, toConverter, path, c); err != nil {
+	if err := encode(image, toConverter, path, c.option.FromExtension, c.option.ToExtension); err != nil {
 		return err
 	}
 	fmt.Print(path + " -> to " + c.option.ToExtension)
-	fmt.Printf("\x1b[32m%s\x1b[0m", "\tDONE\n")
+	fmt.Printf(greenColor, "\tDONE\n")
 	return nil
 }
 
@@ -58,8 +60,8 @@ func decode(path string, converter Converter) (image.Image, error) {
 	return converter.Decode(file)
 }
 
-func encode(image image.Image, converter Converter, path string, c *convert) error {
-	output, err := os.Create(strings.TrimSuffix(path, c.option.FromExtension) + c.option.ToExtension)
+func encode(image image.Image, converter Converter, path string, fromExtension string, toExtension string) error {
+	output, err := os.Create(strings.TrimSuffix(path, fromExtension) + toExtension)
 	if err != nil {
 		return err
 	}
