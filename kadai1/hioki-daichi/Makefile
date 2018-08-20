@@ -4,7 +4,7 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GODOCCMD=godoc
 GODOCPORT=6060
-BINARY_NAME=ffconvert
+BINARY_NAME=imgconv
 
 all: test build
 build:

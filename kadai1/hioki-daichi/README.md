@@ -1,16 +1,16 @@
-# ffconvert
+# imgconv
 
-`ffconvert` is a command to convert the file format under the specified directory.
+`imgconv` is a command to convert the file format under the specified directory.
 
 By default, it converts from `JPEG` to `PNG`.
 
-## How to try ffconvert
+## How to try imgconv
 
 ```shell
 $ make build
-$ ./ffconvert -J -p -f --compression-level=best-speed testdata/
-$ ./ffconvert -P -g -f --num-colors=128 testdata/
-$ ./ffconvert -G -j -f --quality=50 testdata/
+$ ./imgconv -J -p -f --compression-level=best-speed testdata/
+$ ./imgconv -P -g -f --num-colors=128 testdata/
+$ ./imgconv -G -j -f --quality=50 testdata/
 $ make clean
 ```
 
@@ -67,14 +67,14 @@ If the generated file name is duplicated, if you specify the `-f` option, it wil
 If `-f` is not specified, the following error will be displayed.
 
 ```shell
-$ ./ffconvert testdata/images
+$ ./imgconv testdata/images
 File already exists: testdata/images/2018/07/001.png
 ```
 
 `-f` overwrites them.
 
 ```shell
-$ ./ffconvert -f testdata/images
+$ ./imgconv -f testdata/images
 Converted: "testdata/images/2018/07/001.jpg"
 Converted: "testdata/images/2018/08/001.jpg"
 $
