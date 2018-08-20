@@ -12,7 +12,7 @@ import (
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/option"
 )
 
-const TestImageFileName = "test_image.jpg"
+const testImageFileName = "test_image.jpg"
 
 type Mock struct {
 }
@@ -55,7 +55,7 @@ func init() {
 
 	// make test image
 	img := image.NewRGBA(image.Rect(x, y, width, height))
-	file, _ := os.Create(TestImageFileName)
+	file, _ := os.Create(testImageFileName)
 	defer file.Close()
 	if err := jpeg.Encode(file, img, nil); err != nil {
 		panic(err)
@@ -69,8 +69,8 @@ func init() {
 
 func TestConvert_Convert(t *testing.T) {
 	defer func() {
-		if exist := isExist(TestImageFileName); exist {
-			if err := os.Remove(TestImageFileName); err != nil {
+		if exist := isExist(testImageFileName); exist {
+			if err := os.Remove(testImageFileName); err != nil {
 				panic(err)
 			}
 		}
@@ -79,12 +79,12 @@ func TestConvert_Convert(t *testing.T) {
 	for _, fixture := range testFixtures {
 		option := &option.Option{FromExtension: fixture.fromExtension, ToExtension: fixture.toExtension}
 		convert := convert.NewConvert(option)
-		if err := convert.Convert(TestImageFileName); err != nil {
+		if err := convert.Convert(testImageFileName); err != nil {
 			t.Fatalf("failed convert test: %#v", err)
 		}
 
 		// test exists output file
-		outputFile := strings.TrimSuffix(TestImageFileName, fixture.fromExtension) + fixture.toExtension
+		outputFile := strings.TrimSuffix(testImageFileName, fixture.fromExtension) + fixture.toExtension
 		if exist := isExist(outputFile); exist == false {
 			t.Fatal("failed: not found output file")
 		}

@@ -15,8 +15,8 @@ import (
 
 // Exit code.
 const (
-	ExitCodeOK = iota
-	ExitCodeProcessError
+	exitCodeOK = iota
+	exitCodeProcessError
 )
 
 // Cil is interface that has Run function.
@@ -39,15 +39,15 @@ func (c *cli) Run() int {
 
 	if fileInfo, err := os.Stat(c.option.DirName); err != nil || fileInfo.IsDir() == false {
 		fmt.Fprintln(os.Stderr, err.Error())
-		return ExitCodeProcessError
+		return exitCodeProcessError
 	}
 
 	if err := walkDirectory(c.option.DirName, c.option.FromExtension, c.convert); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
-		return ExitCodeProcessError
+		return exitCodeProcessError
 	}
 
-	return ExitCodeOK
+	return exitCodeOK
 }
 
 func walkDirectory(dirName string, fromExtension string, convert convert.Convert) error {
