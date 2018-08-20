@@ -10,13 +10,13 @@ import (
 	"path/filepath"
 )
 
-// converter converts a single image file with specific extension into another.
+// imgFile converts a single image file with specific extension into another.
 // See imgExt for supported image file extensions.
-type converter struct {
+type imgFile struct {
 	Path string
 }
 
-func (c *converter) convert(to imgExt) (string, error) {
+func (c *imgFile) convertTo(to imgExt) (string, error) {
 	img, err := c.decode()
 	if err != nil {
 		return "", err
@@ -25,7 +25,7 @@ func (c *converter) convert(to imgExt) (string, error) {
 	return c.encode(img, to)
 }
 
-func (c *converter) decode() (image.Image, error) {
+func (c *imgFile) decode() (image.Image, error) {
 	from, err := c.ext()
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (c *converter) decode() (image.Image, error) {
 	}
 }
 
-func (c *converter) encode(m image.Image, to imgExt) (string, error) {
+func (c *imgFile) encode(m image.Image, to imgExt) (string, error) {
 	out := c.out(to)
 	writer, err := os.Create(out)
 	if err != nil {
@@ -69,14 +69,14 @@ func (c *converter) encode(m image.Image, to imgExt) (string, error) {
 	}
 }
 
-func (c *converter) extString() string {
+func (c *imgFile) extString() string {
 	return trimExt(filepath.Ext(c.Path))
 }
 
-func (c *converter) ext() (imgExt, error) {
+func (c *imgFile) ext() (imgExt, error) {
 	return ImgExt(c.extString())
 }
 
-func (c *converter) out(to imgExt) string {
+func (c *imgFile) out(to imgExt) string {
 	return c.Path[0:len(c.Path)-len(c.extString())] + to.String()
 }

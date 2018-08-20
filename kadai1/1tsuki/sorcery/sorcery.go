@@ -15,7 +15,7 @@ var (
 	ErrUnsupportedExtension = fmt.Errorf("unsupported extension specified")
 )
 
-// sorcery convert image formats, and print result to writer
+// sorcery convertTo image formats, and print result to writer
 type sorcery struct {
 	writer io.Writer
 }
@@ -27,8 +27,8 @@ func Sorcery(writer io.Writer) *sorcery {
 
 // Exec is a method to start image format conversions
 // Be aware that it automatically search subdirectories
-func (s *sorcery) Exec(from imgExt, to imgExt, dir string) error {
-	if !from.isValid() || !to.isValid() {
+func (s *sorcery) Exec(fromExt imgExt, toExt imgExt, dir string) error {
+	if !fromExt.isValid() || !toExt.isValid() {
 		return ErrUnsupportedExtension
 	}
 
@@ -36,14 +36,14 @@ func (s *sorcery) Exec(from imgExt, to imgExt, dir string) error {
 		return err
 	}
 
-	return scan(dir, from, func(in string) error {
-		c := &converter{Path: in}
-		out, err := c.convert(to)
+	return scan(dir, fromExt, func(file string) error {
+		c := &imgFile{Path: file}
+		out, err := c.convertTo(toExt)
 		if err != nil {
 			return err
 		}
 
-		fmt.Fprintf(s.writer, "file converted: %s to %s\n", in, out)
+		fmt.Fprintf(s.writer, "file converted: %s toExt %s\n", file, out)
 		return nil
 	})
 }
