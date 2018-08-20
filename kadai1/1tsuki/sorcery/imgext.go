@@ -54,5 +54,5 @@ func (e imgExt) isValid() bool {
 }
 
 func trimExt(ext string) string {
-	return strings.Trim(strings.ToLower(ext), ".")
+	return strings.TrimLeft(strings.ToLower(ext), ".")
 }
