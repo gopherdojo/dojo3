@@ -10,7 +10,7 @@ import (
 
 func main() {
 	var (
-		targetDir = flag.String("targetDir", ".", "対象ディレクトリ")
+		targetDir = flag.String("targetDir", "./", "対象ディレクトリ")
 		srcType = flag.String("srcType", "jpeg", "変換元ファイルタイプ")
 		destType = flag.String("destType", "png", "変換先ファイルタイプ")
 	)
@@ -22,7 +22,7 @@ func main() {
 func walkFile(targetDir *string, srcType *string, destType *string) {
 	err := filepath.Walk(*targetDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir(){
-			convertImage.Convert(path, srcType, destType)
+			convertImage.Convert(targetDir, path, srcType, destType)
 		}
 		return nil
 	})

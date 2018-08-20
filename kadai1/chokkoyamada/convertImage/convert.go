@@ -33,7 +33,7 @@ func(ai AbstractImage) encode(out *os.File, destType *string) {
 }
 
 //convert image file from one to another
-func Convert(src string, srcType *string, destType *string) {
+func Convert(targetDir *string, src string, srcType *string, destType *string) {
 	file, err := os.Open(src)
 	if err != nil {
 		panic(err)
@@ -57,7 +57,7 @@ func Convert(src string, srcType *string, destType *string) {
 	}
 	ai := AbstractImage{in:img}
 
-	out, err := os.Create("." + getFileNameWithoutExt(src) + "." + *destType)
+	out, err := os.Create(*targetDir + getFileNameWithoutExt(src) + "." + *destType)
 	if err != nil {
 		panic(err)
 	}
