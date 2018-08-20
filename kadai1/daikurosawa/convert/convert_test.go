@@ -17,12 +17,12 @@ const TestImageFileName = "test_image.jpg"
 type Mock struct {
 }
 
-// Decode mock returns error
+// Decode mock
 func (Mock) Decode(r io.Reader) (image.Image, error) {
 	return jpeg.Decode(r)
 }
 
-// Encode mock returns error
+// Encode mock
 func (Mock) Encode(w io.Writer, m image.Image) error {
 	return nil
 }
