@@ -12,6 +12,7 @@ import (
 )
 
 var writer io.Writer
+
 const (
 	exitCodeOK = iota
 	exitCodeInvalidOption

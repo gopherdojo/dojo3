@@ -49,6 +49,7 @@ func (e imgExt) String() string {
 	}
 }
 
+// isValid checks that imgExt is implemented as a const or not
 func (e imgExt) isValid() bool {
 	return e < end
 }
