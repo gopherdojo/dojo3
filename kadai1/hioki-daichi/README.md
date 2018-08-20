@@ -67,15 +67,16 @@ If the generated file name is duplicated, if you specify the `-f` option, it wil
 If `-f` is not specified, the following error will be displayed.
 
 ```shell
-$ ./imgconv testdata/images
-File already exists: testdata/images/2018/07/001.png
+$ ./imgconv testdata/
+File already exists: testdata/jpeg/sample1.png
 ```
 
 `-f` overwrites them.
 
 ```shell
-$ ./imgconv -f testdata/images
-Converted: "testdata/images/2018/07/001.jpg"
-Converted: "testdata/images/2018/08/001.jpg"
+$ ./imgconv -f testdata/
+Converted: "testdata/jpeg/sample1.png"
+Converted: "testdata/jpeg/sample2.png"
+Converted: "testdata/jpeg/sample3.png"
 $
 ```

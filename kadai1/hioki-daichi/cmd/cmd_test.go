@@ -15,9 +15,9 @@ import (
 func TestJpegToPng(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestJpegToPng"
+	tmpdir := "../tmp/TestJpegToPng"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -25,16 +25,17 @@ func TestJpegToPng(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToPng/2018/07/001.png"`)
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToPng/2018/08/001.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample1.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample2.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample3.png"`)
 }
 
 func TestJpegToGif(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestJpegToGif"
+	tmpdir := "../tmp/TestJpegToGif"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -42,16 +43,17 @@ func TestJpegToGif(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Gif{Options: &gif.Options{NumColors: 256}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToGif/2018/07/001.gif"`)
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestJpegToGif/2018/08/001.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample1.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample2.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample3.gif"`)
 }
 
 func TestPngToJpeg(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestPngToJpeg"
+	tmpdir := "../tmp/TestPngToJpeg"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -59,16 +61,16 @@ func TestPngToJpeg(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToJpeg/2018/07/002.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToJpeg/2018/08/002.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToJpeg/png/sample1.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToJpeg/png/sample2.jpg"`)
 }
 
 func TestPngToGif(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestPngToGif"
+	tmpdir := "../tmp/TestPngToGif"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -76,16 +78,16 @@ func TestPngToGif(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Gif{Options: &gif.Options{NumColors: 256}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToGif/2018/07/002.gif"`)
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestPngToGif/2018/08/002.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToGif/png/sample1.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToGif/png/sample2.gif"`)
 }
 
 func TestGifToJpeg(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestGifToJpeg"
+	tmpdir := "../tmp/TestGifToJpeg"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -93,15 +95,15 @@ func TestGifToJpeg(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestGifToJpeg/2018/08/003.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestGifToJpeg/gif/sample1.jpg"`)
 }
 
 func TestGifToPng(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestGifToPng"
+	tmpdir := "../tmp/TestGifToPng"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -109,15 +111,15 @@ func TestGifToPng(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../testdata/TestGifToPng/2018/08/003.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestGifToPng/gif/sample1.png"`)
 }
 
 func TestConflict(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../testdata/" + "TestConflict"
+	tmpdir := "../tmp/TestConflict"
 
-	exec.Command("cp", "-r", "../testdata/images", tmpdir).Run()
+	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
 
 	buf := &bytes.Buffer{}
@@ -128,7 +130,7 @@ func TestConflict(t *testing.T) {
 	runner = &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: false}
 	err := runner.Run(tmpdir)
 
-	expected := "File already exists: ../testdata/TestConflict/2018/07/001.png"
+	expected := "File already exists: ../tmp/TestConflict/jpeg/sample1.png"
 	if err.Error() != expected {
 		t.Errorf("expected: %s, actual: %s", expected, err)
 	}
