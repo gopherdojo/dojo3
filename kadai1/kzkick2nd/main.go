@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"github.com/gopherdojo/dojo3/kadai1/kzkick2nd/convert"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/gopherdojo/dojo3/kadai1/kzkick2nd/convert"
 )
 
 func main() {
