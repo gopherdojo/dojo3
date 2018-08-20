@@ -93,14 +93,14 @@ func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Deco
 
 func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool, quality *int, numColors *int, humanCompressionLevel *string) conversion.Encoder {
 	switch {
-	case *toPng:
-		return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: toCompressionLevel(humanCompressionLevel)}}
 	case *toGif:
 		return &conversion.Gif{Options: &gif.Options{NumColors: *numColors}}
 	case *toJpeg:
+		return &conversion.Jpeg{Options: &jpeg.Options{Quality: *quality}}
+	case *toPng:
 		fallthrough
 	default:
-		return &conversion.Jpeg{Options: &jpeg.Options{Quality: *quality}}
+		return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: toCompressionLevel(humanCompressionLevel)}}
 	}
 }
 
