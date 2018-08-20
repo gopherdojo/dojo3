@@ -33,7 +33,7 @@ func (c *CLI) Run(args []string) int {
 
 	if len(flag.Args()) < 1 {
 		fmt.Fprintf(c.ErrStream, "Specify one directory.\n")
-		return 1
+		return flagError
 	}
 
 	srcDir := flag.Arg(0)
