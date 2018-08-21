@@ -21,8 +21,8 @@ func (g *Gif) Encode(w io.Writer, img image.Image) error {
 }
 
 // Decode decodes the specified GIF file
-func (g *Gif) Decode(fp *os.File) (image.Image, error) {
-	return gif.Decode(fp)
+func (g *Gif) Decode(r io.Reader) (image.Image, error) {
+	return gif.Decode(r)
 }
 
 // Extname returns "gif"

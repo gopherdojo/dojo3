@@ -21,8 +21,8 @@ func (j *Jpeg) Encode(w io.Writer, img image.Image) error {
 }
 
 // Decode decodes the specified JPEG file
-func (j *Jpeg) Decode(fp *os.File) (image.Image, error) {
-	return jpeg.Decode(fp)
+func (j *Jpeg) Decode(r io.Reader) (image.Image, error) {
+	return jpeg.Decode(r)
 }
 
 // Extname returns "jpg"

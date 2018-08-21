@@ -21,8 +21,8 @@ func (p *Png) Encode(w io.Writer, img image.Image) error {
 }
 
 // Decode decodes the specified PNG file
-func (p *Png) Decode(fp *os.File) (image.Image, error) {
-	return png.Decode(fp)
+func (p *Png) Decode(r io.Reader) (image.Image, error) {
+	return png.Decode(r)
 }
 
 // Extname returns "png"
