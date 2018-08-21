@@ -25,9 +25,9 @@ func TestJpegToPng(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample1.png"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample2.png"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToPng/jpeg/sample3.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample1.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample2.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample3.png"`)
 }
 
 func TestJpegToGif(t *testing.T) {
@@ -43,9 +43,9 @@ func TestJpegToGif(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Gif{Options: &gif.Options{NumColors: 256}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample1.gif"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample2.gif"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestJpegToGif/jpeg/sample3.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample1.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample2.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/jpeg/sample3.gif"`)
 }
 
 func TestPngToJpeg(t *testing.T) {
@@ -61,8 +61,8 @@ func TestPngToJpeg(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToJpeg/png/sample1.jpg"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToJpeg/png/sample2.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/png/sample1.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/png/sample2.jpg"`)
 }
 
 func TestPngToGif(t *testing.T) {
@@ -78,8 +78,8 @@ func TestPngToGif(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Png{}, Encoder: &conversion.Gif{Options: &gif.Options{NumColors: 256}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToGif/png/sample1.gif"`)
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestPngToGif/png/sample2.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/png/sample1.gif"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/png/sample2.gif"`)
 }
 
 func TestGifToJpeg(t *testing.T) {
@@ -95,7 +95,7 @@ func TestGifToJpeg(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Jpeg{Options: &jpeg.Options{Quality: 100}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestGifToJpeg/gif/sample1.jpg"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/gif/sample1.jpg"`)
 }
 
 func TestGifToPng(t *testing.T) {
@@ -111,7 +111,7 @@ func TestGifToPng(t *testing.T) {
 	runner := &Runner{OutStream: buf, Decoder: &conversion.Gif{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: true}
 	runner.Run(tmpdir)
 
-	expectToMatchBuffer(t, buf, `Converted: "../tmp/TestGifToPng/gif/sample1.png"`)
+	expectToMatchBuffer(t, buf, `Converted: "`+tmpdir+`/gif/sample1.png"`)
 }
 
 func TestConflict(t *testing.T) {
@@ -130,7 +130,7 @@ func TestConflict(t *testing.T) {
 	runner = &Runner{OutStream: buf, Decoder: &conversion.Jpeg{}, Encoder: &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCompression}}, Force: false}
 	err := runner.Run(tmpdir)
 
-	expected := "File already exists: ../tmp/TestConflict/jpeg/sample1.png"
+	expected := "File already exists: " + tmpdir + "/jpeg/sample1.png"
 	if err.Error() != expected {
 		t.Errorf("expected: %s, actual: %s", expected, err)
 	}
