@@ -47,8 +47,8 @@ func (c *Converter) Convert(path string, force bool) (*os.File, error) {
 	dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
 	if !force {
-		_, err := os.Stat(dstPath)
-		if err == nil {
+		_, err := os.OpenFile(dstPath, os.O_CREATE|os.O_EXCL, 0)
+		if os.IsExist(err) {
 			return nil, errors.New("File already exists: " + dstPath)
 		}
 	}
