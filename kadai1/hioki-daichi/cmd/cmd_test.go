@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 func TestJpegToPng(t *testing.T) {
@@ -118,7 +119,7 @@ func TestConflict(t *testing.T) {
 
 func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	tempdir, _ := ioutil.TempDir("", "imgconv-testing-")
-	exec.Command("cp", "-r", "../testdata/", tempdir).Run()
+	fileutil.CopyDirRec("../testdata/", tempdir)
 	defer exec.Command("rm", "-r", tempdir).Run()
 	f(t, tempdir)
 }
