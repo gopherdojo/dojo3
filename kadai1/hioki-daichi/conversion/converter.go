@@ -29,7 +29,7 @@ type Encoder interface {
 type Decoder interface {
 	Decode(io.Reader) (image.Image, error)
 	HasProcessableExtname(string) bool
-	IsDecodable(*os.File) bool
+	IsDecodable(io.ReadSeeker) bool
 }
 
 // Convert opens the file, decodes it, creates a file with a different extension, and writes the encoded result.

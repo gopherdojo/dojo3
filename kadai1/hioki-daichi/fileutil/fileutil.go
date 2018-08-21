@@ -12,11 +12,11 @@ import (
 )
 
 // StartsContentsWith returns whether file contents start with specified bytes.
-func StartsContentsWith(fp *os.File, xs []uint8) bool {
+func StartsContentsWith(rs io.ReadSeeker, xs []uint8) bool {
 	buf := make([]byte, len(xs))
-	fp.Seek(0, 0)
-	fp.Read(buf)
-	fp.Seek(0, 0)
+	rs.Seek(0, 0)
+	rs.Read(buf)
+	rs.Seek(0, 0)
 	return bytes.Equal(buf, xs)
 }
 
