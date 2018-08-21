@@ -3,6 +3,7 @@ package conversion
 import (
 	"image"
 	"image/jpeg"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -15,8 +16,8 @@ type Jpeg struct {
 }
 
 // Encode encodes the specified file to JPEG
-func (j *Jpeg) Encode(fp *os.File, img image.Image) error {
-	return jpeg.Encode(fp, img, j.Options)
+func (j *Jpeg) Encode(w io.Writer, img image.Image) error {
+	return jpeg.Encode(w, img, j.Options)
 }
 
 // Decode decodes the specified JPEG file

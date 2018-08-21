@@ -3,6 +3,7 @@ package conversion
 import (
 	"image"
 	"image/gif"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -15,8 +16,8 @@ type Gif struct {
 }
 
 // Encode encodes the specified file to GIF
-func (g *Gif) Encode(fp *os.File, img image.Image) error {
-	return gif.Encode(fp, img, g.Options)
+func (g *Gif) Encode(w io.Writer, img image.Image) error {
+	return gif.Encode(w, img, g.Options)
 }
 
 // Decode decodes the specified GIF file

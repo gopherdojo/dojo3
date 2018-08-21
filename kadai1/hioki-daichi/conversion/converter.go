@@ -8,6 +8,7 @@ package conversion
 import (
 	"errors"
 	"image"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -20,7 +21,7 @@ type Converter struct {
 
 // Encoder configures encode-needed settings.
 type Encoder interface {
-	Encode(*os.File, image.Image) error
+	Encode(io.Writer, image.Image) error
 	Extname() string
 }
 

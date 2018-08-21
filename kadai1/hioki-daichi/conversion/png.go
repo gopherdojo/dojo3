@@ -3,6 +3,7 @@ package conversion
 import (
 	"image"
 	"image/png"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -15,8 +16,8 @@ type Png struct {
 }
 
 // Encode encodes the specified file to PNG
-func (p *Png) Encode(fp *os.File, img image.Image) error {
-	return p.Encoder.Encode(fp, img)
+func (p *Png) Encode(w io.Writer, img image.Image) error {
+	return p.Encoder.Encode(w, img)
 }
 
 // Decode decodes the specified PNG file
