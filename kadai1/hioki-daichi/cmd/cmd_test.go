@@ -6,7 +6,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
-	"os/exec"
+	"os"
 	"regexp"
 	"testing"
 
@@ -120,7 +120,7 @@ func TestConflict(t *testing.T) {
 func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	tempdir, _ := ioutil.TempDir("", "imgconv-testing-")
 	fileutil.CopyDirRec("../testdata/", tempdir)
-	defer exec.Command("rm", "-r", tempdir).Run()
+	defer os.RemoveAll(tempdir)
 	f(t, tempdir)
 }
 
