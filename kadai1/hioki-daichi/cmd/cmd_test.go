@@ -5,6 +5,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"io/ioutil"
 	"os/exec"
 	"regexp"
 	"testing"
@@ -15,7 +16,7 @@ import (
 func TestJpegToPng(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestJpegToPng"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -33,7 +34,7 @@ func TestJpegToPng(t *testing.T) {
 func TestJpegToGif(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestJpegToGif"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -51,7 +52,7 @@ func TestJpegToGif(t *testing.T) {
 func TestPngToJpeg(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestPngToJpeg"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -68,7 +69,7 @@ func TestPngToJpeg(t *testing.T) {
 func TestPngToGif(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestPngToGif"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -85,7 +86,7 @@ func TestPngToGif(t *testing.T) {
 func TestGifToJpeg(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestGifToJpeg"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -101,7 +102,7 @@ func TestGifToJpeg(t *testing.T) {
 func TestGifToPng(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestGifToPng"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
@@ -117,7 +118,7 @@ func TestGifToPng(t *testing.T) {
 func TestConflict(t *testing.T) {
 	t.Parallel()
 
-	tmpdir := "../tmp/TestConflict"
+	tmpdir, _ := ioutil.TempDir("", "imgconv-testing-")
 
 	exec.Command("cp", "-r", "../testdata/", tmpdir).Run()
 	defer exec.Command("rm", "-r", tmpdir).Run()
