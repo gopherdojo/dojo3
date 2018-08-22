@@ -5,8 +5,6 @@ import (
 	"image/jpeg"
 	"io"
 	"path/filepath"
-
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Jpeg https://en.wikipedia.org/wiki/JPEG
@@ -29,9 +27,9 @@ func (j *Jpeg) Extname() string {
 	return "jpg"
 }
 
-// IsDecodable returns whether the file content is JPEG
-func (j *Jpeg) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []byte("\xFF\xD8\xFF"))
+// MagicBytesSlice returns the magic bytes slice of JPEG
+func (j *Jpeg) MagicBytesSlice() [][]byte {
+	return [][]byte{[]byte("\xFF\xD8\xFF")}
 }
 
 // HasProcessableExtname returns whether the specified path has ".jpg" or ".jpeg"

@@ -5,8 +5,6 @@ import (
 	"image/png"
 	"io"
 	"path/filepath"
-
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Png https://en.wikipedia.org/wiki/Portable_Network_Graphics
@@ -29,9 +27,9 @@ func (p *Png) Extname() string {
 	return "png"
 }
 
-// IsDecodable returns whether the file content is PNG
-func (p *Png) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []byte("\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"))
+// MagicBytesSlice returns the magic bytes slice of PNG
+func (p *Png) MagicBytesSlice() [][]byte {
+	return [][]byte{[]byte("\x89\x50\x4E\x47\x0D\x0A\x1A\x0A")}
 }
 
 // HasProcessableExtname returns whether the specified path has ".png"

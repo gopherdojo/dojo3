@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
+	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Gatherer represents decodable.
@@ -42,7 +43,14 @@ func (g *Gatherer) walkFn(path string, info os.FileInfo, err error) error {
 	}
 	defer fp.Close()
 
-	if !g.Decoder.IsDecodable(fp) {
+	isDecodable := false
+	for _, magicBytes := range g.Decoder.MagicBytesSlice() {
+		if fileutil.StartsContentsWith(fp, magicBytes) {
+			isDecodable = true
+			break
+		}
+	}
+	if !isDecodable {
 		return nil
 	}
 

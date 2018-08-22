@@ -5,8 +5,6 @@ import (
 	"image/gif"
 	"io"
 	"path/filepath"
-
-	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/fileutil"
 )
 
 // Gif https://en.wikipedia.org/wiki/GIF
@@ -29,9 +27,9 @@ func (g *Gif) Extname() string {
 	return "gif"
 }
 
-// IsDecodable returns whether the file content is GIF
-func (g *Gif) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []byte("GIF87a")) || fileutil.StartsContentsWith(rs, []byte("GIF89a"))
+// MagicBytesSlice returns the magic bytes slice of GIF
+func (g *Gif) MagicBytesSlice() [][]byte {
+	return [][]byte{[]byte("GIF87a"), []byte("GIF89a")}
 }
 
 // HasProcessableExtname returns whether the specified path has ".gif"
