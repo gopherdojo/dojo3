@@ -31,7 +31,7 @@ func (g *Gif) Extname() string {
 
 // IsDecodable returns whether the file content is GIF
 func (g *Gif) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []uint8{71, 73, 70, 56, 55, 97}) || fileutil.StartsContentsWith(rs, []uint8{71, 73, 70, 56, 57, 97})
+	return fileutil.StartsContentsWith(rs, []byte("GIF87a")) || fileutil.StartsContentsWith(rs, []byte("GIF89a"))
 }
 
 // HasProcessableExtname returns whether the specified path has ".gif"

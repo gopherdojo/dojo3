@@ -31,7 +31,7 @@ func (p *Png) Extname() string {
 
 // IsDecodable returns whether the file content is PNG
 func (p *Png) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []uint8{137, 80, 78, 71, 13, 10, 26, 10})
+	return fileutil.StartsContentsWith(rs, []byte("\x89\x50\x4E\x47\x0D\x0A\x1A\x0A"))
 }
 
 // HasProcessableExtname returns whether the specified path has ".png"

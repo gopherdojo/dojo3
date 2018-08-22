@@ -31,7 +31,7 @@ func (j *Jpeg) Extname() string {
 
 // IsDecodable returns whether the file content is JPEG
 func (j *Jpeg) IsDecodable(rs io.ReadSeeker) bool {
-	return fileutil.StartsContentsWith(rs, []uint8{255, 216, 255})
+	return fileutil.StartsContentsWith(rs, []byte("\xFF\xD8\xFF"))
 }
 
 // HasProcessableExtname returns whether the specified path has ".jpg" or ".jpeg"
