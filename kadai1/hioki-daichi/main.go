@@ -18,7 +18,7 @@ func main() {
 }
 
 func execute() error {
-	dirname, options, err := opt.Parse()
+	dirname, options, err := opt.Parse(os.Args[1:]...)
 	if err != nil {
 		return err
 	}

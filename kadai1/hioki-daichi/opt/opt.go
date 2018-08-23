@@ -9,6 +9,7 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"os"
 
 	"github.com/gopherdojo/dojo3/kadai1/hioki-daichi/conversion"
 )
@@ -21,24 +22,21 @@ type Options struct {
 }
 
 // Parse parses the command line option, validates it, constructs the necessary information for the later conversion process and return it.
-func Parse() (string, *Options, error) {
-	fromJpeg := flag.Bool("J", false, "Convert from JPEG")
-	fromPng := flag.Bool("P", false, "Convert from PNG")
-	fromGif := flag.Bool("G", false, "Convert from GIF")
+func Parse(args ...string) (string, *Options, error) {
+	flg := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 
-	toJpeg := flag.Bool("j", false, "Convert to JPEG")
-	toPng := flag.Bool("p", false, "Convert to PNG")
-	toGif := flag.Bool("g", false, "Convert to GIF")
+	fromJpeg := flg.Bool("J", false, "Convert from JPEG")
+	fromPng := flg.Bool("P", false, "Convert from PNG")
+	fromGif := flg.Bool("G", false, "Convert from GIF")
+	toJpeg := flg.Bool("j", false, "Convert to JPEG")
+	toPng := flg.Bool("p", false, "Convert to PNG")
+	toGif := flg.Bool("g", false, "Convert to GIF")
+	force := flg.Bool("f", false, "Overwrite when the converted file name duplicates.")
+	quality := flg.Int("quality", 100, "JPEG Quality to be used with '-j' option. You can specify 1 to 100.")
+	numColors := flg.Int("num-colors", 256, "Maximum number of colors used in the GIF image to be used with '-g' option. You can specify 1 to 256.")
+	humanCompressionLevel := flg.String("compression-level", "default", "Options to specify the compression level of PNG to be used with '-p' option. You can specify from 'default', 'no', 'best-speed', 'best-compression'.")
 
-	force := flag.Bool("f", false, "Overwrite when the converted file name duplicates.")
-
-	quality := flag.Int("quality", 100, "JPEG Quality to be used with '-j' option. You can specify 1 to 100.")
-
-	numColors := flag.Int("num-colors", 256, "Maximum number of colors used in the GIF image to be used with '-g' option. You can specify 1 to 256.")
-
-	humanCompressionLevel := flag.String("compression-level", "default", "Options to specify the compression level of PNG to be used with '-p' option. You can specify from 'default', 'no', 'best-speed', 'best-compression'.")
-
-	flag.Parse()
+	flg.Parse(args)
 
 	if *toJpeg {
 		if *quality < 1 {
@@ -64,7 +62,7 @@ func Parse() (string, *Options, error) {
 		}
 	}
 
-	dirnames := flag.Args()
+	dirnames := flg.Args()
 	if len(dirnames) == 0 {
 		return "", nil, errors.New("you must specify a directory")
 	}
@@ -93,10 +91,10 @@ func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Deco
 
 func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool, quality *int, numColors *int, humanCompressionLevel *string) conversion.Encoder {
 	switch {
-	case *toGif:
-		return &conversion.Gif{Options: &gif.Options{NumColors: *numColors}}
 	case *toJpeg:
 		return &conversion.Jpeg{Options: &jpeg.Options{Quality: *quality}}
+	case *toGif:
+		return &conversion.Gif{Options: &gif.Options{NumColors: *numColors}}
 	case *toPng:
 		fallthrough
 	default:
