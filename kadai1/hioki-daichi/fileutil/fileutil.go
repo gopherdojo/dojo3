@@ -12,12 +12,25 @@ import (
 )
 
 // StartsContentsWith returns whether file contents start with specified bytes.
-func StartsContentsWith(rs io.ReadSeeker, xs []byte) bool {
+func StartsContentsWith(rs io.ReadSeeker, xs []byte) (bool, error) {
 	buf := make([]byte, len(xs))
-	rs.Seek(0, 0)
-	rs.Read(buf)
-	rs.Seek(0, 0)
-	return bytes.Equal(buf, xs)
+
+	_, err := rs.Seek(0, 0)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = rs.Read(buf)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = rs.Seek(0, 0)
+	if err != nil {
+		return false, err
+	}
+
+	return bytes.Equal(buf, xs), nil
 }
 
 // CopyDirRec copies src directory to dest recursively.

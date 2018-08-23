@@ -45,7 +45,11 @@ func (g *Gatherer) walkFn(path string, info os.FileInfo, err error) error {
 
 	isDecodable := false
 	for _, magicBytes := range g.Decoder.MagicBytesSlice() {
-		if fileutil.StartsContentsWith(fp, magicBytes) {
+		ok, err := fileutil.StartsContentsWith(fp, magicBytes)
+		if err != nil {
+			return err
+		}
+		if ok {
 			isDecodable = true
 			break
 		}
