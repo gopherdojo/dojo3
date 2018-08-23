@@ -64,8 +64,8 @@ func Parse() (string, *Options, error) {
 		}
 	}
 
-	args := flag.Args()
-	if len(args) == 0 {
+	dirnames := flag.Args()
+	if len(dirnames) == 0 {
 		return "", nil, errors.New("you must specify a directory")
 	}
 
@@ -75,7 +75,7 @@ func Parse() (string, *Options, error) {
 		Force:   *force,
 	}
 
-	return args[0], options, nil
+	return dirnames[0], options, nil
 }
 
 func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Decoder {
