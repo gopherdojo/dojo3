@@ -7,14 +7,14 @@ import (
 
 	"image/jpeg"
 
-	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/di"
 )
 
 // Jpg implements convert.Converter.
 type Jpg struct{}
 
 func init() {
-	convert.Register("jpg", Jpg{})
+	di.Register("jpg", Jpg{})
 }
 
 // Decode returns image and error.

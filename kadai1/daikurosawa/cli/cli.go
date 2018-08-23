@@ -2,10 +2,11 @@
 package cli
 
 import (
+	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
-
 	"strings"
 
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
@@ -16,33 +17,39 @@ import (
 // Exit code.
 const (
 	exitCodeOK = iota
+	ExitCodeParseFlagError
 	exitCodeProcessError
 )
 
-// Cil is interface that has Run function.
-type Cil interface {
-	Run() int
-}
-
-type cli struct {
-	convert convert.Convert
-	option  *option.Option
-}
-
-// NewCli is Cli interface constructor.
-func NewCli(convert convert.Convert, option *option.Option) Cil {
-	return &cli{convert: convert, option: option}
+type CLI struct {
+	OutStream, ErrStream io.Writer
 }
 
 // Run command.
-func (c *cli) Run() int {
+func (c *CLI) Run(args []string) int {
 
-	if fileInfo, err := os.Stat(c.option.DirName); err != nil || fileInfo.IsDir() == false {
+	var from, to string
+	flags := flag.NewFlagSet("awesome-cli", flag.ContinueOnError)
+	flags.SetOutput(c.ErrStream)
+	flags.StringVar(&from, "from", "jpg", "Input file extension.")
+	flag.StringVar(&to, "to", "png", "Output file extension.")
+	flag.Parse()
+
+	if err := flags.Parse(args[1:]); err != nil {
+		return ExitCodeParseFlagError
+	}
+
+	dirName := flags.Arg(0)
+
+	if fileInfo, err := os.Stat(dirName); err != nil || fileInfo.IsDir() == false {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return exitCodeProcessError
 	}
 
-	if err := walkDirectory(c.option.DirName, c.option.FromExtension, c.convert); err != nil {
+	option := &option.Option{DirName: dirName, FromExtension: from, ToExtension: to}
+	convert := convert.NewConvert(option)
+
+	if err := walkDirectory(dirName, from, convert); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		return exitCodeProcessError
 	}

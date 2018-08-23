@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/di"
 	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/option"
 )
 
@@ -50,7 +51,7 @@ func (c *convert) Convert(path string) error {
 	return nil
 }
 
-func decode(path string, converter Converter) (image.Image, error) {
+func decode(path string, converter di.Converter) (image.Image, error) {
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -60,7 +61,7 @@ func decode(path string, converter Converter) (image.Image, error) {
 	return converter.Decode(file)
 }
 
-func encode(image image.Image, converter Converter, path string, fromExtension string, toExtension string) error {
+func encode(image image.Image, converter di.Converter, path string, fromExtension string, toExtension string) error {
 	output, err := os.Create(strings.TrimSuffix(path, fromExtension) + toExtension)
 	if err != nil {
 		return err
@@ -69,8 +70,8 @@ func encode(image image.Image, converter Converter, path string, fromExtension s
 	return converter.Encode(output, image)
 }
 
-func getConverter(extension string) (Converter, error) {
-	convert, ok := converts[extension]
+func getConverter(extension string) (di.Converter, error) {
+	convert, ok := di.Converts[extension]
 	if ok {
 		return convert, nil
 	} else {

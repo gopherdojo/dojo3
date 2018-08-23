@@ -7,14 +7,14 @@ import (
 
 	"image/png"
 
-	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/di"
 )
 
 // Png implements convert.Converter
 type Png struct{}
 
 func init() {
-	convert.Register("png", Png{})
+	di.Register("png", Png{})
 }
 
 // Decode returns image and error

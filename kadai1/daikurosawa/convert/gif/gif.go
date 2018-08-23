@@ -6,14 +6,14 @@ import (
 	"image/gif"
 	"io"
 
-	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/convert"
+	"github.com/gopherdojo/dojo3/kadai1/daikurosawa/di"
 )
 
 // Gif implements convert.Converter
 type Gif struct{}
 
 func init() {
-	convert.Register("gif", Gif{})
+	di.Register("gif", Gif{})
 }
 
 // Decode returns image and error.
