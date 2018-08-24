@@ -39,7 +39,7 @@ func Traverse(srcDir, fromExt, toExt string) error {
 
 		iconv := imgconv.ImageConverter{}
 
-		if err := iconv.Convert(r, w, fromExt, toExt); err != nil {
+		if err := iconv.Convert(r, w, toExt); err != nil {
 			return err
 		}
 

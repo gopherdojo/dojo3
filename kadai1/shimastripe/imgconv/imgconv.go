@@ -38,7 +38,7 @@ type ImageConverter struct {
 
 // decode reads a JPG/GIF/PNG image from r and returns the first embedded
 // image as an image.Image.
-func (ic *ImageConverter) decode(r io.Reader, fromExt supportFormat) error {
+func (ic *ImageConverter) decode(r io.Reader) error {
 
 	if ic == nil {
 		return errors.New("ImageConverter is nil receiver.")
@@ -73,13 +73,13 @@ func (ic *ImageConverter) encode(w io.Writer, toExt supportFormat) error {
 }
 
 // Convert the image to the specified format.
-func (ic *ImageConverter) Convert(r io.Reader, w io.Writer, fromExt, toExt string) error {
+func (ic *ImageConverter) Convert(r io.Reader, w io.Writer, toExt string) error {
 
 	if ic == nil {
 		return errors.New("ImageConverter is nil receiver.")
 	}
 
-	if err := ic.decode(r, supportFormat(fromExt)); err != nil {
+	if err := ic.decode(r); err != nil {
 		return err
 	}
 
