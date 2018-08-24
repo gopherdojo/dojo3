@@ -13,29 +13,17 @@ import (
 type supportFormat string
 
 const (
-	gifType supportFormat = "gif"
-	jpgType supportFormat = "jpg"
-	pngType supportFormat = "png"
+	gifType  supportFormat = "gif"
+	jpgType  supportFormat = "jpg"
+	jpegType supportFormat = "jpeg"
+	pngType  supportFormat = "png"
 )
-
-func (sf supportFormat) decode(r io.Reader) (image.Image, error) {
-	switch sf {
-	case gifType:
-		return gif.Decode(r)
-	case jpgType:
-		return jpeg.Decode(r)
-	case pngType:
-		return png.Decode(r)
-	default:
-		return nil, fmt.Errorf("%v is not supported.", sf)
-	}
-}
 
 func (sf supportFormat) encode(w io.Writer, img image.Image) error {
 	switch sf {
 	case gifType:
 		return gif.Encode(w, img, nil)
-	case jpgType:
+	case jpgType, jpegType:
 		return jpeg.Encode(w, img, nil)
 	case pngType:
 		return png.Encode(w, img)
@@ -56,7 +44,7 @@ func (ic *ImageConverter) decode(r io.Reader, fromExt supportFormat) error {
 		return errors.New("ImageConverter is nil receiver.")
 	}
 
-	img, err := fromExt.decode(r)
+	img, _, err := image.Decode(r)
 	if err != nil {
 		return err
 	}
