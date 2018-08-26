@@ -16,6 +16,7 @@ cov:
 	$(GOTEST) ./... -race -coverprofile=coverage/c.out -covermode=atomic
 	$(GOTOOL) cover -html=coverage/c.out -o coverage/index.html
 	open coverage/index.html
+	cp coverage/index.html coverage.html
 clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
