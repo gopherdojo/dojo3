@@ -4,6 +4,7 @@ Package gathering is a package that summarizes the processing necessary for coll
 package gathering
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 
@@ -43,22 +44,29 @@ func (g *Gatherer) walkFn(path string, info os.FileInfo, err error) error {
 	}
 	defer fp.Close()
 
-	isDecodable := false
-	for _, magicBytes := range g.Decoder.MagicBytesSlice() {
-		ok, err := fileutil.StartsContentsWith(fp, magicBytes)
-		if err != nil {
-			return err
-		}
-		if ok {
-			isDecodable = true
-			break
-		}
+	ok, err := g.checkDecodable(fp)
+	if err != nil {
+		return err
 	}
-	if !isDecodable {
+	if !ok {
 		return nil
 	}
 
 	g.Pathnames = append(g.Pathnames, path)
 
 	return nil
+}
+
+func (g *Gatherer) checkDecodable(rs io.ReadSeeker) (bool, error) {
+	for _, magicBytes := range g.Decoder.MagicBytesSlice() {
+		ok, err := fileutil.StartsContentsWith(rs, magicBytes)
+		if err != nil {
+			return false, err
+		}
+		if ok {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
