@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai1/matsumatsu20/converter"
+	"github.com/gopherdojo/dojo3/kadai2/matsumatsu20/converter"
 )
 
 const (

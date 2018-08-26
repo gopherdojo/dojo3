@@ -4,7 +4,7 @@ package main
 import (
 	"os"
 
-	"github.com/gopherdojo/dojo3/kadai1/matsumatsu20/cli"
+	"github.com/gopherdojo/dojo3/kadai2/matsumatsu20/cli"
 )
 
 func main() {
