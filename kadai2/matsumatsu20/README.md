@@ -1,47 +1,71 @@
-# 課題1
-## 次の仕様を満たすコマンドを作って下さい
-- [x] ディレクトリを指定する
-- [x] 指定したディレクトリ以下のJPGファイルをPNGに変換（デフォルト）
-- [x] ディレクトリ以下は再帰的に処理する
-- [x] 変換前と変換後の画像形式を指定できる（オプション）
+# io.Readerとio.Writer
+## 標準パッケージでどのように使われているか
 
-## 以下を満たすように開発してください
-- [x] mainパッケージと分離する
-  - mainとは別に`cli`, `converter` を作ってみました。
-- [x] 自作パッケージと標準パッケージと準標準パッケージのみ使う
-  - 以下のパッケージを利用（準標準は利用なし）
-  	- "errors"
-  	- "flag"
-	- "fmt"
-	- "image"
-	- "image/gif"
-	- "image/jpeg"
-	- "image/png"
-	- "log"
-	- "os"
-	- "path/filepath"
-	- "strings"
-	- "github.com/gopherdojo/dojo3/kadai1/cli" (自作)
-	- "github.com/gopherdojo/dojo3/kadai1/converter" (自作)
-- [x] ユーザ定義型を作ってみる
-  - CLIやConverterを作って見ました。またテストでも一部使っております。
-- [x] GoDocを生成してみる
-  - 生成してみました
+### 定義
+インターフェースの定義は `io/io.go` で定義されている。
+`Reader` と `Writer` だけではなく、`Close` メソッドを持つ、`Closer` やポインタをSeekする `Seeker`などが定義されている。
 
-## 使い方
-### Build
-```
-$ make
-```
+また `Reader`, `Writer`, `Seeker`, `Closer` に関しては埋め込みでそれぞれのインターフェースを掛け合わせてインターフェースが存在する。
 
-### Run
-```
-$ ./ozu -i jpg -o gif images/
-```
+#### (参考) 掛け合わせて定義されたインターフェース
+| インターフェース | io.Reader | io.Writer | io.Seeker | io.Closer |
+|:---:|:---:|:---:|:---:|:---:|
+| io.ReadWriter | ○ | ○ |  |  |
+| io.ReadSeeker | ○ |  | ○ |  |
+| io.ReadCloser | ○ |  |  | ○ |
+| io.WriteSeeker |  | ○ | ○ |  |
+| io.WriteCloser |  | ○ |  | ○ |
+| io.ReadWriteSeeker | ○ | ○ | ○ |  |
+| io.ReadWriteCloser | ○ | ○ |  | ○ |
 
-### Godoc
+### 使われ方
+#### 実装している構造体の例
+##### os.File
+`os.File` は上で挙げた四つのインターフェース全てを実装している。
+
+また、標準入力を扱う `os.Stdin`、標準出力を扱う `os.Stdout` はそれぞれ `File` 型であった。
+ということは標準入力も `os.Writer` であるということである。(一見、`os.Reader` のみであるように感じる)
+
+なので以下のコード(標準入力に対して書き込みをしている)も問題なく実行される。
 ```
- $ godoc github.com/gopherdojo/dojo3/kadai1/matsumatsu20/
- $ godoc github.com/gopherdojo/dojo3/kadai1/matsumatsu20/cli/
- $ godoc github.com/gopherdojo/dojo3/kadai1/matsumatsu20/converter/
+fmt.Fprintln(os.Stdin, "gopher")
+``` 
+
+##### bytes.Buffer
+メモリバッファである `bytes.Budder` だが、これも `os.Reader`, `osWriter` を実装している。
+
+##### net.Conn
+インターネットの通信の接続を扱う `net.Conn` も `os.Reader`, `osWriter` を実装している。
+データの送信者から見ると接続に対して書き込んでおり、受審者からするとデータを接続から読み取っている、という関係性である。
+
+#### 実際にどのように使われているのか
+もちろん、これらのインターフェースを実装している構造体は `Write`, `Read` を呼び出せることができる。
+が実際のユースケースとしては `io.Writer` や `io.Reader` を引数に持つメソッドに渡して利用するケースが多い。
+
+利点のところで後述するが、こうすることによって書き込み対象や読み込み対象を抽象化することができ、メソッドの責務がシンプルになる。
+
+例えば例として `io.Copy` を挙げる。
 ```
+func Copy(dst Writer, src Reader) (written int64, err error) {
+	return copyBuffer(dst, src, nil)
+}
+```
+このメソッドは渡された `io.Reader` からbyteを読み取り、 渡された `io.Writer` に内容を書き込む、というものである。
+（`copyBuffer`の中で `dst.Write` と `src.Read` を呼んでいる）
+
+渡される `io.Writer` は標準出力でもバッファでもなんでもよく、`io.Read`もまた然りである。
+
+## io.Readerとio.Writerがあることでどういう利点があるのか具体例を挙げて考えてみる
+先述した `io.Copy` の例のように、メソッドをインターフェースに依存させることによって、(`os.Reader`, `osWriter`の場合は)読み込み対象、書き込み対象が具体的になんなのかを意識する必要がなくなる。
+
+例えばライブラリやメソッドを自分が実装するケースでも、標準入力などの特定の読み込みに依存させずに、`os.Reader` に依存させることによって使う側は自由度が上がるし、実装側も責務がシンプルになりテスタビリティも上がる。
+
+上記の使う側は自由度が上がる、というのはすでに実感しており、上記の `io.Copy` や `fmt.Fprint` など単純に `io.Writer` に書き込むというものなので、出力はこちらで自由に指定できる。様々なケースでのメソッドを覚える必要はなく、いくつか主要なメソッドを使って渡す構造体で振る舞いが変わる（書き込み対象や読み込み対象が変わる）ので、脳のメモリ節約に一役買っている。
+
+
+さらに、golangが持つクロスコンパイルという特徴にも一役買っているのでは？と感じている。
+カーネルレイヤよりかなりアプリケーションレイヤに近いところで抽象化してOSの違いによる内部APIの差分を吸収し、開発者はあまりOSレイヤを意識せずに決められたインターフェースでコードを書いていけばwindowsでもmacでも動くものが作れる。
+
+
+# テストを書いてみよう
+Comming soon
