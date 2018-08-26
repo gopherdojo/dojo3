@@ -44,31 +44,48 @@ func CopyDirRec(src string, dest string) error {
 			return nil
 		}
 
-		sf, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-
-		destDir := filepath.Join(dest, strings.TrimLeft(filepath.Dir(path), src))
-
-		err = os.MkdirAll(destDir, 0755)
-		if err != nil {
-			return err
-		}
-
-		destPath := filepath.Join(destDir, filepath.Base(path))
-
-		df, err := os.Create(destPath)
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(df, sf)
-		if err != nil {
-			return err
-		}
-
-		return nil
+		createCopier := &fileCreateCopier{}
+		return Copy(createCopier, path, filepath.Join(dest, strings.TrimLeft(filepath.Dir(path), src), filepath.Base(path)))
 	})
 	return err
+}
+
+// Copy copies src path to dest path.
+func Copy(createCopier createCopier, src string, dest string) error {
+	err := os.MkdirAll(filepath.Dir(dest), 0755)
+	if err != nil {
+		return err
+	}
+
+	df, err := createCopier.Create(dest)
+	if err != nil {
+		return err
+	}
+
+	sf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+
+	_, err = createCopier.Copy(df, sf)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type createCopier interface {
+	Create(string) (*os.File, error)
+	Copy(io.Writer, io.Reader) (written int64, err error)
+}
+
+type fileCreateCopier struct{}
+
+func (c *fileCreateCopier) Create(name string) (*os.File, error) {
+	return os.Create(name)
+}
+
+func (c *fileCreateCopier) Copy(dst io.Writer, src io.Reader) (written int64, err error) {
+	return io.Copy(dst, src)
 }
