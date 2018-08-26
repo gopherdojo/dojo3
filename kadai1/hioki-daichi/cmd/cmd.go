@@ -1,5 +1,5 @@
 /*
-Package cmd is a package for executing various things after evaluating flag etc in main().
+Package cmd is a package for executing various things after evaluating flag etc in main function.
 */
 package cmd
 
