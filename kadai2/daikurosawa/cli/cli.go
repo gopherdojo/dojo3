@@ -42,7 +42,7 @@ func (c *CLI) Run(args []string) int {
 	dirName := flags.Arg(0)
 
 	if fileInfo, err := os.Stat(dirName); err != nil || fileInfo.IsDir() == false {
-		fmt.Fprintln(os.Stderr, err.Error())
+		fmt.Fprintln(c.ErrStream, err.Error())
 		return exitCodeProcessError
 	}
 
@@ -50,7 +50,7 @@ func (c *CLI) Run(args []string) int {
 	convert := convert.NewConvert(option)
 
 	if err := walkDirectory(dirName, from, convert); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		fmt.Fprintln(c.ErrStream, err.Error())
 		return exitCodeProcessError
 	}
 
