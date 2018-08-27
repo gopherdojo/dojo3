@@ -26,35 +26,43 @@ func New(from, to string) ImageConverter {
 	}
 }
 
-func (ic *ImageConverter) openImages(path string) (io.Reader, io.Writer, error) {
+func (ic *ImageConverter) openImage(path string) (io.ReadCloser, error) {
 	input, err := os.Open(path)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
+	return input, nil
+}
 
+func (ic *ImageConverter) prepareImage(path string) (io.WriteCloser, error) {
 	output, err := os.Create(rep.ReplaceAllString(path, ic.to))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-
-	return input, output, nil
+	return output, err
 }
 
 // ConvertImage converts image to another extension from provided extension
 func (ic *ImageConverter) ConvertImage(path string) (err error) {
 	var img image.Image
-	var input io.Reader
-	var output io.Writer
+	var input io.ReadCloser
+	var output io.WriteCloser
 
 	ext := rep.FindString(path)
 	if ext == "" || ext != ic.from {
 		return
 	}
 
-	input, output, err = ic.openImages(path)
+	input, err = ic.openImage(path)
 	if err != nil {
 		return
 	}
+	output, err = ic.prepareImage(path)
+	if err != nil {
+		return
+	}
+	defer input.Close()
+	defer output.Close()
 
 	switch {
 	case ext == ".jpg" || ext == ".jpeg":

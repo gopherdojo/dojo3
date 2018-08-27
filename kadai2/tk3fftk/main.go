@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai1/tk3fftk/imageconverter"
+	"github.com/gopherdojo/dojo3/kadai2/tk3fftk/imageconverter"
 )
 
 var (
