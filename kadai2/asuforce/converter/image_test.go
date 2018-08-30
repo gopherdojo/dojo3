@@ -2,9 +2,10 @@ package converter
 
 import "testing"
 
-func TestNewImageSuccess(t *testing.T) {
-	i, err := NewImage("../testdata/test.jpeg")
+var path = "../testdata/test.jpeg"
 
+func TestNewImageSuccess(t *testing.T) {
+	i, err := NewImage(path)
 	if err != nil {
 		t.Errorf("failed test\ngot: %v", err)
 	}
@@ -33,13 +34,40 @@ func TestNewImageSuccess(t *testing.T) {
 
 func TestNewImageFailed(t *testing.T) {
 	i, err := NewImage("")
-
 	if err == nil {
 		t.Fatal("failed test")
 	}
 
 	expected := Image{}
 	if i != expected {
+		t.Fatal("failed test")
+	}
+}
+
+func TestGetFileNameSuccess(t *testing.T) {
+	i, _ := NewImage(path)
+
+	actual, err := i.GetFileName("png")
+	if err != nil {
+		t.Errorf("failed test\ngot: %v", err)
+	}
+
+	expected := "test.png"
+
+	if actual != expected {
+		t.Errorf("got: %v\nwant: %v", actual, expected)
+	}
+}
+
+func TestGetFileNameFailed(t *testing.T) {
+	i, _ := NewImage(path)
+
+	actual, err := i.GetFileName("")
+	if err == nil {
+		t.Fatal("failed test")
+	}
+
+	if actual != "" {
 		t.Fatal("failed test")
 	}
 }
