@@ -37,9 +37,13 @@ func init() {
 }
 
 func main() {
-	var c = converter.NewConverter(path, fromExt, toExt)
+	c, err := converter.NewConverter(path, fromExt, toExt)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
-	err := filepath.Walk(c.Path, c.CrawlFile)
+	err = filepath.Walk(c.Path, c.CrawlFile)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

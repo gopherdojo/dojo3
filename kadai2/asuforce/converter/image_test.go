@@ -1,8 +1,8 @@
 package converter
 
-import "testing"
-
-var path = "../testdata/test.jpeg"
+import (
+	"testing"
+)
 
 func TestNewImageSuccess(t *testing.T) {
 	i, err := NewImage(path)

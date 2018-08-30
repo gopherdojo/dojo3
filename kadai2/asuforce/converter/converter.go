@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // Converter struct
@@ -20,12 +22,15 @@ type Converter struct {
 }
 
 // NewConverter is creating Converter struct
-func NewConverter(path string, fromExt string, toExt string) Converter {
+func NewConverter(path string, fromExt string, toExt string) (Converter, error) {
+	if path == "" {
+		return Converter{}, errors.New("path must not be empty")
+	}
 	return Converter{
 		Path:    path,
 		FromExt: fromExt,
 		ToExt:   toExt,
-	}
+	}, nil
 }
 
 // FetchConverter is queuing image
