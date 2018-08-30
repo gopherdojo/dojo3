@@ -57,7 +57,11 @@ func (c *Converter) Convert(i Image) error {
 		return err
 	}
 
-	outputFile, err := os.Create(i.GetFileName(c.ToExt))
+	fileName, err := i.GetFileName(c.ToExt)
+	if err != nil {
+		return err
+	}
+	outputFile, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}

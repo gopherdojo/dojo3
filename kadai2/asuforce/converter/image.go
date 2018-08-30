@@ -32,6 +32,10 @@ func NewImage(path string) (Image, error) {
 }
 
 // GetFileName bind filename and extension
-func (i *Image) GetFileName(ext string) string {
-	return i.name + "." + ext
+func (i *Image) GetFileName(ext string) (string, error) {
+	if ext == "" {
+		return "", errors.New("path must not be empty")
+	}
+
+	return i.name + "." + ext, nil
 }
