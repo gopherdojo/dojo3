@@ -75,7 +75,11 @@ func (c *Converter) Convert(i Image) error {
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	if checkExtension(filepath.Ext(path)) == ("." + c.FromExt) {
 		if !info.IsDir() {
-			c.Files = append(c.Files, NewImage(path))
+			i, err := NewImage(path)
+			if err != nil {
+				return err
+			}
+			c.Files = append(c.Files, i)
 		}
 	}
 	return nil
