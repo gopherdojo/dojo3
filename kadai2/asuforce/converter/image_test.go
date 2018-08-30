@@ -3,7 +3,11 @@ package converter
 import "testing"
 
 func TestNewImageSuccess(t *testing.T) {
-	i := NewImage("../testdata/test.jpeg")
+	i, err := NewImage("../testdata/test.jpeg")
+
+	if err != nil {
+		t.Errorf("failed test\ngot: %v", err)
+	}
 
 	actualPath := i.path
 	actualName := i.name
@@ -25,4 +29,17 @@ func TestNewImageSuccess(t *testing.T) {
 		t.Errorf("got: %v\nwant: %v", actualExt, expectedExt)
 	}
 
+}
+
+func TestNewImageFailed(t *testing.T) {
+	i, err := NewImage("")
+
+	if err == nil {
+		t.Fatal("failed test")
+	}
+
+	expected := Image{}
+	if i != expected {
+		t.Fatal("failed test")
+	}
 }
