@@ -53,13 +53,12 @@ func (c *Converter) Convert(i Image) error {
 
 // CrawlFile function found image file and append Converter.Files
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
-	ext, err := checkExtension(filepath.Ext(path))
-	if err != nil {
-		return err
-	}
-
-	if ext == ("." + c.FromExt) {
-		if !info.IsDir() {
+	if !info.IsDir() {
+		ext, err := checkExtension(filepath.Ext(path))
+		if ext == ("." + c.FromExt) {
+			if err != nil {
+				return err
+			}
 			i := Image{path: path}
 			if err != nil {
 				return err
