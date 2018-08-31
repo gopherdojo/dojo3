@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/pkg/errors"
 )
@@ -19,22 +18,6 @@ type Converter struct {
 	Files   []Image
 	FromExt string
 	ToExt   string
-}
-
-// FetchConverter is queuing image
-func (c *Converter) FetchConverter(q chan Image, wg *sync.WaitGroup) {
-	for {
-		image, more := <-q
-		if more {
-			err := c.Convert(image)
-			if err != nil {
-				//TODO: error hundling
-			}
-		} else {
-			wg.Done()
-			return
-		}
-	}
 }
 
 // Convert image functon

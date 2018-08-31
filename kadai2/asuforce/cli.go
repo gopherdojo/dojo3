@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/gopherdojo/dojo3/kadai2/asuforce/converter"
 )
@@ -29,7 +28,6 @@ func (cli *CLI) Run(args []string) int {
 		path    string
 		fromExt string
 		toExt   string
-		wg      sync.WaitGroup
 	)
 
 	flag.StringVar(&fromExt, "f", "jpg", "Specify input image extension")
@@ -57,15 +55,9 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	queue := make(chan converter.Image)
-	for _, image := range c.Files {
-		wg.Add(1)
-		go c.FetchConverter(queue, &wg)
-		queue <- image
+	for _, i := range c.Files {
+		c.Convert(i)
 	}
-
-	close(queue)
-	wg.Wait()
 
 	return ExitCodeOK
 }
