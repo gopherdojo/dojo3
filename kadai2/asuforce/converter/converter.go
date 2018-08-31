@@ -28,6 +28,7 @@ func NewConverter(path string, fromExt string, toExt string) (Converter, error) 
 	}
 	return Converter{
 		Path:    path,
+		Files:   []Image{},
 		FromExt: fromExt,
 		ToExt:   toExt,
 	}, nil

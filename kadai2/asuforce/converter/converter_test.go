@@ -41,7 +41,12 @@ func TestNewConverterFailed(t *testing.T) {
 		t.Errorf("failed test: %v", err)
 	}
 
-	expected := Converter{}
+	expected := Converter{
+		Path:    "",
+		Files:   []Image{},
+		FromExt: "",
+		ToExt:   "",
+	}
 	if cmp.Equal(c, expected) {
 		t.Fatal("failed test: ")
 	}
