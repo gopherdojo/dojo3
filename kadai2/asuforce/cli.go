@@ -25,12 +25,11 @@ type CLI struct {
 // Run invokes the CLI
 func (cli *CLI) Run(args []string) int {
 	var (
-		version     = "1.0.0"
-		showVersion bool
-		path        string
-		fromExt     string
-		toExt       string
-		wg          sync.WaitGroup
+		version bool
+		path    string
+		fromExt string
+		toExt   string
+		wg      sync.WaitGroup
 	)
 
 	flag.StringVar(&fromExt, "f", "jpg", "Specify input image extension")
@@ -38,13 +37,13 @@ func (cli *CLI) Run(args []string) int {
 	flag.StringVar(&toExt, "t", "png", "Specify output image extension")
 	flag.StringVar(&toExt, "to", "png", "Specify output image extension")
 
-	flag.BoolVar(&showVersion, "v", false, "Show version")
-	flag.BoolVar(&showVersion, "version", false, "Show version")
+	flag.BoolVar(&version, "v", false, "Show version")
+	flag.BoolVar(&version, "version", false, "Show version")
 
 	flag.Parse()
 
-	if showVersion {
-		fmt.Fprintf(cli.errStream, "Version: %s\n", version)
+	if version {
+		fmt.Fprintf(cli.errStream, "Version: %s\n", Version)
 		return ExitCodeOK
 	}
 
