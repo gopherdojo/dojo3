@@ -8,21 +8,20 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/pkg/errors"
 )
 
 // Converter struct
 type Converter struct {
-	Path    string
-	Files   []Image
 	FromExt string
 	ToExt   string
 }
 
 // Convert image functon
-func (c *Converter) Convert(i Image) error {
-	file, err := os.Open(i.path)
+func (c *Converter) Convert(path string) error {
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
@@ -33,7 +32,7 @@ func (c *Converter) Convert(i Image) error {
 		return err
 	}
 
-	fileName, err := i.GetFileName(c.ToExt)
+	fileName, err := c.getFileName(path)
 	if err != nil {
 		return err
 	}
@@ -51,24 +50,6 @@ func (c *Converter) Convert(i Image) error {
 	return nil
 }
 
-// CrawlFile function found image file and append Converter.Files
-func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
-	if !info.IsDir() {
-		ext, err := checkExtension(filepath.Ext(path))
-		if ext == ("." + c.FromExt) {
-			if err != nil {
-				return err
-			}
-			i := Image{path: path}
-			if err != nil {
-				return err
-			}
-			c.Files = append(c.Files, i)
-		}
-	}
-	return nil
-}
-
 func checkExtension(ext string) (string, error) {
 	if ext == "" {
 		return "", errors.New("ext must not be empty")
@@ -76,6 +57,19 @@ func checkExtension(ext string) (string, error) {
 		return ".jpg", nil
 	}
 	return ext, nil
+}
+
+func (c *Converter) getFileName(path string) (string, error) {
+	ext := c.ToExt
+	if ext == "" {
+		return "", errors.New("path must not be empty")
+	}
+
+	imageExt := filepath.Ext(path)
+	rep := regexp.MustCompile(imageExt + "$")
+	name := filepath.Base(rep.ReplaceAllString(path, ""))
+
+	return name + "." + ext, nil
 }
 
 func (c *Converter) encodeImage(file io.Writer, img image.Image) error {

@@ -47,16 +47,21 @@ func (cli *CLI) Run(args []string) int {
 
 	path = flag.Arg(0)
 
-	c := &converter.Converter{Path: path, FromExt: fromExt, ToExt: toExt}
+	collect := &converter.Collect{FromExt: fromExt}
 
-	err := filepath.Walk(c.Path, c.CrawlFile)
+	err := filepath.Walk(path, collect.CollectPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return ExitCodeError
 	}
 
-	for _, i := range c.Files {
-		c.Convert(i)
+	c := &converter.Converter{FromExt: fromExt, ToExt: toExt}
+	for _, i := range collect.Paths {
+		err := c.Convert(i)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return ExitCodeError
+		}
 	}
 
 	return ExitCodeOK
