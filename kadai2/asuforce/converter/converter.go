@@ -83,7 +83,12 @@ func (c *Converter) Convert(i Image) error {
 
 // CrawlFile function found image file and append Converter.Files
 func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
-	if checkExtension(filepath.Ext(path)) == ("." + c.FromExt) {
+	ext, err := checkExtension(filepath.Ext(path))
+	if err != nil {
+		return err
+	}
+
+	if ext == ("." + c.FromExt) {
 		if !info.IsDir() {
 			i, err := NewImage(path)
 			if err != nil {
@@ -95,11 +100,13 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func checkExtension(path string) string {
-	if path == ".jpeg" {
-		return ".jpg"
+func checkExtension(ext string) (string, error) {
+	if ext == "" {
+		return "", errors.New("ext must not be empty")
+	} else if ext == ".jpeg" {
+		return ".jpg", nil
 	}
-	return path
+	return ext, nil
 }
 
 func (c *Converter) encodeImage(file io.Writer, img image.Image) error {
