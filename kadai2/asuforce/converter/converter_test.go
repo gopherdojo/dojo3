@@ -36,7 +36,7 @@ func Test_checkExtension(t *testing.T) {
 }
 
 func Test_getFileName(t *testing.T) {
-	c := &Converter{ToExt: "png"}
+	c := &Converter{Encoder: &Png{}}
 
 	actual, err := c.getFileName(path)
 	if err != nil {
@@ -49,10 +49,9 @@ func Test_getFileName(t *testing.T) {
 		t.Errorf("got: %v\nwant: %v", actual, expected)
 	}
 
-	c.ToExt = ""
 	actual, err = c.getFileName("")
 	if err == nil {
-		t.Fatal("failed test")
+		t.Errorf("failed test\ngot: %v", err)
 	}
 
 	if actual != "" {

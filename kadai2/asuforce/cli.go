@@ -55,7 +55,10 @@ func (cli *CLI) Run(args []string) int {
 		return ExitCodeError
 	}
 
-	c := &converter.Converter{FromExt: fromExt, ToExt: toExt}
+	c := &converter.Converter{
+		Encoder: cli.switchEncoder(fromExt),
+		Decoder: cli.switchDecoder(toExt),
+	}
 	for _, i := range collect.Paths {
 		err := c.Convert(i)
 		if err != nil {
@@ -65,4 +68,26 @@ func (cli *CLI) Run(args []string) int {
 	}
 
 	return ExitCodeOK
+}
+
+func (cli *CLI) switchEncoder(ext string) converter.Encoder {
+	switch ext {
+	case "jpg", "jpeg":
+		return &converter.Jpg{}
+	case "gif":
+		return &converter.Gif{}
+	default:
+		return &converter.Png{}
+	}
+}
+
+func (cli *CLI) switchDecoder(ext string) converter.Decoder {
+	switch ext {
+	case "png":
+		return &converter.Png{}
+	case "gif":
+		return &converter.Gif{}
+	default:
+		return &converter.Jpg{}
+	}
 }
