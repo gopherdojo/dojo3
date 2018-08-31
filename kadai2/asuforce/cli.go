@@ -49,13 +49,9 @@ func (cli *CLI) Run(args []string) int {
 
 	path = flag.Arg(0)
 
-	c, err := converter.NewConverter(path, fromExt, toExt)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return ExitCodeError
-	}
+	c := &converter.Converter{Path: path, FromExt: fromExt, ToExt: toExt}
 
-	err = filepath.Walk(c.Path, c.CrawlFile)
+	err := filepath.Walk(c.Path, c.CrawlFile)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return ExitCodeError

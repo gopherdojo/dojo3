@@ -21,19 +21,6 @@ type Converter struct {
 	ToExt   string
 }
 
-// NewConverter is creating Converter struct
-func NewConverter(path string, fromExt string, toExt string) (Converter, error) {
-	if path == "" {
-		return Converter{}, errors.New("path must not be empty")
-	}
-	return Converter{
-		Path:    path,
-		Files:   []Image{},
-		FromExt: fromExt,
-		ToExt:   toExt,
-	}, nil
-}
-
 // FetchConverter is queuing image
 func (c *Converter) FetchConverter(q chan Image, wg *sync.WaitGroup) {
 	for {
@@ -90,7 +77,7 @@ func (c *Converter) CrawlFile(path string, info os.FileInfo, err error) error {
 
 	if ext == ("." + c.FromExt) {
 		if !info.IsDir() {
-			i, err := NewImage(path)
+			i := Image{path: path}
 			if err != nil {
 				return err
 			}

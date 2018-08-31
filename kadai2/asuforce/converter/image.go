@@ -10,25 +10,6 @@ import (
 // Image information struct
 type Image struct {
 	path string
-	name string
-	ext  string
-}
-
-// NewImage is creating Image struct
-func NewImage(path string) (Image, error) {
-	if path == "" {
-		return Image{}, errors.New("path must not be empty")
-	}
-
-	ext := filepath.Ext(path)
-	rep := regexp.MustCompile(ext + "$")
-	name := filepath.Base(rep.ReplaceAllString(path, ""))
-
-	return Image{
-		path: path,
-		name: name,
-		ext:  ext,
-	}, nil
 }
 
 // GetFileName bind filename and extension
@@ -37,5 +18,9 @@ func (i *Image) GetFileName(ext string) (string, error) {
 		return "", errors.New("path must not be empty")
 	}
 
-	return i.name + "." + ext, nil
+	imageExt := filepath.Ext(i.path)
+	rep := regexp.MustCompile(imageExt + "$")
+	name := filepath.Base(rep.ReplaceAllString(i.path, ""))
+
+	return name + "." + ext, nil
 }
