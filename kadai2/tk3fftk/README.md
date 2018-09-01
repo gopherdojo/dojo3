@@ -24,3 +24,9 @@ Usage of ./main:
   -t string
     	extension of after conversion (jpg, jpeg, png, gif) (default "png")
 ```
+
+## io.Readerとio.Writerについて
+### 標準パッケージでどのように使われているか
+読みこみ、書き込みが発生するほぼ全ての箇所に
+
+### io.Readerとio.Writerがあることでどういう利点があるのか

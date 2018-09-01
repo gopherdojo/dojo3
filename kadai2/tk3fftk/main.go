@@ -21,20 +21,28 @@ func init() {
 	flag.StringVar(&to, "t", "png", "extension of after conversion (jpg, jpeg, png, gif)")
 }
 
+func exitWithUsage() {
+	flag.Usage()
+	os.Exit(2)
+}
+
 func main() {
 	flag.Parse()
 	if dir == "" {
-		flag.Usage()
-		os.Exit(2)
+		fmt.Println("dir is empty")
+		exitWithUsage()
 	}
 
-	ic := imageconverter.New(from, to)
-
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		return ic.ConvertImage(path)
-	})
+	ic, err := imageconverter.New(from, to)
 	if err != nil {
 		fmt.Printf("%v", err)
-		os.Exit(2)
+		exitWithUsage()
+	}
+
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		return ic.ConvertImage(path, nil)
+	})
+	if err != nil {
+		fmt.Errorf("%v", err)
 	}
 }

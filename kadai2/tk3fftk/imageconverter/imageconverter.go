@@ -1,6 +1,7 @@
 package imageconverter
 
 import (
+	"github.com/pkg/errors"
 	"image"
 	"image/gif"
 	"image/jpeg"
@@ -10,7 +11,7 @@ import (
 	"regexp"
 )
 
-var rep = regexp.MustCompile("\\.(jpg|jpeg|png|gif)$")
+var reg = regexp.MustCompile("(jpg|jpeg|png|gif)$")
 
 // ImageConverter provides image conversion
 type ImageConverter struct {
@@ -19,57 +20,46 @@ type ImageConverter struct {
 }
 
 // New returns an ImageConverter that has file extensions for conversion
-func New(from, to string) ImageConverter {
+func New(from, to string) (ImageConverter, error) {
+	if !reg.MatchString(from) || !reg.MatchString(to) || from == to {
+		return ImageConverter{}, errors.New("this extension is not allowed")
+	}
+
 	return ImageConverter{
-		from: "." + from,
-		to:   "." + to,
-	}
-}
-
-func (ic *ImageConverter) openImage(path string) (io.ReadCloser, error) {
-	input, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	return input, nil
-}
-
-func (ic *ImageConverter) prepareImage(path string) (io.WriteCloser, error) {
-	output, err := os.Create(rep.ReplaceAllString(path, ic.to))
-	if err != nil {
-		return nil, err
-	}
-	return output, err
+		from,
+		to,
+	}, nil
 }
 
 // ConvertImage converts image to another extension from provided extension
-func (ic *ImageConverter) ConvertImage(path string) (err error) {
+func (ic *ImageConverter) ConvertImage(path string, output io.WriteCloser) (err error) {
 	var img image.Image
-	var input io.ReadCloser
-	var output io.WriteCloser
+	println(path)
 
-	ext := rep.FindString(path)
+	ext := reg.FindString(path)
 	if ext == "" || ext != ic.from {
 		return
 	}
 
-	input, err = ic.openImage(path)
+	input, err := os.Open(path)
 	if err != nil {
 		return
 	}
-	output, err = ic.prepareImage(path)
-	if err != nil {
-		return
+	if output == nil {
+		output, err = os.Create(reg.ReplaceAllString(path, ic.to))
+		if err != nil {
+			return
+		}
 	}
 	defer input.Close()
 	defer output.Close()
 
 	switch {
-	case ext == ".jpg" || ext == ".jpeg":
+	case ext == "jpg" || ext == "jpeg":
 		img, err = jpeg.Decode(input)
-	case ext == ".png":
+	case ext == "png":
 		img, err = png.Decode(input)
-	case ext == ".gif":
+	case ext == "gif":
 		img, err = gif.Decode(input)
 	default:
 		return
@@ -79,11 +69,11 @@ func (ic *ImageConverter) ConvertImage(path string) (err error) {
 	}
 
 	switch {
-	case ic.to == ".jpg" || ic.to == ".jpeg":
+	case ic.to == "jpg" || ic.to == "jpeg":
 		err = jpeg.Encode(output, img, nil)
-	case ic.to == ".png":
+	case ic.to == "png":
 		err = png.Encode(output, img)
-	case ic.to == ".gif":
+	case ic.to == "gif":
 		err = gif.Encode(output, img, nil)
 	}
 
