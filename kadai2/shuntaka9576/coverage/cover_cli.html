@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com\gopherdojo\dojo3\kadai2\shuntaka9576\cli\cli.go (76.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package cli
+
+import (
+        "flag"
+        "fmt"
+        "io"
+        "io/ioutil"
+        "os"
+        "path/filepath"
+        "strconv"
+        "strings"
+        "time"
+
+        "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/converter"
+        _ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/gif"
+        _ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/png"
+        _ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/jpg"
+)
+
+const (
+        ExitCodeOK = iota
+        ExitCodeError
+)
+
+type Cli struct {
+        OutStream, ErrStream io.Writer
+        Name, Version        string
+}
+
+func NewApp(in, out io.Writer) *Cli <span class="cov8" title="1">{
+        return &amp;Cli{OutStream: in, ErrStream: out}
+}</span>
+
+func (c *Cli) Run(args []string) int <span class="cov8" title="1">{
+        outdir, err := initDir()
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(c.ErrStream, err.Error())
+                return ExitCodeError
+        }</span>
+
+        <span class="cov8" title="1">var fromExt, toExt, targetDir string
+        var version bool
+        flags := flag.NewFlagSet(c.Name, flag.ContinueOnError)
+        flags.SetOutput(c.ErrStream)
+        flags.StringVar(&amp;fromExt, "f", "png", "")
+        flags.StringVar(&amp;toExt, "t", "jpg", "")
+        flags.BoolVar(&amp;version, "version", false, "")
+
+        if err := flags.Parse(args[1:]); err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(c.ErrStream, err.Error())
+                return ExitCodeError
+        }</span>
+
+        <span class="cov8" title="1">nonflagArgs := flags.Args()
+        switch </span>{
+        case len(nonflagArgs) &lt;= 0:<span class="cov8" title="1">
+                targetDir = "."</span>
+        case len(nonflagArgs) == 1:<span class="cov8" title="1">
+                targetDir = nonflagArgs[0]</span>
+        default:<span class="cov0" title="0">
+                fmt.Fprintf(c.ErrStream, "dir argument error occurred\n")
+                return ExitCodeError</span>
+        }
+
+        <span class="cov8" title="1">if version </span><span class="cov0" title="0">{
+                fmt.Fprintf(c.OutStream, "%v version %v", c.Name, c.Version)
+                return ExitCodeOK
+        }</span>
+
+        <span class="cov8" title="1">convert, err := converter.GetConverter(fromExt, toExt)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(c.ErrStream, err.Error())
+                return ExitCodeError
+        }</span>
+
+        <span class="cov8" title="1">filepaths := dirwalk(targetDir)
+        var createdImageFileNames []string
+        for _, path := range filepaths </span><span class="cov8" title="1">{
+                path, err = filepath.Abs(path)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Fprintf(c.ErrStream, err.Error())
+                        return ExitCodeError
+                }</span>
+                <span class="cov8" title="1">convertedImageName := filepath.Base(path[:len(path)-len(filepath.Ext(path))] + "_c." + toExt)
+
+                // Duplication check
+                convertedImageName = checkSameFileName(createdImageFileNames, convertedImageName, 0)
+
+                // Convert image file
+                outfilname, err := convert.Convert(path, filepath.Join(outdir, convertedImageName))
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Fprintf(c.ErrStream, err.Error())
+                        return ExitCodeError
+                }</span>
+                <span class="cov8" title="1">if outfilname == "" </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">createdImageFileNames = append(createdImageFileNames, convertedImageName)
+                fmt.Fprintf(c.OutStream, "Convert Succeeded![%s -&gt; %s]\n", path, filepath.Join(outdir, convertedImageName))</span>
+        }
+        <span class="cov8" title="1">return ExitCodeOK</span>
+}
+
+func initDir() (string, error) <span class="cov8" title="1">{
+        outdir := "converted_" + time.Now().Format("20060102-150405")
+        if err := os.Mkdir(outdir, 0777); err != nil </span>{<span class="cov8" title="1">
+        }</span>
+        <span class="cov8" title="1">initialDir, err := filepath.Abs(outdir)
+        if err != nil </span><span class="cov0" title="0">{
+                return initialDir, err
+        }</span>
+        <span class="cov8" title="1">return initialDir, nil</span>
+}
+
+// Recursively directory search function
+func dirwalk(dir string) []string <span class="cov8" title="1">{
+        files, err := ioutil.ReadDir(dir)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+
+        <span class="cov8" title="1">var paths []string
+        for _, file := range files </span><span class="cov8" title="1">{
+                if file.IsDir() </span><span class="cov8" title="1">{
+                        paths = append(paths, dirwalk(filepath.Join(dir, file.Name()))...)
+                        continue</span>
+                }
+                <span class="cov8" title="1">paths = append(paths, filepath.Join(dir, file.Name()))</span>
+        }
+        <span class="cov8" title="1">return paths</span>
+}
+
+// Returns file names that have never been created
+func checkSameFileName(createdImages []string, convertedImageName string, count int) string <span class="cov8" title="1">{
+        for _, imageName := range createdImages </span><span class="cov8" title="1">{
+                if imageName == convertedImageName </span><span class="cov8" title="1">{
+                        count++
+                        convertedImageName = convertedImageName[:strings.LastIndex(convertedImageName, "c")+1] + strconv.Itoa(count) + filepath.Ext(convertedImageName)
+                        convertedImageName = checkSameFileName(createdImages, convertedImageName, count)
+                }</span>
+        }
+        <span class="cov8" title="1">return convertedImageName</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
