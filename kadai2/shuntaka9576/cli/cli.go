@@ -12,6 +12,9 @@ import (
 	"time"
 
 	"github.com/gopherdojo/dojo3/kadai2/shuntaka9576/converter"
+	_ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/gif"
+	_ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/png"
+	_ "github.com/gopherdojo/dojo3/kadai2/shuntaka9576/imagetypes/jpg"
 )
 
 const (
@@ -61,7 +64,7 @@ func (c *Cli) Run(args []string) int {
 
 	if version {
 		fmt.Fprintf(c.OutStream, "%v version %v", c.Name, c.Version)
-		return ExitCodeError
+		return ExitCodeOK
 	}
 
 	convert, err := converter.GetConverter(fromExt, toExt)

@@ -46,6 +46,8 @@ func TestCli_Run(t *testing.T) {
 		{"no-normal", "case", []string{"imageConverter", "-", "gif", "-t", "jpeg", "../testdata"}, ""},
 
 		{"no-normal", "dir name fail", []string{"imageConverter", "-f", "gif", "t", "jpg", "../a"}, ""},
+
+		{"no-normal", "dir name fail", []string{"imageConverter", "-version"}, ""},
 	}
 
 	for _, tt := range tests {
