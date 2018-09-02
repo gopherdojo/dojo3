@@ -68,4 +68,9 @@ func Copy(dst Writer, src Reader) (written int64, err error) {
 
 
 # テストを書いてみよう
-Comming soon
+## テストのしやすさを考えてリファクタリングしてみる
+## テストのカバレッジを取ってみる
+* make testで実行されるtestでカバレッジが表示されるようにしました。
+
+## テーブル駆動テストを行う
+## テストヘルパーを作ってみる
