@@ -36,31 +36,32 @@ func TestCollect_CollectPath(t *testing.T) {
 	}
 }
 
-func Test_checkExtension(t *testing.T) {
+func TestCollect_appendFiles(t *testing.T) {
+	type fields struct {
+		FromExt string
+	}
 	type args struct {
-		ext string
+		path string
 	}
 	tests := []struct {
 		name    string
+		fields  fields
 		args    args
-		want    string
 		wantErr bool
 	}{
-		{name: "Input jpeg type", args: args{ext: ".jpeg"}, want: ".jpg", wantErr: false},
-		{name: "Input jpg type", args: args{ext: ".jpg"}, want: ".jpg", wantErr: false},
-		{name: "Input png type", args: args{ext: ".png"}, want: ".png", wantErr: false},
-		{name: "Input gif type", args: args{ext: ".gif"}, want: ".gif", wantErr: false},
-		{name: "Enpty path", args: args{ext: ""}, wantErr: true},
+		{name: "Input jpeg type", fields: fields{FromExt: "jpeg"}, args: args{path: ".jpeg"}, wantErr: false},
+		{name: "Input jpg type", fields: fields{FromExt: "jpg"}, args: args{path: ".jpg"}, wantErr: false},
+		{name: "Input png type", fields: fields{FromExt: "png"}, args: args{path: ".png"}, wantErr: false},
+		{name: "Input gif type", fields: fields{FromExt: "gif"}, args: args{path: ".gif"}, wantErr: false},
+		{name: "Enpty path", fields: fields{FromExt: ""}, args: args{path: ""}, wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := checkExtension(tt.args.ext)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("checkExtension() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			c := &Collect{
+				FromExt: tt.fields.FromExt,
 			}
-			if got != tt.want {
-				t.Errorf("checkExtension() = %v, want %v", got, tt.want)
+			if err := c.appendFiles(tt.args.path); (err != nil) != tt.wantErr {
+				t.Errorf("Collect.appendFiles() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

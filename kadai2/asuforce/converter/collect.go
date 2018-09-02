@@ -24,23 +24,27 @@ func (c *Collect) CollectPath(path string) error {
 			return nil
 		}
 
-		ext, err := checkExtension(filepath.Ext(path))
-		if ext == ("." + c.FromExt) {
-			if err != nil {
-				return err
-			}
-			c.Paths = append(c.Paths, path)
+		err = c.appendFiles(path)
+		if err != nil {
+			return err
 		}
 		return nil
 	})
 	return err
 }
 
-func checkExtension(ext string) (string, error) {
-	if ext == "" {
-		return "", errors.New("ext must not be empty")
-	} else if ext == ".jpeg" {
-		return ".jpg", nil
+func (c *Collect) appendFiles(path string) error {
+	if path == "" {
+		return errors.New("path must not be empty")
 	}
-	return ext, nil
+
+	ext := filepath.Ext(path)
+	if ext == ".jpeg" {
+		ext = ".jpg"
+	}
+
+	if ext == ("." + c.FromExt) {
+		c.Paths = append(c.Paths, path)
+	}
+	return nil
 }
