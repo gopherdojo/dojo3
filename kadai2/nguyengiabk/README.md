@@ -79,3 +79,8 @@ $go test -coverprofile=coverage.out ./...
 $go tool cover -func=coverage.out
 $go tool cover -html=coverage.out
 ```
+Result:
+```
+ok      github.com/gopherdojo/dojo3/kadai2/nguyengiabk/cmd      0.967s  coverage: 97.2% of statements
+ok      github.com/gopherdojo/dojo3/kadai2/nguyengiabk/converter        0.151s  coverage: 90.0% of statements
+```
