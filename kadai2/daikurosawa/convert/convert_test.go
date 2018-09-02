@@ -1,6 +1,8 @@
 package convert_test
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/gopherdojo/dojo3/kadai2/daikurosawa/convert"
@@ -55,8 +57,33 @@ func TestConvert_Convert(t *testing.T) {
 			sut := convert.NewConvert(tt.Option)
 			path := testFilePath[tt.FromExtension]
 			if err := sut.Convert(path); err != nil {
-				t.Fatal("failed convert", err)
+				t.Error("failed convert", err)
 			}
 		})
+	}
+}
+
+func createTempFile(t *testing.T) string {
+	t.Helper()
+	tempFile, err := ioutil.TempFile("./", "temp_file")
+	if err != nil {
+		t.Fatal("failed create temp file", err)
+	}
+	defer tempFile.Close()
+	return tempFile.Name()
+}
+
+func TestConvert_Convert_UnsupportedExtension(t *testing.T) {
+	option := &option.Option{FromExtension: "foo", ToExtension: "bar"}
+	sut := convert.NewConvert(option)
+	tempFileName := createTempFile(t)
+	defer os.Remove(tempFileName)
+	err := sut.Convert(tempFileName)
+	if err == nil {
+		t.Error("failed unsupported extension error is nothing")
+	}
+	errorMessage := "unsupported extension"
+	if err.Error() != errorMessage {
+		t.Errorf("failed different error message: %s", err.Error())
 	}
 }
