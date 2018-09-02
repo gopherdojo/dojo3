@@ -16,9 +16,10 @@ import (
 
 // Exit code.
 const (
-	exitCodeOK = iota
+	ExitCodeOK = iota
 	ExitCodeParseFlagError
-	exitCodeProcessError
+	ExitCodeInvalidArgsError
+	ExitCodeProcessError
 )
 
 type CLI struct {
@@ -29,32 +30,38 @@ type CLI struct {
 func (c *CLI) Run(args []string) int {
 
 	var from, to string
-	flags := flag.NewFlagSet("awesome-cli", flag.ContinueOnError)
+	flags := flag.NewFlagSet("convert", flag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
 	flags.StringVar(&from, "from", "jpg", "Input file extension.")
-	flag.StringVar(&to, "to", "png", "Output file extension.")
+	flags.StringVar(&to, "to", "png", "Output file extension.")
 	flag.Parse()
 
 	if err := flags.Parse(args[1:]); err != nil {
+		fmt.Fprintln(c.ErrStream, err.Error())
 		return ExitCodeParseFlagError
 	}
 
 	dirName := flags.Arg(0)
 
-	if fileInfo, err := os.Stat(dirName); err != nil || fileInfo.IsDir() == false {
+	info, err := os.Stat(dirName)
+	if err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
-		return exitCodeProcessError
+		return ExitCodeInvalidArgsError
+	}
+	if info.IsDir() == false {
+		fmt.Fprintf(c.ErrStream, "%s is not directory\n", dirName)
+		return ExitCodeInvalidArgsError
 	}
 
-	option := &option.Option{DirName: dirName, FromExtension: from, ToExtension: to}
+	option := &option.Option{FromExtension: from, ToExtension: to}
 	convert := convert.NewConvert(option)
 
 	if err := walkDirectory(dirName, from, convert); err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
-		return exitCodeProcessError
+		return ExitCodeProcessError
 	}
 
-	return exitCodeOK
+	return ExitCodeOK
 }
 
 func walkDirectory(dirName string, fromExtension string, convert convert.Convert) error {

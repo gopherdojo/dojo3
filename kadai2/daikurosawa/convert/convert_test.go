@@ -13,9 +13,9 @@ import (
 var testFilePath = map[string]string{}
 
 func init() {
-	testFilePath["jpg"] = "testdata/gopher.jpg"
-	testFilePath["png"] = "testdata/gopher.png"
-	testFilePath["gif"] = "testdata/gopher.gif"
+	testFilePath["jpg"] = "./../testdata/gopher.jpg"
+	testFilePath["png"] = "./../testdata/gopher.png"
+	testFilePath["gif"] = "./../testdata/gopher.gif"
 }
 
 var convertTests = []struct {
@@ -24,36 +24,36 @@ var convertTests = []struct {
 }{
 	{
 		"convert from jpg to png",
-		&option.Option{DirName: "dummy", FromExtension: "jpg", ToExtension: "png"},
+		&option.Option{FromExtension: "jpg", ToExtension: "png"},
 	},
 	{
 		"convert from jpg to gif",
-		&option.Option{DirName: "dummy", FromExtension: "jpg", ToExtension: "gif"},
+		&option.Option{FromExtension: "jpg", ToExtension: "gif"},
 	},
 	{
 		"convert from png to jpg",
-		&option.Option{DirName: "dummy", FromExtension: "png", ToExtension: "jpg"},
+		&option.Option{FromExtension: "png", ToExtension: "jpg"},
 	},
 	{
 		"convert from png to gif",
-		&option.Option{DirName: "dummy", FromExtension: "png", ToExtension: "gif"},
+		&option.Option{FromExtension: "png", ToExtension: "gif"},
 	},
 	{
 		"convert from gif to jpg",
-		&option.Option{DirName: "dummy", FromExtension: "gif", ToExtension: "jpg"},
+		&option.Option{FromExtension: "gif", ToExtension: "jpg"},
 	},
 	{
 		"convert from gif to png",
-		&option.Option{DirName: "dummy", FromExtension: "gif", ToExtension: "png"},
+		&option.Option{FromExtension: "gif", ToExtension: "png"},
 	},
 }
 
 func TestConvert_Convert(t *testing.T) {
-	for _, conv := range convertTests {
-		conv := conv
-		t.Run(conv.name, func(t *testing.T) {
-			sut := convert.NewConvert(conv.Option)
-			path := testFilePath[conv.FromExtension]
+	for _, tt := range convertTests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			sut := convert.NewConvert(tt.Option)
+			path := testFilePath[tt.FromExtension]
 			if err := sut.Convert(path); err != nil {
 				t.Fatal("failed convert", err)
 			}
