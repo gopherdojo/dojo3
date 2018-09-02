@@ -6,12 +6,23 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"os"
 	"reflect"
 	"testing"
 
 	"github.com/gopherdojo/dojo3/kadai2/nguyengiabk/cmd"
 )
+
+func Example() {
+	params, err := cmd.Parse(os.Args[1:])
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = cmd.Run(*params, os.Stdout); err != nil {
+		log.Fatal(err)
+	}
+}
 
 var testParseFixtures = []struct {
 	name   string
