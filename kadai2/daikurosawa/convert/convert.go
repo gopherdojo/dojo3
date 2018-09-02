@@ -61,7 +61,7 @@ func decode(path string, converter di.Converter) (image.Image, error) {
 	return converter.Decode(file)
 }
 
-func encode(image image.Image, converter di.Converter, path string, fromExtension string, toExtension string) error {
+func encode(image image.Image, converter di.Converter, path, fromExtension, toExtension string) error {
 	output, err := os.Create(strings.TrimSuffix(path, fromExtension) + toExtension)
 	if err != nil {
 		return err
