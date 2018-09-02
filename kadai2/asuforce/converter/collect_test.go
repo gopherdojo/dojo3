@@ -18,9 +18,9 @@ func TestCollect_CollectPath(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{name: "Select jpg file", fields: fields{Paths: []string{}, FromExt: "jpg"}, args: args{path: "../testdata/"}, wantErr: false},
-		{name: "Select png file", fields: fields{Paths: []string{}, FromExt: "png"}, args: args{path: "../testdata/"}, wantErr: false},
-		{name: "Select gif file", fields: fields{Paths: []string{}, FromExt: "gif"}, args: args{path: "../testdata/"}, wantErr: false},
+		{name: "Select jpg file", fields: fields{Paths: []string{}, FromExt: "jpg"}, args: args{path: "testdata/"}, wantErr: false},
+		{name: "Select png file", fields: fields{Paths: []string{}, FromExt: "png"}, args: args{path: "testdata/"}, wantErr: false},
+		{name: "Select gif file", fields: fields{Paths: []string{}, FromExt: "gif"}, args: args{path: "testdata/"}, wantErr: false},
 		{name: "Input empty path", fields: fields{Paths: []string{}, FromExt: "jpg"}, args: args{path: ""}, wantErr: true},
 	}
 	for _, tt := range tests {

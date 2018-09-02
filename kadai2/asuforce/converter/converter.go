@@ -69,5 +69,8 @@ func (c *Converter) getFileName(path string) (string, error) {
 	rep := regexp.MustCompile(imageExt + "$")
 	name := filepath.Base(rep.ReplaceAllString(path, ""))
 
+	if imageExt == ("." + ext) {
+		return "", errors.New("input and output ext is same")
+	}
 	return name + "." + ext, nil
 }
