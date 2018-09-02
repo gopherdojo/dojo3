@@ -10,7 +10,7 @@ func TestJpg_GetExt(t *testing.T) {
 		j    *Jpg
 		want string
 	}{
-		{name: "success", want: "jpg"},
+		{name: "success", want: ".jpg"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

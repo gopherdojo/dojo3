@@ -21,5 +21,5 @@ func (j *Jpg) Decode(file io.Reader) (image.Image, error) {
 
 // GetExt return jpg
 func (j *Jpg) GetExt() string {
-	return "jpg"
+	return ".jpg"
 }

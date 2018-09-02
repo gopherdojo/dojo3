@@ -21,5 +21,5 @@ func (p *Png) Decode(file io.Reader) (image.Image, error) {
 
 // GetExt return png
 func (p *Png) GetExt() string {
-	return "png"
+	return ".png"
 }

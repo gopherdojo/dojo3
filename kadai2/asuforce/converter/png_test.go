@@ -10,7 +10,7 @@ func TestPng_GetExt(t *testing.T) {
 		p    *Png
 		want string
 	}{
-		{name: "success", want: "png"},
+		{name: "success", want: ".png"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

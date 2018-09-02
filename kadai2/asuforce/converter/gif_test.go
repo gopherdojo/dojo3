@@ -10,7 +10,7 @@ func TestGif_GetExt(t *testing.T) {
 		g    *Gif
 		want string
 	}{
-		{name: "success", want: "gif"},
+		{name: "success", want: ".gif"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

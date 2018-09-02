@@ -21,5 +21,5 @@ func (g *Gif) Decode(file io.Reader) (image.Image, error) {
 
 // GetExt return gif
 func (g *Gif) GetExt() string {
-	return "gif"
+	return ".gif"
 }
