@@ -15,7 +15,7 @@ var (
 	ErrSameFormat = errors.New("convert to the same format")
 )
 
-func Run(path string, src string, dst string) error {
+func Run(path, src string, dst string) error {
 	if err := validate(path, src, dst); err != nil {
 		return err
 	}
