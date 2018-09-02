@@ -15,7 +15,7 @@
   - リファクタリング
   - カバレッジ取得
     ```
-    $ go test ./... -coverprofile cover.out; go tool cover -func cover.out
+    $ go test ./... -coverprofile cover.out; go tool cover -html=cover.out -o cover.html
     ```
   - テーブル駆動テスト
   - テストヘルパー

@@ -1,6 +1,7 @@
 package imageconverter
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"image"
 	"image/gif"
@@ -34,7 +35,6 @@ func New(from, to string) (ImageConverter, error) {
 // ConvertImage converts image to another extension from provided extension
 func (ic *ImageConverter) ConvertImage(path string, output io.WriteCloser) (err error) {
 	var img image.Image
-	println(path)
 
 	ext := reg.FindString(path)
 	if ext == "" || ext != ic.from {
@@ -53,6 +53,7 @@ func (ic *ImageConverter) ConvertImage(path string, output io.WriteCloser) (err 
 	}
 	defer input.Close()
 	defer output.Close()
+	fmt.Printf("Converting %s to %s\n", path, ic.to)
 
 	switch {
 	case ext == "jpg" || ext == "jpeg":
