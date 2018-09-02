@@ -1,0 +1,20 @@
+mode: set
+github.com/dojo3/kadai2/nKumaya/main.go:33.42,40.46 6 1
+github.com/dojo3/kadai2/nKumaya/main.go:44.2,44.23 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:49.2,50.16 2 1
+github.com/dojo3/kadai2/nKumaya/main.go:54.2,56.70 2 1
+github.com/dojo3/kadai2/nKumaya/main.go:61.2,61.19 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:40.46,42.3 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:44.23,47.3 2 1
+github.com/dojo3/kadai2/nKumaya/main.go:50.16,52.3 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:56.70,59.3 2 1
+github.com/dojo3/kadai2/nKumaya/main.go:64.79,65.81 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:79.2,79.12 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:65.81,66.33 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:74.3,74.17 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:77.3,77.13 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:66.33,69.46 3 1
+github.com/dojo3/kadai2/nKumaya/main.go:72.4,72.71 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:69.46,71.5 1 0
+github.com/dojo3/kadai2/nKumaya/main.go:74.17,76.4 1 1
+github.com/dojo3/kadai2/nKumaya/main.go:82.13,85.2 2 0
