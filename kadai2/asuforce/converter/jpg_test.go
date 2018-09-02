@@ -4,12 +4,6 @@ import (
 	"testing"
 )
 
-func TestJpg_Encode(t *testing.T) {
-}
-
-func TestJpg_Decode(t *testing.T) {
-}
-
 func TestJpg_GetExt(t *testing.T) {
 	tests := []struct {
 		name string

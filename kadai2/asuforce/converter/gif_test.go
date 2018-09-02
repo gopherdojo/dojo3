@@ -4,12 +4,6 @@ import (
 	"testing"
 )
 
-func TestGif_Encode(t *testing.T) {
-}
-
-func TestGif_Decode(t *testing.T) {
-}
-
 func TestGif_GetExt(t *testing.T) {
 	tests := []struct {
 		name string
