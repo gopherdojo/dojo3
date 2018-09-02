@@ -5,12 +5,14 @@ import "testing"
 func TestValidateFormat(t *testing.T) {
 	noError := func(err error) {
 		if err != nil {
+			t.Helper()
 			t.Errorf("expected no error")
 		}
 	}
 
 	withError := func(err error) {
 		if err == nil {
+			t.Helper()
 			t.Errorf("expected returning error")
 		}
 	}
