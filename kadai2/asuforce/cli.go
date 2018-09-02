@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/gopherdojo/dojo3/kadai2/asuforce/converter"
 )
@@ -49,15 +48,15 @@ func (cli *CLI) Run(args []string) int {
 
 	collect := &converter.Collect{FromExt: fromExt}
 
-	err := filepath.Walk(path, collect.CollectPath)
+	err := collect.CollectPath(path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return ExitCodeError
 	}
 
 	c := &converter.Converter{
-		Encoder: cli.switchEncoder(fromExt),
-		Decoder: cli.switchDecoder(toExt),
+		Encoder: cli.switchEncoder(toExt),
+		Decoder: cli.switchDecoder(fromExt),
 	}
 	for _, i := range collect.Paths {
 		err := c.Convert(i)

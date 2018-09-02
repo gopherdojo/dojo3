@@ -44,6 +44,7 @@ func (c *Converter) Convert(path string) error {
 	if err != nil {
 		return err
 	}
+
 	outputFile, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -56,15 +57,6 @@ func (c *Converter) Convert(path string) error {
 	}
 
 	return nil
-}
-
-func checkExtension(ext string) (string, error) {
-	if ext == "" {
-		return "", errors.New("ext must not be empty")
-	} else if ext == ".jpeg" {
-		return ".jpg", nil
-	}
-	return ext, nil
 }
 
 func (c *Converter) getFileName(path string) (string, error) {
