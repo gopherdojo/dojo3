@@ -5,55 +5,65 @@ import (
 )
 
 func TestConvertFormat(t *testing.T) {
-	t.Run("jpg to png", func(t *testing.T) {
-		c := &Converter{
-			Src:       "testdata/1px.jpg",
-			OutputExt: "png",
-		}
-		err := c.Convert()
-		if err != nil {
-			t.Errorf("jpg to png: %v", err)
-			return
-		}
-	})
-
-	t.Run("png to jpg", func(t *testing.T) {
-		c := &Converter{
-			Src:       "testdata/1px.png",
-			OutputExt: "jpg",
-		}
-		err := c.Convert()
-		if err != nil {
-			t.Errorf("png to jpg: %v", err)
-			return
-		}
-	})
+	patterns := []struct {
+		name string
+		src string
+		outputExt string
+		dir string
+	}{
+		{
+      name: "jpg to png",
+      src: "testdata/1px.jpg",
+      outputExt: "png",
+    },
+		{
+      name: "png to jpg",
+      src: "testdata/1px.png",
+      outputExt: "jpg",
+    },
+	}
+  for _, p := range patterns {
+		t.Run(p.name, func(t *testing.T) {
+			c := &Converter{
+				Src:       p.src,
+				OutputExt: p.outputExt,
+			}
+			err := c.Convert()
+			if err != nil {
+				t.Errorf("p.name: %v", err)
+			}
+		})
+	}
 }
 
-func TestNotFound(t *testing.T) {
-	t.Run("file not found", func(t *testing.T) {
-		c := &Converter{
-			Src:       "testdata/xxx.jpg",
-			OutputExt: "png",
-		}
-		err := c.Convert()
-		if err == nil {
-			t.Errorf("file not found: %v", err)
-			return
-		}
-	})
-}
-
-func TestUnsupported(t *testing.T) {
-	t.Run("unsupported file", func(t *testing.T) {
-		c := &Converter{
-			Src:       "testdata/dummy.txt",
-			OutputExt: "png",
-		}
-		err := c.Convert()
-		if err == nil {
-			t.Errorf("unsupported file: %v", err)
-			return
-		}
-	})
+func TestConvertFail(t *testing.T) {
+	patterns := []struct {
+		name string
+		src string
+		outputExt string
+		dir string
+	}{
+		{
+      name: "file not found",
+      src: "testdata/xxx.jpg",
+      outputExt: "png",
+    },
+		{
+      name: "unsupported file",
+      src: "testdata/dummy.txt",
+      outputExt: "png",
+    },
+	}
+  for _, p := range patterns {
+		t.Run(p.name, func(t *testing.T) {
+			c := &Converter{
+				Src:       p.src,
+				OutputExt: p.outputExt,
+			}
+			err := c.Convert()
+			if err == nil {
+				t.Errorf("p.name: %v", err)
+			}
+		})
+	}
 }
