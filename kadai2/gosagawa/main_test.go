@@ -32,8 +32,8 @@ func TestIsValidInput(t *testing.T) {
 		{inType: "jpeg", outType: "png", args: correctArgs, assertFn: noError},
 		{inType: "jpeg", outType: "png", args: nilArgs, assertFn: withError},
 		{inType: "jpeg", outType: "png", args: overArgs, assertFn: withError},
-		{inType: "unsuppport", outType: "png", assertFn: withError},
-		{inType: "png", outType: "unsupport", assertFn: withError},
+		{inType: "unsuppport", outType: "png", args: correctArgs, assertFn: withError},
+		{inType: "png", outType: "unsupport", args: correctArgs, assertFn: withError},
 	}
 
 	for _, v := range cases {
