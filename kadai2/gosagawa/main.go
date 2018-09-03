@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"./converter"
+	"github.com/dojo3/kadai2/gosagawa/converter"
 )
 
 //
