@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -22,19 +21,19 @@ type Converter struct {
 func (c *Converter) Convert() error {
 	file, err := os.Open(c.Src)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
 	img, _, err := image.Decode(file)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	destPath := c.Src[:len(c.Src)-len(filepath.Ext(c.Src))] + "." + c.OutputExt
 	fd, err := os.Create(destPath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	switch c.OutputExt {
@@ -44,12 +43,12 @@ func (c *Converter) Convert() error {
 		err = png.Encode(fd, img)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = fd.Close()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
