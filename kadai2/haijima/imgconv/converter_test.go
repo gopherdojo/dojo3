@@ -5,39 +5,45 @@ import (
 	"testing"
 	"bytes"
 	"os"
+	"image"
 )
 
 func Test_imgConverter_Convert(t *testing.T) {
-	type fields struct {
-		DestFormat string
+	t.Run("#1 normal case", func(t *testing.T) {
+		assertConvert(t, "lena.jpg", "png")
+		assertConvert(t, "lena.jpg", "gif")
+		//assertConvert(t, "lena.png", "jpg")
+		//assertConvert(t, "lena.png", "png")
+		//assertConvert(t, "lena.gif", "png")
+		//assertConvert(t, "lena.gif", "gif")
+	})
+}
+
+func assertConvert(t *testing.T, filename string, destFormat string) {
+	t.Helper()
+
+	c := &imgConverter{
+		DestFormat: destFormat,
 	}
-	type args struct {
-		filename string
+
+	w := &bytes.Buffer{}
+	r, err := os.Open(testdata(filename))
+	if err != nil {
+		t.Error(err)
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{name: "#1 normal case", fields: fields{DestFormat: "png"}, args: args{filename: "lena.jpg"}, wantErr: false},
+	defer r.Close()
+
+	if err := c.Convert(r, w); err != nil {
+		t.Errorf("imgConverter.Convert() error = %v", err)
+		return
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &imgConverter{
-				DestFormat: tt.fields.DestFormat,
-			}
-			w := &bytes.Buffer{}
-			r, err := os.Open(testdata(tt.args.filename))
-			if err != nil {
-				t.Error(err)
-			}
-			defer r.Close()
-			if err := c.Convert(r, w); (err != nil) != tt.wantErr {
-				t.Errorf("imgConverter.Convert() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-		})
+
+	_, format, e := image.Decode(w)
+	if e != nil {
+		t.Error(err)
+	}
+	if format != destFormat {
+		t.Errorf("The format of the image produced by imgConverter.Convert() = %v, want %v", format, destFormat)
 	}
 }
 
