@@ -14,6 +14,9 @@ func init() {
 	buffer = &bytes.Buffer{}
 }
 
+func ExampleSorcery_Exec() {
+
+}
 
 func TestExec(t *testing.T) {
 	tempDir, err := ioutil.TempDir("", "test")

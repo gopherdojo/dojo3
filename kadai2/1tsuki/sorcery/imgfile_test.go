@@ -23,12 +23,12 @@ type TestFiles struct {
 	Tiff string
 }
 
-func initTestDataSet(t *testing.T) (*TestFiles, error) {
+func initTestDataSet(t *testing.T) *TestFiles {
 	t.Helper()
 
 	tempDir, err := ioutil.TempDir("", "sorcery-test")
 	if err != nil {
-		return nil, err
+		t.Fatalf("Unexpected error: %v", err)
 	}
 
 	testFiles := &TestFiles{
@@ -40,49 +40,37 @@ func initTestDataSet(t *testing.T) (*TestFiles, error) {
 	}
 
 	// FIXME : write method to copy items recursively
-	if err := copyFile(srcDir+"/"+srcJpeg, testFiles.Jpeg, t); err != nil {
-		return nil, err
-	}
-	if err := copyFile(srcDir+"/"+srcPng, testFiles.Png, t); err != nil {
-		return nil, err
-	}
-	if err := copyFile(srcDir+"/"+srcGif, testFiles.Gif, t); err != nil {
-		return nil, err
-	}
-	if err := copyFile(srcDir+"/"+srcTiff, testFiles.Tiff, t); err != nil {
-		return nil, err
-	}
+	copyFile(srcDir+"/"+srcJpeg, testFiles.Jpeg, t)
+	copyFile(srcDir+"/"+srcPng, testFiles.Png, t)
+	copyFile(srcDir+"/"+srcGif, testFiles.Gif, t)
+	copyFile(srcDir+"/"+srcTiff, testFiles.Tiff, t)
 
-	return testFiles, nil
+	return testFiles
 }
 
-func copyFile(src, dst string, t *testing.T) error {
+func copyFile(src, dst string, t *testing.T) {
 	t.Helper()
 
 	from, err := os.Open(src)
 	if err != nil {
-		return err
+		t.Fatalf("Unexpected error: %v", err)
 	}
 	defer from.Close()
 
 	to, err := os.Create(dst)
 	if err != nil {
-		return err
+		t.Fatalf("Unexpected error: %v", err)
 	}
 	defer to.Close()
 
 	_, err = io.Copy(to, from)
 	if err != nil {
-		return err
+		t.Fatalf("Unexpected error: %v", err)
 	}
-	return nil
 }
 
 func Test_imgFile_convertTo(t *testing.T) {
-	testFiles, err := initTestDataSet(t)
-	if err != nil {
-		t.Fatalf("initialization failed with err: %v", err)
-	}
+	testFiles := initTestDataSet(t)
 	defer os.RemoveAll(testFiles.Dir)
 
 	type fields struct {
