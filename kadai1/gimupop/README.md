@@ -1,4 +1,4 @@
-# Img Converter
+#第1回課題 Img Converter
  ## 仕様
 * ディレクトリを指定する
 * 指定したディレクトリ以下のJPGファイルをPNGに変換（デフォルト）
