@@ -26,6 +26,12 @@ bin/imgconv [OPTION] dir_path
   -v	詳細なログを表示
 ```
 
+# test
+
+```
+make check
+```
+
 # io.Readerとio.Writerについて調べてみよう
 ## 標準パッケージでどのように使われているか?
 

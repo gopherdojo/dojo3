@@ -10,7 +10,7 @@ fmt:
 	@echo ./... | xargs go fmt
 
 check:
-	go test -v ./...
+	go test -v -cover ./...
 
 clean:
 	rm -rf bin/*
