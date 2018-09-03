@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if !isValidInput(*inType, *outType, args) {
+	if err := IsValidInput(*inType, *outType, args); err != nil {
 		usage()
 		os.Exit(2)
 	}
@@ -41,16 +41,16 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  -v	詳細なログを表示\n")
 }
 
-//
-func isValidInput(inType string, outType string, args []string) bool {
+// Validate Input
+func IsValidInput(inType string, outType string, args []string) error {
 	if len(args) != 1 {
-		return false
+		return fmt.Errorf("Invalid Args len \n")
 	}
 	if !converter.IsValidImageType(inType) {
-		return false
+		return fmt.Errorf("%v: Invalid image type \n", inType)
 	}
 	if !converter.IsValidImageType(outType) {
-		return false
+		return fmt.Errorf("%v: Invalid image type \n", outType)
 	}
-	return true
+	return nil
 }
