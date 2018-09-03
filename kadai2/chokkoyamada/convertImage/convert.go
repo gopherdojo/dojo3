@@ -7,7 +7,7 @@ import (
 	"image/png"
 	"image/gif"
 	"io"
-			"bytes"
+	"bytes"
 )
 
 //Abstracted image
@@ -16,7 +16,7 @@ type AbstractImage struct {
 }
 
 //encode image according to the destination type
-func (ai AbstractImage) encode(destType *string)(buf bytes.Buffer) {
+func (ai AbstractImage) encode(destType *string) (buf bytes.Buffer) {
 	switch *destType {
 	case "png":
 		png.Encode(&buf, ai.in)
@@ -29,7 +29,7 @@ func (ai AbstractImage) encode(destType *string)(buf bytes.Buffer) {
 }
 
 //convert image file from one to another
-func Convert(in io.Reader, destType *string)(b []byte) {
+func Convert(in io.Reader, destType *string) (b []byte) {
 	img, _, err := image.Decode(in)
 	if err != nil {
 		panic(err)
@@ -37,4 +37,3 @@ func Convert(in io.Reader, destType *string)(b []byte) {
 	ai := AbstractImage{in: img}
 	return ai.encode(destType).Bytes()
 }
-
