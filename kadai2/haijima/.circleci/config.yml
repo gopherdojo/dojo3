@@ -1,0 +1,29 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: /go/src/github.com/haijima/go-imgconv
+    docker:
+    - image: golang:latest
+      environment:
+        REVIEWDOG_VERSION: "0.9.11"
+        REVIEWDOG_TOKEN: 64cf5646be200c33
+    steps:
+    - checkout
+    - run:
+        name: System information
+        command: 'echo "Golang $(go version)"'
+    - run: 'curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o reviewdog && chmod +x ./reviewdog'
+    - run: 'go get -u golang.org/x/lint/golint'
+    - run: 'go get -u honnef.co/go/tools/cmd/unused'
+    - run: 'go get -u github.com/kisielk/errcheck'
+    - run: 'go get -u honnef.co/go/tools/cmd/gosimple'
+    - run: 'go get -d -v -t ./...'
+    - run: 'go vet ./... 2>&1 | ./reviewdog -f=govet -reporter=github-pr-check'
+    - run: 'golint ./... 2>&1 | ./reviewdog -f=golint -reporter=github-pr-check'
+    - run: 'unused ./... || true | ./reviewdog -efm="%f:%l:%c: %m" -name=unused -reporter=github-pr-check'
+    - run: 'errcheck ./... || true | ./reviewdog -efm="%f:%l:%c: %m" -name=errcheck -reporter=github-pr-check'
+    - run: 'gosimple ./... || true | ./reviewdog -efm="%f:%l:%c: %m" -name=gosimple -reporter=github-pr-check'
+    - run:
+        name: go test
+        command: 'go test -v -race ./...'
