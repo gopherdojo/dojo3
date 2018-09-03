@@ -4,18 +4,18 @@ import (
 	"testing"
 )
 
-type AssertFn func(err error)
+type AssertFn func(name string, err error)
 
 func TestIsValidInput(t *testing.T) {
 
-	noError := func(err error) {
+	noError := func(name string, err error) {
 		if err != nil {
-			t.Errorf("expected no error")
+			t.Errorf("%v: expected no error", name)
 		}
 	}
-	withError := func(err error) {
+	withError := func(name string, err error) {
 		if err == nil {
-			t.Errorf("expected returning error")
+			t.Errorf("%v: expected returning error", name)
 		}
 	}
 
@@ -24,21 +24,23 @@ func TestIsValidInput(t *testing.T) {
 	overArgs := []string{"test1", "test2"}
 
 	cases := []struct {
+		name     string
 		inType   string
 		outType  string
 		args     []string
 		assertFn AssertFn
 	}{
-		{inType: "jpeg", outType: "png", args: correctArgs, assertFn: noError},
-		{inType: "jpeg", outType: "png", args: nilArgs, assertFn: withError},
-		{inType: "jpeg", outType: "png", args: overArgs, assertFn: withError},
-		{inType: "unsuppport", outType: "png", args: correctArgs, assertFn: withError},
-		{inType: "png", outType: "unsupport", args: correctArgs, assertFn: withError},
+		{name: "all correct", inType: "jpeg", outType: "png", args: correctArgs, assertFn: noError},
+		{name: "no args", inType: "jpeg", outType: "png", args: nilArgs, assertFn: withError},
+		{name: "more than two args", inType: "jpeg", outType: "png", args: overArgs, assertFn: withError},
+		{name: "unsupported inType", inType: "unsuppport", outType: "png", args: correctArgs, assertFn: withError},
+		{name: "unsupported outType", inType: "png", outType: "unsupport", args: correctArgs, assertFn: withError},
 	}
 
 	for _, v := range cases {
-		err := IsValidInput(v.inType, v.outType, v.args)
-		v.assertFn(err)
+		t.Run(v.name, func(t *testing.T) {
+			err := IsValidInput(v.inType, v.outType, v.args)
+			v.assertFn(v.name, err)
+		})
 	}
-
 }
