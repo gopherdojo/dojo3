@@ -38,8 +38,19 @@ type Writer interface {
 
 ## 1回目の宿題のテストを作ってみてください
 * テストのしやすさを考えてリファクタリングしてみる
+実ファイルを扱わなくてもテストできるように、io.Readerを受け取ってbytes.Bufferを返すようにした
+
 * テストのカバレッジをとってみる
+
+```
+ᐅ go test -coverprofile=profile ./convertImage
+ok _/Users/yamadanaoyuki/Documents/git/dojo3/kadai2/chokkoyamada/convertImage	0.576s	coverage: 90.0% of statements
+```
+
 * テーブル駆動テストを行う
+TestConvert()をtestFlagsという変数でテーブルテストしてみた
+
 * テストヘルパーを作ってみる
+これがよくわからず、未対応
 
 
