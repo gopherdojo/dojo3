@@ -72,18 +72,11 @@ func GetImageType(path string) string {
 }
 
 //IsValidImageType returns imageType is valid or not
-//XXX もっとスマートなやり方があるのでは
-func IsValidImageType(imageType string) bool {
-	var isValidType bool
-	switch imageType {
-	case "jpeg":
-		isValidType = true
-	case "png":
-		isValidType = true
-	case "gif":
-		isValidType = true
-	default:
-		isValidType = false
+func IsValidImageType(imageType string) error {
+
+	supportedImage := map[string]bool{"jpeg": true, "png": true, "gif": true}
+	if n, ok := supportedImage[imageType]; !n || !ok {
+		return fmt.Errorf("%v: Invalid image type \n", imageType)
 	}
-	return isValidType
+	return nil
 }

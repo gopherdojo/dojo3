@@ -46,11 +46,11 @@ func IsValidInput(inType string, outType string, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("Invalid Args len \n")
 	}
-	if !converter.IsValidImageType(inType) {
-		return fmt.Errorf("%v: Invalid image type \n", inType)
+	if err := converter.IsValidImageType(inType); err != nil {
+		return err
 	}
-	if !converter.IsValidImageType(outType) {
-		return fmt.Errorf("%v: Invalid image type \n", outType)
+	if err := converter.IsValidImageType(outType); err != nil {
+		return err
 	}
 	return nil
 }
