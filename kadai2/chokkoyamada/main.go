@@ -50,7 +50,7 @@ func walkFile(targetDir *string, srcType *string, destType *string) {
 
 			inputFile.Seek(0, 0)
 			b := convertImage.Convert(inputFile, destType)
-			outputFile.Write(b)
+			outputFile.Write(b.Bytes())
 		}
 		return nil
 	})
