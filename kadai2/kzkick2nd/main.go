@@ -3,10 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
-	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/convert"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/cli"
 )
 
 func main() {
@@ -23,26 +21,13 @@ func main() {
 
 	// FIXME 並列処理にできない？
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-		if filepath.Ext(path) != "."+inputExt {
-			return nil
-		}
-		c := convert.Converter{
-			Src:       path,
-			OutputExt: outputExt,
-		}
-		errConvert := c.Convert()
-		if errConvert != nil {
-			log.Fatal(errConvert)
-			return errConvert
-		}
-		return nil
-	})
+	w := cli.Worker{
+		Input:  inputExt,
+	  Output: outputExt,
+	}
+	err := w.Run(dir)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
