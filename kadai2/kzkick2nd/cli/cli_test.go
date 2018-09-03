@@ -18,13 +18,13 @@ func TestRunWithArgs(t *testing.T) {
       name: "jpg to png with dir",
       inputExt: "jpg",
       outputExt: "png",
-      dir: "../convert/testfiles/",
+      dir: "../convert/testdata/",
     },
     {
       name: "jpg to png with 1 file",
       inputExt: "jpg",
       outputExt: "png",
-      dir: "../convert/testfiles/1px.jpg",
+      dir: "../convert/testdata/1px.jpg",
     },
 	}
   for _, p := range patterns {

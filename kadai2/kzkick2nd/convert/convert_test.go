@@ -7,7 +7,7 @@ import (
 func TestConvertFormat(t *testing.T) {
 	t.Run("jpg to png", func(t *testing.T) {
 		c := &Converter{
-			Src:       "testfiles/1px.jpg",
+			Src:       "testdata/1px.jpg",
 			OutputExt: "png",
 		}
 		err := c.Convert()
@@ -19,7 +19,7 @@ func TestConvertFormat(t *testing.T) {
 
 	t.Run("png to jpg", func(t *testing.T) {
 		c := &Converter{
-			Src:       "testfiles/1px.png",
+			Src:       "testdata/1px.png",
 			OutputExt: "jpg",
 		}
 		err := c.Convert()
@@ -33,7 +33,7 @@ func TestConvertFormat(t *testing.T) {
 func TestNotFound(t *testing.T) {
 	t.Run("file not found", func(t *testing.T) {
 		c := &Converter{
-			Src:       "testfiles/xxx.jpg",
+			Src:       "testdata/xxx.jpg",
 			OutputExt: "png",
 		}
 		err := c.Convert()
@@ -47,7 +47,7 @@ func TestNotFound(t *testing.T) {
 func TestUnsupported(t *testing.T) {
 	t.Run("unsupported file", func(t *testing.T) {
 		c := &Converter{
-			Src:       "testfiles/dummy.txt",
+			Src:       "testdata/dummy.txt",
 			OutputExt: "png",
 		}
 		err := c.Convert()
