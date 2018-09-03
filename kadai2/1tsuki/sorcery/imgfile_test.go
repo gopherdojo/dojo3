@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-
-
 const (
 	srcDir  string = "./testdata"
 	srcJpeg string = "jpegfile.jpg"
@@ -18,10 +16,10 @@ const (
 )
 
 type TestFiles struct {
-	Dir string
+	Dir  string
 	Jpeg string
-	Png string
-	Gif string
+	Png  string
+	Gif  string
 	Tiff string
 }
 
@@ -34,24 +32,24 @@ func initTestDataSet(t *testing.T) (*TestFiles, error) {
 	}
 
 	testFiles := &TestFiles{
-		Dir: tempDir,
+		Dir:  tempDir,
 		Jpeg: tempDir + "/" + srcJpeg,
-		Png: tempDir + "/" + srcPng,
-		Gif: tempDir + "/" + srcGif,
+		Png:  tempDir + "/" + srcPng,
+		Gif:  tempDir + "/" + srcGif,
 		Tiff: tempDir + "/" + srcTiff,
 	}
 
 	// FIXME : write method to copy items recursively
-	if err := copyFile(srcDir+ "/" +srcJpeg, testFiles.Jpeg, t); err != nil {
+	if err := copyFile(srcDir+"/"+srcJpeg, testFiles.Jpeg, t); err != nil {
 		return nil, err
 	}
-	if err := copyFile(srcDir+ "/" +srcPng, testFiles.Png, t); err != nil {
+	if err := copyFile(srcDir+"/"+srcPng, testFiles.Png, t); err != nil {
 		return nil, err
 	}
-	if err := copyFile(srcDir+ "/" +srcGif, testFiles.Gif, t); err != nil {
+	if err := copyFile(srcDir+"/"+srcGif, testFiles.Gif, t); err != nil {
 		return nil, err
 	}
-	if err := copyFile(srcDir+ "/" +srcTiff, testFiles.Tiff, t); err != nil {
+	if err := copyFile(srcDir+"/"+srcTiff, testFiles.Tiff, t); err != nil {
 		return nil, err
 	}
 
@@ -83,8 +81,7 @@ func copyFile(src, dst string, t *testing.T) error {
 func Test_imgFile_convertTo(t *testing.T) {
 	testFiles, err := initTestDataSet(t)
 	if err != nil {
-		t.Errorf("initialization failed with err: %v", err)
-		return
+		t.Fatalf("initialization failed with err: %v", err)
 	}
 	defer os.RemoveAll(testFiles.Dir)
 
@@ -117,7 +114,6 @@ func Test_imgFile_convertTo(t *testing.T) {
 		{"unsupported to jpg", fields{testFiles.Tiff}, args{Jpeg}, "", true},
 		{"unsupported to png", fields{testFiles.Tiff}, args{Png}, "", true},
 		{"unsupported to gif", fields{testFiles.Tiff}, args{Gif}, "", true},
-
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -135,7 +131,6 @@ func Test_imgFile_convertTo(t *testing.T) {
 		})
 	}
 }
-
 
 func Test_imgFile_extString(t *testing.T) {
 	type fields struct {
