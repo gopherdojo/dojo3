@@ -29,15 +29,19 @@ func TestRunWithArgs(t *testing.T) {
 	}
   for _, p := range patterns {
     t.Run(p.name, func(t *testing.T) {
-      w := &Worker{
-        Input:  p.inputExt,
-    	  Output: p.outputExt,
-      }
-      err := w.Run(p.dir)
-    	if err != nil {
-        t.Errorf("p.name: %v", err)
-    	}
+      workerRun(t, p.name, p.inputExt, p.outputExt, p.dir)
     })
   }
+}
 
+func workerRun(t *testing.T, name string, inputExt string, outputExt string, dir string ){
+  t.Helper()
+  w := &Worker{
+    Input:  inputExt,
+    Output: outputExt,
+  }
+  err := w.Run(dir)
+  if err != nil {
+    t.Errorf("%s: %v",name, err)
+  }
 }
