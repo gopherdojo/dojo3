@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gopherdojo/dojo3/kadai1/kzkick2nd/convert"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/convert"
 )
 
 func main() {
@@ -31,11 +31,11 @@ func main() {
 		if filepath.Ext(path) != "."+inputExt {
 			return nil
 		}
-		converter := convert.Converter{
+		c := convert.Converter{
 			Src:       path,
 			OutputExt: outputExt,
 		}
-		errConvert := converter.Convert()
+		errConvert := c.Convert()
 		if errConvert != nil {
 			log.Fatal(errConvert)
 			return errConvert
