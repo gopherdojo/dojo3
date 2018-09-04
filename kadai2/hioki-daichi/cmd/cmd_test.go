@@ -13,16 +13,6 @@ import (
 	"github.com/gopherdojo/dojo3/kadai2/hioki-daichi/fileutil"
 )
 
-// Decoder
-var jpegD conversion.Jpeg
-var pngD conversion.Png
-var gifD conversion.Gif
-
-// Encoder
-var jpegE = &conversion.Jpeg{Options: &jpeg.Options{Quality: 1}}
-var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompression}}
-var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
-
 func TestCmd_Run(t *testing.T) {
 	cases := map[string]struct {
 		decoder conversion.Decoder
@@ -32,33 +22,33 @@ func TestCmd_Run(t *testing.T) {
 		// Reason: To be able to handle "tempdir"
 		expected func(string) string
 	}{
-		"JPEG to PNG": {decoder: &jpegD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		"JPEG to PNG": {decoder: jpegDecoder(t), encoder: pngEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.png"
 Converted: "` + tempdir + `/jpeg/sample2.png"
 Converted: "` + tempdir + `/jpeg/sample3.png"
 `
 		}},
-		"JPEG to GIF": {decoder: &jpegD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		"JPEG to GIF": {decoder: jpegDecoder(t), encoder: gifEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.gif"
 Converted: "` + tempdir + `/jpeg/sample2.gif"
 Converted: "` + tempdir + `/jpeg/sample3.gif"
 `
 		}},
-		"PNG to JPEG": {decoder: &pngD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		"PNG to JPEG": {decoder: pngDecoder(t), encoder: jpegEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.jpg"
 Converted: "` + tempdir + `/png/sample2.jpg"
 `
 		}},
-		"PNG to GIF": {decoder: &pngD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		"PNG to GIF": {decoder: pngDecoder(t), encoder: gifEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.gif"
 Converted: "` + tempdir + `/png/sample2.gif"
 `
 		}},
-		"GIF to JPEG": {decoder: &gifD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		"GIF to JPEG": {decoder: gifDecoder(t), encoder: jpegEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.jpg"
 `
 		}},
-		"GIF to PNG": {decoder: &gifD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		"GIF to PNG": {decoder: gifDecoder(t), encoder: pngEncoder(t), force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.png"
 `
 		}},
@@ -95,7 +85,7 @@ func TestCmd_Run_Nonexistence(t *testing.T) {
 
 	expected := "lstat nonexistent_path: no such file or directory"
 
-	runner := Runner{OutStream: ioutil.Discard, Decoder: &jpegD, Encoder: pngE, Force: true}
+	runner := Runner{OutStream: ioutil.Discard, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: true}
 
 	err := runner.Run("nonexistent_path")
 
@@ -116,13 +106,13 @@ func TestCmd_Run_Conflict(t *testing.T) {
 		var runner Runner
 		var err error
 
-		runner = Runner{OutStream: w, Decoder: &jpegD, Encoder: pngE, Force: true}
+		runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: true}
 		err = runner.Run(tempdir)
 		if err != nil {
 			t.Fatalf("err %s", err)
 		}
 
-		runner = Runner{OutStream: w, Decoder: &jpegD, Encoder: pngE, Force: false}
+		runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: false}
 		err = runner.Run(tempdir)
 		actual := err.Error()
 		if actual != expected {
@@ -146,4 +136,37 @@ func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	defer os.RemoveAll(tempdir)
 
 	f(t, tempdir)
+}
+
+func jpegDecoder(t *testing.T) *conversion.Jpeg {
+	t.Helper()
+	var d conversion.Jpeg
+	return &d
+}
+
+func pngDecoder(t *testing.T) *conversion.Png {
+	t.Helper()
+	var d conversion.Png
+	return &d
+}
+
+func gifDecoder(t *testing.T) *conversion.Gif {
+	t.Helper()
+	var d conversion.Gif
+	return &d
+}
+
+func jpegEncoder(t *testing.T) *conversion.Jpeg {
+	t.Helper()
+	return &conversion.Jpeg{Options: &jpeg.Options{Quality: 1}}
+}
+
+func pngEncoder(t *testing.T) *conversion.Png {
+	t.Helper()
+	return &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompression}}
+}
+
+func gifEncoder(t *testing.T) *conversion.Gif {
+	t.Helper()
+	return &conversion.Gif{Options: &gif.Options{NumColors: 1}}
 }

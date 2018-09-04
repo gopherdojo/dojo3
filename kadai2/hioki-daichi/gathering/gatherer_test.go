@@ -1,9 +1,6 @@
 package gathering
 
 import (
-	"image/gif"
-	"image/jpeg"
-	"image/png"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,24 +10,14 @@ import (
 	"github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion"
 )
 
-// Decoder
-var jpegD conversion.Jpeg
-var pngD conversion.Png
-var gifD conversion.Gif
-
-// Encoder
-var jpegE = &conversion.Jpeg{Options: &jpeg.Options{Quality: 1}}
-var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompression}}
-var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
-
 func TestGathering_Gather(t *testing.T) {
 	cases := map[string]struct {
 		decoder  conversion.Decoder
 		expected []string
 	}{
-		"JPEG": {decoder: &jpegD, expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
-		"PNG":  {decoder: &pngD, expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
-		"GIF":  {decoder: &gifD, expected: []string{"../testdata/gif/sample1.gif"}},
+		"JPEG": {decoder: jpegDecoder(t), expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
+		"PNG":  {decoder: pngDecoder(t), expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
+		"GIF":  {decoder: gifDecoder(t), expected: []string{"../testdata/gif/sample1.gif"}},
 	}
 
 	for n, c := range cases {
@@ -56,7 +43,7 @@ func TestGathering_Gather_Nonexistence(t *testing.T) {
 
 	expected := "lstat nonexistent_path: no such file or directory"
 
-	g := Gatherer{Decoder: &jpegD}
+	g := Gatherer{Decoder: jpegDecoder(t)}
 
 	_, err := g.Gather("nonexistent_path")
 	actual := err.Error()
@@ -82,7 +69,7 @@ func TestGathering_Gather_Unopenable(t *testing.T) {
 
 	expected := "open " + path + ": permission denied"
 
-	g := Gatherer{Decoder: &jpegD}
+	g := Gatherer{Decoder: jpegDecoder(t)}
 
 	_, err = g.Gather(tempdir)
 
@@ -97,7 +84,7 @@ func TestGathering_Gather_FailedToCheckDecodable(t *testing.T) {
 
 	expected := "EOF"
 
-	g := Gatherer{Decoder: &jpegD}
+	g := Gatherer{Decoder: jpegDecoder(t)}
 
 	_, err := g.Gather("./testdata/empty.jpg")
 
@@ -110,10 +97,28 @@ func TestGathering_Gather_FailedToCheckDecodable(t *testing.T) {
 func TestGathering_Gather_Undecodable(t *testing.T) {
 	t.Parallel()
 
-	g := Gatherer{Decoder: &jpegD}
+	g := Gatherer{Decoder: jpegDecoder(t)}
 
 	_, err := g.Gather("./testdata/undecodable.jpg")
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
+}
+
+func jpegDecoder(t *testing.T) *conversion.Jpeg {
+	t.Helper()
+	var d conversion.Jpeg
+	return &d
+}
+
+func pngDecoder(t *testing.T) *conversion.Png {
+	t.Helper()
+	var d conversion.Png
+	return &d
+}
+
+func gifDecoder(t *testing.T) *conversion.Gif {
+	t.Helper()
+	var d conversion.Gif
+	return &d
 }
