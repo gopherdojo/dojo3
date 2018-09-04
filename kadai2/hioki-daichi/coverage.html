@@ -175,38 +175,39 @@ type Decoder interface {
 }
 
 // Convert opens the file, decodes it, creates a file with a different extension, and writes the encoded result.
-func (c *Converter) Convert(path string, force bool) (*os.File, error) <span class="cov10" title="11">{
+func (c *Converter) Convert(path string, force bool) (*os.File, error) <span class="cov10" title="12">{
         fp, err := os.Open(path)
         if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
-        <span class="cov9" title="10">defer fp.Close()
+        <span class="cov9" title="11">defer fp.Close()
 
         img, err := c.Decoder.Decode(fp)
         if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
 
-        <span class="cov9" title="9">dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
+        <span class="cov9" title="10">dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
 
         if !force </span><span class="cov3" title="2">{
                 _, err := os.OpenFile(dstPath, os.O_CREATE|os.O_EXCL, 0)
                 if os.IsExist(err) </span><span class="cov1" title="1">{
                         return nil, errors.New("File already exists: " + dstPath)
                 }</span>
+                <span class="cov1" title="1">os.Remove(dstPath)</span>
         }
 
-        <span class="cov8" title="8">dstFile, err := os.Create(dstPath)
+        <span class="cov8" title="9">dstFile, err := os.Create(dstPath)
         if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
 
-        <span class="cov8" title="7">err = c.Encoder.Encode(dstFile, img)
+        <span class="cov8" title="8">err = c.Encoder.Encode(dstFile, img)
         if err != nil </span><span class="cov1" title="1">{
                 return nil, err
         }</span>
 
-        <span class="cov7" title="6">return dstFile, nil</span>
+        <span class="cov8" title="7">return dstFile, nil</span>
 }
 </pre>
 		
@@ -270,7 +271,7 @@ func (j *Jpeg) Encode(w io.Writer, img image.Image) error <span class="cov4" tit
 }</span>
 
 // Decode decodes the specified JPEG file
-func (j *Jpeg) Decode(r io.Reader) (image.Image, error) <span class="cov10" title="6">{
+func (j *Jpeg) Decode(r io.Reader) (image.Image, error) <span class="cov10" title="7">{
         return jpeg.Decode(r)
 }</span>
 
@@ -306,7 +307,7 @@ type Png struct {
 }
 
 // Encode encodes the specified file to PNG
-func (p *Png) Encode(w io.Writer, img image.Image) error <span class="cov4" title="2">{
+func (p *Png) Encode(w io.Writer, img image.Image) error <span class="cov6" title="3">{
         return p.Encoder.Encode(w, img)
 }</span>
 
@@ -316,7 +317,7 @@ func (p *Png) Decode(r io.Reader) (image.Image, error) <span class="cov4" title=
 }</span>
 
 // Extname returns "png"
-func (p *Png) Extname() string <span class="cov10" title="5">{
+func (p *Png) Extname() string <span class="cov10" title="6">{
         return "png"
 }</span>
 
@@ -326,7 +327,7 @@ func (p *Png) MagicBytesSlice() [][]byte <span class="cov1" title="1">{
 }</span>
 
 // HasProcessableExtname returns whether the specified path has ".png"
-func (p *Png) HasProcessableExtname(path string) bool <span class="cov8" title="4">{
+func (p *Png) HasProcessableExtname(path string) bool <span class="cov7" title="4">{
         return filepath.Ext(path) == ".png"
 }</span>
 </pre>
