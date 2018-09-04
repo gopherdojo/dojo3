@@ -14,9 +14,9 @@ import (
 )
 
 // Decoder
-var jpegD = &conversion.Jpeg{}
-var pngD = &conversion.Png{}
-var gifD = &conversion.Gif{}
+var jpegD conversion.Jpeg
+var pngD conversion.Png
+var gifD conversion.Gif
 
 // Encoder
 var jpegE = &conversion.Jpeg{Options: &jpeg.Options{Quality: 1}}
@@ -30,9 +30,9 @@ func TestGathering_Gather(t *testing.T) {
 		decoder  conversion.Decoder
 		expected []string
 	}{
-		{decoder: jpegD, expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
-		{decoder: pngD, expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
-		{decoder: gifD, expected: []string{"../testdata/gif/sample1.gif"}},
+		{decoder: &jpegD, expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
+		{decoder: &pngD, expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
+		{decoder: &gifD, expected: []string{"../testdata/gif/sample1.gif"}},
 	}
 
 	for _, c := range cases {
@@ -52,7 +52,7 @@ func TestGathering_Gather_Nonexistence(t *testing.T) {
 
 	expected := "lstat nonexistent_path: no such file or directory"
 
-	g := Gatherer{Decoder: jpegD}
+	g := Gatherer{Decoder: &jpegD}
 
 	_, err := g.Gather("nonexistent_path")
 	actual := err.Error()
@@ -75,7 +75,7 @@ func TestGathering_Gather_Unopenable(t *testing.T) {
 
 	expected := "open " + path + ": permission denied"
 
-	g := Gatherer{Decoder: jpegD}
+	g := Gatherer{Decoder: &jpegD}
 
 	_, err := g.Gather(tempdir)
 
@@ -90,7 +90,7 @@ func TestGathering_Gather_FailedToCheckDecodable(t *testing.T) {
 
 	expected := "EOF"
 
-	g := Gatherer{Decoder: jpegD}
+	g := Gatherer{Decoder: &jpegD}
 
 	_, err := g.Gather("./testdata/empty.jpg")
 
@@ -103,7 +103,7 @@ func TestGathering_Gather_FailedToCheckDecodable(t *testing.T) {
 func TestGathering_Gather_Undecodable(t *testing.T) {
 	t.Parallel()
 
-	g := Gatherer{Decoder: jpegD}
+	g := Gatherer{Decoder: &jpegD}
 
 	_, err := g.Gather("./testdata/undecodable.jpg")
 	if err != nil {

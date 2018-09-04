@@ -14,9 +14,9 @@ import (
 )
 
 // Decoder
-var jpegD = &conversion.Jpeg{}
-var pngD = &conversion.Png{}
-var gifD = &conversion.Gif{}
+var jpegD conversion.Jpeg
+var pngD conversion.Png
+var gifD conversion.Gif
 
 // Encoder
 var jpegE = &conversion.Jpeg{Options: &jpeg.Options{Quality: 1}}
@@ -34,33 +34,33 @@ func TestCmd_Run(t *testing.T) {
 		// Reason: To be able to handle "tempdir"
 		expected func(string) string
 	}{
-		{decoder: jpegD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		{decoder: &jpegD, encoder: pngE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.png"
 Converted: "` + tempdir + `/jpeg/sample2.png"
 Converted: "` + tempdir + `/jpeg/sample3.png"
 `
 		}},
-		{decoder: jpegD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		{decoder: &jpegD, encoder: gifE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.gif"
 Converted: "` + tempdir + `/jpeg/sample2.gif"
 Converted: "` + tempdir + `/jpeg/sample3.gif"
 `
 		}},
-		{decoder: pngD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		{decoder: &pngD, encoder: jpegE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.jpg"
 Converted: "` + tempdir + `/png/sample2.jpg"
 `
 		}},
-		{decoder: pngD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		{decoder: &pngD, encoder: gifE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.gif"
 Converted: "` + tempdir + `/png/sample2.gif"
 `
 		}},
-		{decoder: gifD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		{decoder: &gifD, encoder: jpegE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.jpg"
 `
 		}},
-		{decoder: gifD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		{decoder: &gifD, encoder: pngE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.png"
 `
 		}},
@@ -94,7 +94,7 @@ func TestCmd_Run_Nonexistence(t *testing.T) {
 
 	expected := "lstat nonexistent_path: no such file or directory"
 
-	runner := Runner{OutStream: ioutil.Discard, Decoder: jpegD, Encoder: pngE, Force: true}
+	runner := Runner{OutStream: ioutil.Discard, Decoder: &jpegD, Encoder: pngE, Force: true}
 
 	err := runner.Run("nonexistent_path")
 
@@ -115,13 +115,13 @@ func TestCmd_Run_Conflict(t *testing.T) {
 		var runner Runner
 		var err error
 
-		runner = Runner{OutStream: w, Decoder: jpegD, Encoder: pngE, Force: true}
+		runner = Runner{OutStream: w, Decoder: &jpegD, Encoder: pngE, Force: true}
 		err = runner.Run(tempdir)
 		if err != nil {
 			t.Fatalf("err %s", err)
 		}
 
-		runner = Runner{OutStream: w, Decoder: jpegD, Encoder: pngE, Force: false}
+		runner = Runner{OutStream: w, Decoder: &jpegD, Encoder: pngE, Force: false}
 		err = runner.Run(tempdir)
 		actual := err.Error()
 		if actual != expected {
