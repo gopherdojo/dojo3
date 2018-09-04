@@ -27,7 +27,10 @@ func TestFileutil_StartsContentsWith(t *testing.T) {
 		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
-			actual, _ := StartsContentsWith(bytes.NewReader(c.a), c.b)
+			actual, err := StartsContentsWith(bytes.NewReader(c.a), c.b)
+			if err != nil {
+				t.Fatalf("err %s", err)
+			}
 			if actual != c.expected {
 				t.Errorf(`expected="%t" actual="%t"`, c.expected, actual)
 			}
@@ -40,9 +43,12 @@ func TestFileutil_StartsContentsWith_Unreadable(t *testing.T) {
 
 	expected := "EOF"
 
-	fp, _ := os.Open("./testdata/empty.txt")
+	fp, err := os.Open("./testdata/empty.txt")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
-	_, err := StartsContentsWith(fp, []byte("\x01"))
+	_, err = StartsContentsWith(fp, []byte("\x01"))
 
 	actual := err.Error()
 	if actual != expected {
@@ -93,12 +99,15 @@ func TestFileutil_CopyDirRec(t *testing.T) {
 		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
-			tempdir, _ := ioutil.TempDir("", "imgconv")
+			tempdir, err := ioutil.TempDir("", "imgconv")
+			if err != nil {
+				t.Fatalf("err %s", err)
+			}
 
 			CopyDirRec("../testdata/", tempdir)
 			defer os.RemoveAll(tempdir)
 
-			_, err := os.OpenFile(filepath.Join(tempdir, c.path), os.O_CREATE|os.O_EXCL, 0)
+			_, err = os.OpenFile(filepath.Join(tempdir, c.path), os.O_CREATE|os.O_EXCL, 0)
 			if !os.IsExist(err) {
 				t.Fatalf("err %s", err)
 			}
@@ -122,19 +131,25 @@ func TestFileutil_CopyDirRec_Nonexistence(t *testing.T) {
 func TestFileutil_CopyDirRec_Unopenable(t *testing.T) {
 	t.Parallel()
 
-	srcDir, _ := ioutil.TempDir("", "imgconv")
+	srcDir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
 	srcPath := filepath.Join(srcDir, "unopenable.txt")
 
 	expected := "open " + srcPath + ": permission denied"
 
-	_, err := os.OpenFile(srcPath, os.O_CREATE, 000)
+	_, err = os.OpenFile(srcPath, os.O_CREATE, 000)
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
 	defer os.Remove(srcPath)
 
-	dstDir, _ := ioutil.TempDir("", "imgconv")
+	dstDir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
 	err = CopyDirRec(srcDir, dstDir)
 
@@ -147,12 +162,15 @@ func TestFileutil_CopyDirRec_Unopenable(t *testing.T) {
 func TestFileutil_CopyDirRec_MkdirFailure(t *testing.T) {
 	t.Parallel()
 
-	tempDir, _ := ioutil.TempDir("", "imgconv")
+	tempDir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
 	dstPath := filepath.Join(tempDir, "foo")
 	expected := "mkdir " + dstPath + "/gif: permission denied"
 
-	err := os.Mkdir(dstPath, 0000)
+	err = os.Mkdir(dstPath, 0000)
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
@@ -168,9 +186,12 @@ func TestFileutil_CopyDirRec_MkdirFailure(t *testing.T) {
 
 func TestFileutil_Copy_CreateError(t *testing.T) {
 	expected := "error on create"
-	tempDir, _ := ioutil.TempDir("", "imgconv")
+	tempDir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 	m := &createCopierMock{errOnCreate: true, errOnCopy: false}
-	err := Copy(m, "../testdata/", tempDir)
+	err = Copy(m, "../testdata/", tempDir)
 	actual := err.Error()
 	if actual != expected {
 		t.Errorf(`expected="%s" actual="%s"`, expected, actual)
@@ -179,9 +200,12 @@ func TestFileutil_Copy_CreateError(t *testing.T) {
 
 func TestFileutil_Copy_CopyError(t *testing.T) {
 	expected := "error on copy"
-	tempDir, _ := ioutil.TempDir("", "imgconv")
+	tempDir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 	m := &createCopierMock{errOnCreate: false, errOnCopy: true}
-	err := Copy(m, "../testdata/", tempDir)
+	err = Copy(m, "../testdata/", tempDir)
 	actual := err.Error()
 	if actual != expected {
 		t.Errorf(`expected="%s" actual="%s"`, expected, actual)

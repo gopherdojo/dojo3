@@ -40,7 +40,10 @@ func TestGathering_Gather(t *testing.T) {
 
 			g := Gatherer{Decoder: c.decoder}
 
-			actual, _ := g.Gather("../testdata/")
+			actual, err := g.Gather("../testdata/")
+			if err != nil {
+				t.Fatalf("err %s", err)
+			}
 			if !reflect.DeepEqual(actual, c.expected) {
 				t.Errorf(`expected="%s" actual="%s"`, c.expected, actual)
 			}
@@ -65,7 +68,10 @@ func TestGathering_Gather_Nonexistence(t *testing.T) {
 func TestGathering_Gather_Unopenable(t *testing.T) {
 	t.Parallel()
 
-	tempdir, _ := ioutil.TempDir("", "imgconv")
+	tempdir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 	defer os.RemoveAll(tempdir)
 
 	path := filepath.Join(tempdir, "unopenable.jpg")
@@ -78,7 +84,7 @@ func TestGathering_Gather_Unopenable(t *testing.T) {
 
 	g := Gatherer{Decoder: &jpegD}
 
-	_, err := g.Gather(tempdir)
+	_, err = g.Gather(tempdir)
 
 	actual := err.Error()
 	if actual != expected {

@@ -134,9 +134,12 @@ func TestCmd_Run_Conflict(t *testing.T) {
 func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	t.Helper()
 
-	tempdir, _ := ioutil.TempDir("", "imgconv")
+	tempdir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
-	err := fileutil.CopyDirRec("../testdata/", tempdir)
+	err = fileutil.CopyDirRec("../testdata/", tempdir)
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}

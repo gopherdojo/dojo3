@@ -58,8 +58,11 @@ func TestConversion_Convert_Conflict(t *testing.T) {
 
 		path := filepath.Join(tempdir, "./jpeg/sample1.jpg")
 
-		_, _ = converter.Convert(path, false)
 		_, err := converter.Convert(path, false)
+		if err != nil {
+			t.Fatalf("err %s", err)
+		}
+		_, err = converter.Convert(path, false)
 
 		actual := err.Error()
 		if actual != expected {
@@ -171,9 +174,12 @@ func gifEncoder() *Gif {
 func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	t.Helper()
 
-	tempdir, _ := ioutil.TempDir("", "imgconv")
+	tempdir, err := ioutil.TempDir("", "imgconv")
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
-	err := fileutil.CopyDirRec("../testdata/", tempdir)
+	err = fileutil.CopyDirRec("../testdata/", tempdir)
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
