@@ -52,6 +52,7 @@ func (c *Converter) Convert(path string, force bool) (*os.File, error) {
 		if os.IsExist(err) {
 			return nil, errors.New("File already exists: " + dstPath)
 		}
+		os.Remove(dstPath)
 	}
 
 	dstFile, err := os.Create(dstPath)
