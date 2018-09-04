@@ -11,7 +11,6 @@ import (
 )
 
 func TestFileutil_StartsContentsWith(t *testing.T) {
-	t.Parallel()
 	cases := []struct {
 		a        []byte
 		b        []byte
@@ -26,6 +25,8 @@ func TestFileutil_StartsContentsWith(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			actual, _ := StartsContentsWith(bytes.NewReader(c.a), c.b)
 			if actual != c.expected {
 				t.Errorf(`expected="%t" actual="%t"`, c.expected, actual)
@@ -76,13 +77,6 @@ func TestFileutil_StartsContentsWith_Unseekable(t *testing.T) {
 }
 
 func TestFileutil_CopyDirRec(t *testing.T) {
-	t.Parallel()
-
-	tempdir, _ := ioutil.TempDir("", "imgconv")
-
-	CopyDirRec("../testdata/", tempdir)
-	defer os.RemoveAll(tempdir)
-
 	cases := []struct {
 		path string
 	}{
@@ -97,6 +91,13 @@ func TestFileutil_CopyDirRec(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
+			tempdir, _ := ioutil.TempDir("", "imgconv")
+
+			CopyDirRec("../testdata/", tempdir)
+			defer os.RemoveAll(tempdir)
+
 			_, err := os.OpenFile(filepath.Join(tempdir, c.path), os.O_CREATE|os.O_EXCL, 0)
 			if !os.IsExist(err) {
 				t.Fatalf("err %s", err)

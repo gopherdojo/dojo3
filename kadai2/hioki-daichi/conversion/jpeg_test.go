@@ -19,8 +19,6 @@ func TestConversion_Jpeg_MagicBytesSlice(t *testing.T) {
 }
 
 func TestConversion_Jpeg_HasProcessableExtname(t *testing.T) {
-	t.Parallel()
-
 	j := Jpeg{}
 
 	cases := []struct {
@@ -36,6 +34,8 @@ func TestConversion_Jpeg_HasProcessableExtname(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			actual := j.HasProcessableExtname(c.path)
 			if actual != c.expected {
 				t.Errorf(`expected="%t" actual="%t"`, c.expected, actual)

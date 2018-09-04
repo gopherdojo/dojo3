@@ -16,8 +16,6 @@ import (
 )
 
 func TestConversion_Convert(t *testing.T) {
-	t.Parallel()
-
 	cases := []struct {
 		decoder  Decoder
 		encoder  Encoder
@@ -44,6 +42,8 @@ func TestConversion_Convert(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			converter := &Converter{Decoder: c.decoder, Encoder: c.encoder}
 
 			withTempDir(t, func(t *testing.T, tempdir string) {

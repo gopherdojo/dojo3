@@ -24,8 +24,6 @@ var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompres
 var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
 
 func TestCmd_Run(t *testing.T) {
-	t.Parallel()
-
 	cases := []struct {
 		decoder conversion.Decoder
 		encoder conversion.Encoder
@@ -69,6 +67,8 @@ Converted: "` + tempdir + `/png/sample2.gif"
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			buf := &bytes.Buffer{}
 
 			runner := Runner{OutStream: buf, Decoder: c.decoder, Encoder: c.encoder, Force: c.force}

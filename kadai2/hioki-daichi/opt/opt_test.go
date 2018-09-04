@@ -22,8 +22,6 @@ var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.DefaultCo
 var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 256}}
 
 func TestOpt_Parse(t *testing.T) {
-	t.Parallel()
-
 	cases := []struct {
 		args    []string
 		dirname string
@@ -70,6 +68,8 @@ func TestOpt_Parse(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			dirname, options, err := Parse(c.args...)
 
 			if c.err == nil { // If it is expected that no error will occur

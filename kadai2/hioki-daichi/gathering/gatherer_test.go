@@ -24,8 +24,6 @@ var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompres
 var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
 
 func TestGathering_Gather(t *testing.T) {
-	t.Parallel()
-
 	cases := []struct {
 		decoder  conversion.Decoder
 		expected []string
@@ -38,6 +36,8 @@ func TestGathering_Gather(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			g := Gatherer{Decoder: c.decoder}
 
 			actual, _ := g.Gather("../testdata/")

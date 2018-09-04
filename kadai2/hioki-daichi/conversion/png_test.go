@@ -19,8 +19,6 @@ func TestConversion_Png_MagicBytesSlice(t *testing.T) {
 }
 
 func TestConversion_Png_HasProcessableExtname(t *testing.T) {
-	t.Parallel()
-
 	p := Png{}
 
 	cases := []struct {
@@ -36,6 +34,8 @@ func TestConversion_Png_HasProcessableExtname(t *testing.T) {
 	for _, c := range cases {
 		c := c
 		t.Run("", func(t *testing.T) {
+			t.Parallel()
+
 			actual := p.HasProcessableExtname(c.path)
 			if actual != c.expected {
 				t.Errorf(`expected="%t" actual="%t"`, c.expected, actual)
