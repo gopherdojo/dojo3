@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/gopherdojo/dojo3/kadai2/daikurosawa/convert"
 	"github.com/gopherdojo/dojo3/kadai2/daikurosawa/option"
@@ -68,7 +67,7 @@ func walkDirectory(dirName, fromExtension string, convert convert.Convert) error
 	var eg errgroup.Group
 
 	err := filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
-		if strings.TrimPrefix(filepath.Ext(path), ".") == fromExtension {
+		if filepath.Ext(path) == "."+fromExtension {
 			eg.Go(func() error {
 				return convert.Convert(path)
 			})
