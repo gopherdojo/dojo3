@@ -16,32 +16,24 @@ import (
 )
 
 func TestConversion_Convert(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		decoder  Decoder
 		encoder  Encoder
 		path     string
 		force    bool
 		expected error
 	}{
-		// JPEG to PNG
-		{decoder: jpegDecoder(), encoder: pngEncoder(), path: "./jpeg/sample1.jpg", force: true, expected: nil},
-		// JPEG to GIF
-		{decoder: jpegDecoder(), encoder: gifEncoder(), path: "./jpeg/sample1.jpg", force: true, expected: nil},
-
-		// PNG to JPEG
-		{decoder: pngDecoder(), encoder: jpegEncoder(), path: "./png/sample1.png", force: true, expected: nil},
-		// PNG to GIF
-		{decoder: pngDecoder(), encoder: gifEncoder(), path: "./png/sample1.png", force: true, expected: nil},
-
-		// GIF to JPEG
-		{decoder: gifDecoder(), encoder: jpegEncoder(), path: "./gif/sample1.gif", force: true, expected: nil},
-		// GIF to PNG
-		{decoder: gifDecoder(), encoder: pngEncoder(), path: "./gif/sample1.gif", force: true, expected: nil},
+		"JPEG to PNG": {decoder: jpegDecoder(), encoder: pngEncoder(), path: "./jpeg/sample1.jpg", force: true, expected: nil},
+		"JPEG to GIF": {decoder: jpegDecoder(), encoder: gifEncoder(), path: "./jpeg/sample1.jpg", force: true, expected: nil},
+		"PNG to JPEG": {decoder: pngDecoder(), encoder: jpegEncoder(), path: "./png/sample1.png", force: true, expected: nil},
+		"PNG to GIF":  {decoder: pngDecoder(), encoder: gifEncoder(), path: "./png/sample1.png", force: true, expected: nil},
+		"GIF to JPEG": {decoder: gifDecoder(), encoder: jpegEncoder(), path: "./gif/sample1.gif", force: true, expected: nil},
+		"GIF to PNG":  {decoder: gifDecoder(), encoder: pngEncoder(), path: "./gif/sample1.gif", force: true, expected: nil},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			converter := &Converter{Decoder: c.decoder, Encoder: c.encoder}

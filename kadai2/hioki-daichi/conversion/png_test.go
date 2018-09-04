@@ -21,19 +21,19 @@ func TestConversion_Png_MagicBytesSlice(t *testing.T) {
 func TestConversion_Png_HasProcessableExtname(t *testing.T) {
 	p := Png{}
 
-	cases := []struct {
+	cases := map[string]struct {
 		path     string
 		expected bool
 	}{
-		{path: "foo.png", expected: true},
-		{path: "foo.jpg", expected: false},
-		{path: "foo.jpeg", expected: false},
-		{path: "foo.gif", expected: false},
+		"foo.png":  {path: "foo.png", expected: true},
+		"foo.jpg":  {path: "foo.jpg", expected: false},
+		"foo.jpeg": {path: "foo.jpeg", expected: false},
+		"foo.gif":  {path: "foo.gif", expected: false},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			actual := p.HasProcessableExtname(c.path)

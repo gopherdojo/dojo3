@@ -24,7 +24,7 @@ var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompres
 var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
 
 func TestCmd_Run(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		decoder conversion.Decoder
 		encoder conversion.Encoder
 		force   bool
@@ -32,41 +32,41 @@ func TestCmd_Run(t *testing.T) {
 		// Reason: To be able to handle "tempdir"
 		expected func(string) string
 	}{
-		{decoder: &jpegD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		"JPEG to PNG": {decoder: &jpegD, encoder: pngE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.png"
 Converted: "` + tempdir + `/jpeg/sample2.png"
 Converted: "` + tempdir + `/jpeg/sample3.png"
 `
 		}},
-		{decoder: &jpegD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		"JPEG to GIF": {decoder: &jpegD, encoder: gifE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/jpeg/sample1.gif"
 Converted: "` + tempdir + `/jpeg/sample2.gif"
 Converted: "` + tempdir + `/jpeg/sample3.gif"
 `
 		}},
-		{decoder: &pngD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		"PNG to JPEG": {decoder: &pngD, encoder: jpegE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.jpg"
 Converted: "` + tempdir + `/png/sample2.jpg"
 `
 		}},
-		{decoder: &pngD, encoder: gifE, force: true, expected: func(tempdir string) string {
+		"PNG to GIF": {decoder: &pngD, encoder: gifE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/png/sample1.gif"
 Converted: "` + tempdir + `/png/sample2.gif"
 `
 		}},
-		{decoder: &gifD, encoder: jpegE, force: true, expected: func(tempdir string) string {
+		"GIF to JPEG": {decoder: &gifD, encoder: jpegE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.jpg"
 `
 		}},
-		{decoder: &gifD, encoder: pngE, force: true, expected: func(tempdir string) string {
+		"GIF to PNG": {decoder: &gifD, encoder: pngE, force: true, expected: func(tempdir string) string {
 			return `Converted: "` + tempdir + `/gif/sample1.png"
 `
 		}},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			buf := &bytes.Buffer{}

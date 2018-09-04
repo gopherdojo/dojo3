@@ -11,20 +11,20 @@ import (
 )
 
 func TestFileutil_StartsContentsWith(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		a        []byte
 		b        []byte
 		expected bool
 	}{
-		{a: []byte("\x01\x02"), b: []byte("\x01"), expected: true},
-		{a: []byte("\x01\x02"), b: []byte("\x01\x02"), expected: true},
-		{a: []byte("\x01\x02"), b: []byte("\x01\x02\x03"), expected: false},
-		{a: []byte("\x01\x02"), b: []byte("\x02"), expected: false},
+		"\x01\x02 starts with \x01":                 {a: []byte("\x01\x02"), b: []byte("\x01"), expected: true},
+		"\x01\x02 starts with \x01\x02":             {a: []byte("\x01\x02"), b: []byte("\x01\x02"), expected: true},
+		"\x01\x02 does not start with \x01\x02\x03": {a: []byte("\x01\x02"), b: []byte("\x01\x02\x03"), expected: false},
+		"\x01\x02 does not start with \x02":         {a: []byte("\x01\x02"), b: []byte("\x02"), expected: false},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			actual, _ := StartsContentsWith(bytes.NewReader(c.a), c.b)
@@ -77,20 +77,20 @@ func TestFileutil_StartsContentsWith_Unseekable(t *testing.T) {
 }
 
 func TestFileutil_CopyDirRec(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		path string
 	}{
-		{path: "./jpeg/sample1.jpg"},
-		{path: "./jpeg/sample2.jpg"},
-		{path: "./jpeg/sample3.jpeg"},
-		{path: "./png/sample1.png"},
-		{path: "./png/sample2.png"},
-		{path: "./gif/sample1.gif"},
+		"./jpeg/sample1.jpg":  {path: "./jpeg/sample1.jpg"},
+		"./jpeg/sample2.jpg":  {path: "./jpeg/sample2.jpg"},
+		"./jpeg/sample3.jpeg": {path: "./jpeg/sample3.jpeg"},
+		"./png/sample1.png":   {path: "./png/sample1.png"},
+		"./png/sample2.png":   {path: "./png/sample2.png"},
+		"./gif/sample1.gif":   {path: "./gif/sample1.gif"},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			tempdir, _ := ioutil.TempDir("", "imgconv")

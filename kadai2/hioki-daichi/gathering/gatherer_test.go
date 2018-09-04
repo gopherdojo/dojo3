@@ -24,18 +24,18 @@ var pngE = &conversion.Png{Encoder: &png.Encoder{CompressionLevel: png.NoCompres
 var gifE = &conversion.Gif{Options: &gif.Options{NumColors: 1}}
 
 func TestGathering_Gather(t *testing.T) {
-	cases := []struct {
+	cases := map[string]struct {
 		decoder  conversion.Decoder
 		expected []string
 	}{
-		{decoder: &jpegD, expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
-		{decoder: &pngD, expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
-		{decoder: &gifD, expected: []string{"../testdata/gif/sample1.gif"}},
+		"JPEG": {decoder: &jpegD, expected: []string{"../testdata/jpeg/sample1.jpg", "../testdata/jpeg/sample2.jpg", "../testdata/jpeg/sample3.jpeg"}},
+		"PNG":  {decoder: &pngD, expected: []string{"../testdata/png/sample1.png", "../testdata/png/sample2.png"}},
+		"GIF":  {decoder: &gifD, expected: []string{"../testdata/gif/sample1.gif"}},
 	}
 
-	for _, c := range cases {
+	for n, c := range cases {
 		c := c
-		t.Run("", func(t *testing.T) {
+		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			g := Gatherer{Decoder: c.decoder}
