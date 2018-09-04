@@ -63,19 +63,20 @@ Converted: "` + tempdir + `/png/sample2.gif"
 
 			runner := Runner{OutStream: buf, Decoder: c.decoder, Encoder: c.encoder, Force: c.force}
 
-			withTempDir(t, func(t *testing.T, tempdir string) {
-				expected := c.expected(tempdir)
+			tempdir, cleanFn := withTempDir(t)
+			defer cleanFn()
 
-				err := runner.Run(tempdir)
-				if err != nil {
-					t.Fatalf("err %s", err)
-				}
+			expected := c.expected(tempdir)
 
-				actual := buf.String()
-				if actual != expected {
-					t.Errorf(`expected="%s" actual="%s"`, expected, actual)
-				}
-			})
+			err := runner.Run(tempdir)
+			if err != nil {
+				t.Fatalf("err %s", err)
+			}
+
+			actual := buf.String()
+			if actual != expected {
+				t.Errorf(`expected="%s" actual="%s"`, expected, actual)
+			}
 		})
 	}
 }
@@ -100,28 +101,29 @@ func TestCmd_Run_Conflict(t *testing.T) {
 
 	w := ioutil.Discard
 
-	withTempDir(t, func(t *testing.T, tempdir string) {
-		expected := "File already exists: " + tempdir + "/jpeg/sample1.png"
+	tempdir, cleanFn := withTempDir(t)
+	defer cleanFn()
 
-		var runner Runner
-		var err error
+	expected := "File already exists: " + tempdir + "/jpeg/sample1.png"
 
-		runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: true}
-		err = runner.Run(tempdir)
-		if err != nil {
-			t.Fatalf("err %s", err)
-		}
+	var runner Runner
+	var err error
 
-		runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: false}
-		err = runner.Run(tempdir)
-		actual := err.Error()
-		if actual != expected {
-			t.Errorf(`expected="%s" actual="%s"`, expected, actual)
-		}
-	})
+	runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: true}
+	err = runner.Run(tempdir)
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
+
+	runner = Runner{OutStream: w, Decoder: jpegDecoder(t), Encoder: pngEncoder(t), Force: false}
+	err = runner.Run(tempdir)
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf(`expected="%s" actual="%s"`, expected, actual)
+	}
 }
 
-func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
+func withTempDir(t *testing.T) (string, func()) {
 	t.Helper()
 
 	tempdir, err := ioutil.TempDir("", "imgconv")
@@ -133,9 +135,8 @@ func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
-	defer os.RemoveAll(tempdir)
 
-	f(t, tempdir)
+	return tempdir, func() { os.RemoveAll(tempdir) }
 }
 
 func jpegDecoder(t *testing.T) *conversion.Jpeg {

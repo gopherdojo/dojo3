@@ -38,12 +38,13 @@ func TestConversion_Convert(t *testing.T) {
 
 			converter := &Converter{Decoder: c.decoder, Encoder: c.encoder}
 
-			withTempDir(t, func(t *testing.T, tempdir string) {
-				_, actual := converter.Convert(filepath.Join(tempdir, c.path), c.force)
-				if actual != c.expected {
-					t.Errorf(`expected="%s" actual="%s"`, c.expected, actual)
-				}
-			})
+			tempdir, cleanFn := withTempDir(t)
+			defer cleanFn()
+
+			_, actual := converter.Convert(filepath.Join(tempdir, c.path), c.force)
+			if actual != c.expected {
+				t.Errorf(`expected="%s" actual="%s"`, c.expected, actual)
+			}
 		})
 	}
 }
@@ -53,22 +54,23 @@ func TestConversion_Convert_Conflict(t *testing.T) {
 
 	converter := &Converter{Decoder: jpegDecoder(), Encoder: pngEncoder()}
 
-	withTempDir(t, func(t *testing.T, tempdir string) {
-		expected := "File already exists: " + tempdir + "/jpeg/sample1.png"
+	tempdir, cleanFn := withTempDir(t)
+	defer cleanFn()
 
-		path := filepath.Join(tempdir, "./jpeg/sample1.jpg")
+	expected := "File already exists: " + tempdir + "/jpeg/sample1.png"
 
-		_, err := converter.Convert(path, false)
-		if err != nil {
-			t.Fatalf("err %s", err)
-		}
-		_, err = converter.Convert(path, false)
+	path := filepath.Join(tempdir, "./jpeg/sample1.jpg")
 
-		actual := err.Error()
-		if actual != expected {
-			t.Errorf("expected: %s, actual: %s", expected, actual)
-		}
-	})
+	_, err := converter.Convert(path, false)
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
+	_, err = converter.Convert(path, false)
+
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf("expected: %s, actual: %s", expected, actual)
+	}
 }
 
 func TestConversion_Convert_Nonexistence(t *testing.T) {
@@ -106,26 +108,27 @@ func TestConversion_Convert_CreationFailure(t *testing.T) {
 
 	converter := &Converter{Decoder: jpegDecoder(), Encoder: pngEncoder()}
 
-	withTempDir(t, func(t *testing.T, tempdir string) {
-		expected := "open " + tempdir + "/jpeg/sample1.png: permission denied"
+	tempdir, cleanFn := withTempDir(t)
+	defer cleanFn()
 
-		src := filepath.Join(tempdir, "./jpeg/sample1.jpg")
-		dst := filepath.Join(tempdir, "./jpeg/sample1.png")
+	expected := "open " + tempdir + "/jpeg/sample1.png: permission denied"
 
-		// First, create a file without permission in PATH after conversion,
-		_, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL, 0)
-		if err != nil {
-			t.Fatalf("err %s", err)
-		}
+	src := filepath.Join(tempdir, "./jpeg/sample1.jpg")
+	dst := filepath.Join(tempdir, "./jpeg/sample1.png")
 
-		// then convert.
-		_, err = converter.Convert(src, true)
+	// First, create a file without permission in PATH after conversion,
+	_, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL, 0)
+	if err != nil {
+		t.Fatalf("err %s", err)
+	}
 
-		actual := err.Error()
-		if actual != expected {
-			t.Errorf("expected: %s, actual: %s", expected, actual)
-		}
-	})
+	// then convert.
+	_, err = converter.Convert(src, true)
+
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf("expected: %s, actual: %s", expected, actual)
+	}
 }
 
 func TestConversion_Convert_EncodeFailure(t *testing.T) {
@@ -135,16 +138,17 @@ func TestConversion_Convert_EncodeFailure(t *testing.T) {
 
 	converter := &Converter{Decoder: jpegDecoder(), Encoder: mockEncoder()}
 
-	withTempDir(t, func(t *testing.T, tempdir string) {
-		path := filepath.Join(tempdir, "./jpeg/sample1.jpg")
+	tempdir, cleanFn := withTempDir(t)
+	defer cleanFn()
 
-		_, err := converter.Convert(path, true)
+	path := filepath.Join(tempdir, "./jpeg/sample1.jpg")
 
-		actual := err.Error()
-		if actual != expected {
-			t.Errorf("expected: %s, actual: %s", expected, actual)
-		}
-	})
+	_, err := converter.Convert(path, true)
+
+	actual := err.Error()
+	if actual != expected {
+		t.Errorf("expected: %s, actual: %s", expected, actual)
+	}
 }
 
 func jpegDecoder() *Jpeg {
@@ -171,7 +175,7 @@ func gifEncoder() *Gif {
 	return &Gif{Options: &gif.Options{NumColors: 1}}
 }
 
-func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
+func withTempDir(t *testing.T) (string, func()) {
 	t.Helper()
 
 	tempdir, err := ioutil.TempDir("", "imgconv")
@@ -183,9 +187,8 @@ func withTempDir(t *testing.T, f func(t *testing.T, tempdir string)) {
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
-	defer os.RemoveAll(tempdir)
 
-	f(t, tempdir)
+	return tempdir, func() { os.RemoveAll(tempdir) }
 }
 
 type EncoderMock struct {
