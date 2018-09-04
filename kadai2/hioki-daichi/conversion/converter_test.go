@@ -105,6 +105,33 @@ func TestConversion_Convert_Undecodable(t *testing.T) {
 	}
 }
 
+func TestConversion_Convert_CreationFailure(t *testing.T) {
+	t.Parallel()
+
+	converter := &Converter{Decoder: jpegDecoder(), Encoder: pngEncoder()}
+
+	withTempDir(t, func(t *testing.T, tempdir string) {
+		expected := "open " + tempdir + "/jpeg/sample1.png: permission denied"
+
+		src := filepath.Join(tempdir, "./jpeg/sample1.jpg")
+		dst := filepath.Join(tempdir, "./jpeg/sample1.png")
+
+		// First, create a file without permission in PATH after conversion,
+		_, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL, 0)
+		if err != nil {
+			t.Fatalf("err %s", err)
+		}
+
+		// then convert.
+		_, err = converter.Convert(src, true)
+
+		actual := err.Error()
+		if actual != expected {
+			t.Errorf("expected: %s, actual: %s", expected, actual)
+		}
+	})
+}
+
 func TestConversion_Convert_EncodeFailure(t *testing.T) {
 	t.Parallel()
 
