@@ -36,6 +36,7 @@ func TestGathering_Gather(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			g := Gatherer{Decoder: c.decoder}
 

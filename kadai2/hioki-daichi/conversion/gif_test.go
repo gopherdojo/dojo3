@@ -34,6 +34,7 @@ func TestConversion_Gif_HasProcessableExtname(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			actual := g.HasProcessableExtname(c.path)
 			if actual != c.expected {

@@ -42,6 +42,7 @@ func TestConversion_Convert(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			converter := &Converter{Decoder: c.decoder, Encoder: c.encoder}
 

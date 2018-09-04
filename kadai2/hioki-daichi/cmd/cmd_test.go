@@ -67,6 +67,7 @@ Converted: "` + tempdir + `/png/sample2.gif"
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			buf := &bytes.Buffer{}
 

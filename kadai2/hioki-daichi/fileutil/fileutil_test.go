@@ -24,6 +24,7 @@ func TestFileutil_StartsContentsWith(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			actual, _ := StartsContentsWith(bytes.NewReader(c.a), c.b)
 			if actual != c.expected {
@@ -94,6 +95,7 @@ func TestFileutil_CopyDirRec(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		c := c
 		t.Run("", func(t *testing.T) {
 			_, err := os.OpenFile(filepath.Join(tempdir, c.path), os.O_CREATE|os.O_EXCL, 0)
 			if !os.IsExist(err) {
