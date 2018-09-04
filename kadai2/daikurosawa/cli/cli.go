@@ -33,7 +33,6 @@ func (c *CLI) Run(args []string) int {
 	flags.SetOutput(c.ErrStream)
 	flags.StringVar(&from, "from", "jpg", "Input file extension.")
 	flags.StringVar(&to, "to", "png", "Output file extension.")
-	flag.Parse()
 
 	if err := flags.Parse(args[1:]); err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
