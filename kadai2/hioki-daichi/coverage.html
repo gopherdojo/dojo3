@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/cmd/cmd.go (100.0%)</option>
+				
+				<option value="file1">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion/converter.go (100.0%)</option>
+				
+				<option value="file2">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion/gif.go (100.0%)</option>
+				
+				<option value="file3">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion/jpeg.go (100.0%)</option>
+				
+				<option value="file4">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion/png.go (100.0%)</option>
+				
+				<option value="file5">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/fileutil/fileutil.go (100.0%)</option>
+				
+				<option value="file6">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/gathering/gatherer.go (100.0%)</option>
+				
+				<option value="file7">github.com/gopherdojo/dojo3/kadai2/hioki-daichi/opt/opt.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">/*
+Package cmd is a package for executing various things after evaluating flag etc in main function.
+*/
+package cmd
+
+import (
+        "fmt"
+        "io"
+
+        "github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion"
+        "github.com/gopherdojo/dojo3/kadai2/hioki-daichi/gathering"
+)
+
+// Runner configures run-needed settings.
+type Runner struct {
+        // Usually, stdout is specified, and at the time of testing, buffer is specified.
+        OutStream io.Writer
+
+        // See conversion.{Jpeg,Png,Gif}.
+        Decoder conversion.Decoder
+        Encoder conversion.Encoder
+
+        // Overwrite when the converted file name duplicates.
+        Force bool
+}
+
+// Run gathers and converts the target files.
+func (r *Runner) Run(dirname string) error <span class="cov8" title="9">{
+        gatherer := &amp;gathering.Gatherer{Decoder: r.Decoder}
+        paths, err := gatherer.Gather(dirname)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov7" title="8">converter := &amp;conversion.Converter{Decoder: r.Decoder, Encoder: r.Encoder}
+
+        for _, path := range paths </span><span class="cov10" title="16">{
+                fp, err := converter.Convert(path, r.Force)
+                if err != nil </span><span class="cov1" title="1">{
+                        return err
+                }</span>
+
+                <span class="cov9" title="15">fmt.Fprintf(r.OutStream, "Converted: %q\n", fp.Name())</span>
+        }
+
+        <span class="cov7" title="7">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">/*
+Package conversion has the necessary processing to convert.
+
+File is divided for each file format.
+*/
+package conversion
+
+import (
+        "errors"
+        "image"
+        "io"
+        "os"
+        "path/filepath"
+)
+
+// Converter represents encodable and decodable.
+type Converter struct {
+        Encoder Encoder
+        Decoder Decoder
+}
+
+// Encoder configures encode-needed settings.
+type Encoder interface {
+        Encode(io.Writer, image.Image) error
+        Extname() string
+}
+
+// Decoder configures decode-needed settings.
+type Decoder interface {
+        Decode(io.Reader) (image.Image, error)
+        HasProcessableExtname(string) bool
+        MagicBytesSlice() [][]byte
+}
+
+// Convert opens the file, decodes it, creates a file with a different extension, and writes the encoded result.
+func (c *Converter) Convert(path string, force bool) (*os.File, error) <span class="cov10" title="12">{
+        fp, err := os.Open(path)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov9" title="11">defer fp.Close()
+
+        img, err := c.Decoder.Decode(fp)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov9" title="10">dstPath := path[:len(path)-len(filepath.Ext(path))] + "." + c.Encoder.Extname()
+
+        if !force </span><span class="cov3" title="2">{
+                _, err := os.OpenFile(dstPath, os.O_CREATE|os.O_EXCL, 0)
+                if os.IsExist(err) </span><span class="cov1" title="1">{
+                        return nil, errors.New("File already exists: " + dstPath)
+                }</span>
+                <span class="cov1" title="1">os.Remove(dstPath)</span>
+        }
+
+        <span class="cov8" title="9">dstFile, err := os.Create(dstPath)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="8">err = c.Encoder.Encode(dstFile, img)
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="7">return dstFile, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package conversion
+
+import (
+        "image"
+        "image/gif"
+        "io"
+        "path/filepath"
+)
+
+// Gif https://en.wikipedia.org/wiki/GIF
+type Gif struct {
+        Options *gif.Options
+}
+
+// Encode encodes the specified file to GIF
+func (g *Gif) Encode(w io.Writer, img image.Image) error <span class="cov5" title="2">{
+        return gif.Encode(w, img, g.Options)
+}</span>
+
+// Decode decodes the specified GIF file
+func (g *Gif) Decode(r io.Reader) (image.Image, error) <span class="cov5" title="2">{
+        return gif.Decode(r)
+}</span>
+
+// Extname returns "gif"
+func (g *Gif) Extname() string <span class="cov5" title="2">{
+        return "gif"
+}</span>
+
+// MagicBytesSlice returns the magic bytes slice of GIF
+func (g *Gif) MagicBytesSlice() [][]byte <span class="cov1" title="1">{
+        return [][]byte{[]byte("GIF87a"), []byte("GIF89a")}
+}</span>
+
+// HasProcessableExtname returns whether the specified path has ".gif"
+func (g *Gif) HasProcessableExtname(path string) bool <span class="cov10" title="4">{
+        return filepath.Ext(path) == ".gif"
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package conversion
+
+import (
+        "image"
+        "image/jpeg"
+        "io"
+        "path/filepath"
+)
+
+// Jpeg https://en.wikipedia.org/wiki/JPEG
+type Jpeg struct {
+        Options *jpeg.Options
+}
+
+// Encode encodes the specified file to JPEG
+func (j *Jpeg) Encode(w io.Writer, img image.Image) error <span class="cov4" title="2">{
+        return jpeg.Encode(w, img, j.Options)
+}</span>
+
+// Decode decodes the specified JPEG file
+func (j *Jpeg) Decode(r io.Reader) (image.Image, error) <span class="cov10" title="7">{
+        return jpeg.Decode(r)
+}</span>
+
+// Extname returns "jpg"
+func (j *Jpeg) Extname() string <span class="cov4" title="2">{
+        return "jpg"
+}</span>
+
+// MagicBytesSlice returns the magic bytes slice of JPEG
+func (j *Jpeg) MagicBytesSlice() [][]byte <span class="cov1" title="1">{
+        return [][]byte{[]byte("\xFF\xD8\xFF")}
+}</span>
+
+// HasProcessableExtname returns whether the specified path has ".jpg" or ".jpeg"
+func (j *Jpeg) HasProcessableExtname(path string) bool <span class="cov7" title="4">{
+        ext := filepath.Ext(path)
+        return ext == ".jpg" || ext == ".jpeg"
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package conversion
+
+import (
+        "image"
+        "image/png"
+        "io"
+        "path/filepath"
+)
+
+// Png https://en.wikipedia.org/wiki/Portable_Network_Graphics
+type Png struct {
+        Encoder *png.Encoder
+}
+
+// Encode encodes the specified file to PNG
+func (p *Png) Encode(w io.Writer, img image.Image) error <span class="cov6" title="3">{
+        return p.Encoder.Encode(w, img)
+}</span>
+
+// Decode decodes the specified PNG file
+func (p *Png) Decode(r io.Reader) (image.Image, error) <span class="cov4" title="2">{
+        return png.Decode(r)
+}</span>
+
+// Extname returns "png"
+func (p *Png) Extname() string <span class="cov10" title="6">{
+        return "png"
+}</span>
+
+// MagicBytesSlice returns the magic bytes slice of PNG
+func (p *Png) MagicBytesSlice() [][]byte <span class="cov1" title="1">{
+        return [][]byte{[]byte("\x89\x50\x4E\x47\x0D\x0A\x1A\x0A")}
+}</span>
+
+// HasProcessableExtname returns whether the specified path has ".png"
+func (p *Png) HasProcessableExtname(path string) bool <span class="cov7" title="4">{
+        return filepath.Ext(path) == ".png"
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">/*
+Package fileutil is a collection of convenient functions for manipulating files
+*/
+package fileutil
+
+import (
+        "bytes"
+        "io"
+        "os"
+        "path/filepath"
+        "strings"
+)
+
+// StartsContentsWith returns whether file contents start with specified bytes.
+func StartsContentsWith(rs io.ReadSeeker, xs []byte) (bool, error) <span class="cov7" title="7">{
+        buf := make([]byte, len(xs))
+
+        _, err := rs.Seek(0, 0)
+        if err != nil </span><span class="cov1" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov6" title="6">_, err = rs.Read(buf)
+        if err != nil </span><span class="cov1" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov6" title="5">_, err = rs.Seek(0, 0)
+        if err != nil </span><span class="cov1" title="1">{
+                return false, err
+        }</span>
+
+        <span class="cov5" title="4">return bytes.Equal(buf, xs), nil</span>
+}
+
+// CopyDirRec copies src directory to dest recursively.
+func CopyDirRec(src string, dest string) error <span class="cov5" title="4">{
+        err := filepath.Walk(src, func(path string, info os.FileInfo, err error) error </span><span class="cov10" title="16">{
+                if err != nil </span><span class="cov1" title="1">{
+                        return err
+                }</span>
+
+                <span class="cov9" title="15">if info.IsDir() </span><span class="cov7" title="7">{
+                        return nil
+                }</span>
+
+                <span class="cov7" title="8">createCopier := &amp;fileCreateCopier{}
+                return Copy(createCopier, path, filepath.Join(dest, strings.TrimLeft(filepath.Dir(path), src), filepath.Base(path)))</span>
+        })
+        <span class="cov5" title="4">return err</span>
+}
+
+// Copy copies src path to dest path.
+func Copy(createCopier createCopier, src string, dest string) error <span class="cov8" title="10">{
+        err := os.MkdirAll(filepath.Dir(dest), 0755)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov8" title="9">df, err := createCopier.Create(dest)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov7" title="8">sf, err := os.Open(src)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov7" title="7">_, err = createCopier.Copy(df, sf)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov6" title="6">return nil</span>
+}
+
+type createCopier interface {
+        Create(string) (*os.File, error)
+        Copy(io.Writer, io.Reader) (written int64, err error)
+}
+
+type fileCreateCopier struct{}
+
+func (c *fileCreateCopier) Create(name string) (*os.File, error) <span class="cov7" title="7">{
+        return os.Create(name)
+}</span>
+
+func (c *fileCreateCopier) Copy(dst io.Writer, src io.Reader) (written int64, err error) <span class="cov6" title="6">{
+        return io.Copy(dst, src)
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">/*
+Package gathering is a package that summarizes the processing necessary for collecting the files to be decoded.
+*/
+package gathering
+
+import (
+        "io"
+        "os"
+        "path/filepath"
+
+        "github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion"
+        "github.com/gopherdojo/dojo3/kadai2/hioki-daichi/fileutil"
+)
+
+// Gatherer represents decodable.
+type Gatherer struct {
+        Decoder   conversion.Decoder
+        Pathnames []string
+}
+
+// Gather searches under the specified directory and collects files to be decoded.
+func (g *Gatherer) Gather(dirname string) ([]string, error) <span class="cov5" title="7">{
+        err := filepath.Walk(dirname, g.walkFn)
+
+        return g.Pathnames, err
+}</span>
+
+func (g *Gatherer) walkFn(path string, info os.FileInfo, err error) error <span class="cov10" title="35">{
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov9" title="34">if info.IsDir() </span><span class="cov7" title="13">{
+                return nil
+        }</span>
+
+        <span class="cov8" title="21">if !g.Decoder.HasProcessableExtname(path) </span><span class="cov7" title="12">{
+                return nil
+        }</span>
+
+        <span class="cov6" title="9">fp, err := os.Open(path)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov6" title="8">defer fp.Close()
+
+        ok, err := g.checkDecodable(fp)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+        <span class="cov5" title="7">if !ok </span><span class="cov1" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov5" title="6">g.Pathnames = append(g.Pathnames, path)
+
+        return nil</span>
+}
+
+func (g *Gatherer) checkDecodable(rs io.ReadSeeker) (bool, error) <span class="cov6" title="8">{
+        for _, magicBytes := range g.Decoder.MagicBytesSlice() </span><span class="cov6" title="9">{
+                ok, err := fileutil.StartsContentsWith(rs, magicBytes)
+                if err != nil </span><span class="cov1" title="1">{
+                        return false, err
+                }</span>
+                <span class="cov6" title="8">if ok </span><span class="cov5" title="6">{
+                        return true, nil
+                }</span>
+        }
+
+        <span class="cov1" title="1">return false, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">/*
+Package opt is a package for parsing the command line option and building necessary information.
+*/
+package opt
+
+import (
+        "errors"
+        "flag"
+        "image/gif"
+        "image/jpeg"
+        "image/png"
+        "os"
+
+        "github.com/gopherdojo/dojo3/kadai2/hioki-daichi/conversion"
+)
+
+// Options sets Decoder, Encoder and Force.
+type Options struct {
+        Decoder conversion.Decoder
+        Encoder conversion.Encoder
+        Force   bool
+}
+
+// Parse parses the command line option, validates it, constructs the necessary information for the later conversion process and return it.
+func Parse(args ...string) (string, *Options, error) <span class="cov10" title="22">{
+        flg := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+        fromJpeg := flg.Bool("J", false, "Convert from JPEG")
+        fromPng := flg.Bool("P", false, "Convert from PNG")
+        fromGif := flg.Bool("G", false, "Convert from GIF")
+        toJpeg := flg.Bool("j", false, "Convert to JPEG")
+        toPng := flg.Bool("p", false, "Convert to PNG")
+        toGif := flg.Bool("g", false, "Convert to GIF")
+        force := flg.Bool("f", false, "Overwrite when the converted file name duplicates.")
+        quality := flg.Int("quality", 100, "JPEG Quality to be used with '-j' option. You can specify 1 to 100.")
+        numColors := flg.Int("num-colors", 256, "Maximum number of colors used in the GIF image to be used with '-g' option. You can specify 1 to 256.")
+        humanCompressionLevel := flg.String("compression-level", "default", "Options to specify the compression level of PNG to be used with '-p' option. You can specify from 'default', 'no', 'best-speed', 'best-compression'.")
+
+        flg.Parse(args)
+
+        if *toJpeg </span><span class="cov6" title="6">{
+                if *quality &lt; 1 </span><span class="cov1" title="1">{
+                        return "", nil, errors.New("--quality must be greater than or equal to 1")
+                }</span> else<span class="cov5" title="5"> if *quality &gt; 100 </span><span class="cov1" title="1">{
+                        return "", nil, errors.New("--quality must be less than or equal to 100")
+                }</span>
+        }
+
+        <span class="cov9" title="20">if *toGif </span><span class="cov6" title="6">{
+                if *numColors &lt; 1 </span><span class="cov1" title="1">{
+                        return "", nil, errors.New("--num-colors must be greater than or equal to 1")
+                }</span> else<span class="cov5" title="5"> if *numColors &gt; 256 </span><span class="cov1" title="1">{
+                        return "", nil, errors.New("--num-colors must be less than or equal to 256")
+                }</span>
+        }
+
+        <span class="cov9" title="18">if *toPng </span><span class="cov6" title="7">{
+                switch *humanCompressionLevel </span>{
+                case "default", "no", "best-speed", "best-compression":<span class="cov6" title="6"></span>
+                default:<span class="cov1" title="1">
+                        return "", nil, errors.New("--compression-level is not included in the list: \"default\", \"no\", \"best-speed\", \"best-compression\"")</span>
+                }
+        }
+
+        <span class="cov9" title="17">dirnames := flg.Args()
+        if len(dirnames) == 0 </span><span class="cov1" title="1">{
+                return "", nil, errors.New("you must specify a directory")
+        }</span>
+
+        <span class="cov9" title="16">options := &amp;Options{
+                Decoder: deriveDecoder(fromJpeg, fromPng, fromGif),
+                Encoder: deriveEncoder(toJpeg, toPng, toGif, quality, numColors, humanCompressionLevel),
+                Force:   *force,
+        }
+
+        return dirnames[0], options, nil</span>
+}
+
+func deriveDecoder(fromJpeg *bool, fromPng *bool, fromGif *bool) conversion.Decoder <span class="cov9" title="16">{
+        switch </span>{
+        case *fromPng:<span class="cov5" title="4">
+                return &amp;conversion.Png{}</span>
+        case *fromGif:<span class="cov3" title="2">
+                return &amp;conversion.Gif{}</span>
+        case *fromJpeg:<span class="cov7" title="8">
+                fallthrough</span>
+        default:<span class="cov7" title="10">
+                return &amp;conversion.Jpeg{}</span>
+        }
+}
+
+func deriveEncoder(toJpeg *bool, toPng *bool, toGif *bool, quality *int, numColors *int, humanCompressionLevel *string) conversion.Encoder <span class="cov9" title="16">{
+        switch </span>{
+        case *toJpeg:<span class="cov5" title="4">
+                return &amp;conversion.Jpeg{Options: &amp;jpeg.Options{Quality: *quality}}</span>
+        case *toGif:<span class="cov5" title="4">
+                return &amp;conversion.Gif{Options: &amp;gif.Options{NumColors: *numColors}}</span>
+        case *toPng:<span class="cov6" title="6">
+                fallthrough</span>
+        default:<span class="cov7" title="8">
+                return &amp;conversion.Png{Encoder: &amp;png.Encoder{CompressionLevel: toCompressionLevel(humanCompressionLevel)}}</span>
+        }
+}
+
+func toCompressionLevel(humanCompressionLevel *string) png.CompressionLevel <span class="cov7" title="8">{
+        switch *humanCompressionLevel </span>{
+        case "no":<span class="cov1" title="1">
+                return png.NoCompression</span>
+        case "best-speed":<span class="cov1" title="1">
+                return png.BestSpeed</span>
+        case "best-compression":<span class="cov1" title="1">
+                return png.BestCompression</span>
+        case "default":<span class="cov5" title="5">
+                fallthrough</span>
+        default:<span class="cov5" title="5">
+                return png.DefaultCompression</span>
+        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
