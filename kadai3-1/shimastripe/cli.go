@@ -20,6 +20,10 @@ const (
 	wordListError
 )
 
+const (
+	completeMessage = "You answered all words correctly."
+)
+
 // Run command
 func (c *CLI) Run(args []string) int {
 	if len(c.WordList) < 1 {
@@ -63,7 +67,7 @@ L:
 				counter += 1
 
 				if len(wordList) < 1 {
-					fmt.Fprintln(c.OutStream, "You answered all words correctly.")
+					fmt.Fprintln(c.OutStream, completeMessage)
 					break L
 				}
 
@@ -74,7 +78,7 @@ L:
 				fmt.Fprintln(c.OutStream, "wrong!")
 			}
 
-		case <-time.After(1 * time.Minute):
+		case <-time.After(c.Interval):
 			break L
 		}
 	}
