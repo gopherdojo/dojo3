@@ -27,7 +27,7 @@ const (
 // Run command
 func (c *CLI) Run(args []string) int {
 	if len(c.WordList) < 1 {
-		fmt.Fprintf(c.ErrStream, "Word list is insufficient.")
+		fmt.Fprintln(c.ErrStream, "Word list is insufficient.")
 		return wordListError
 	}
 
