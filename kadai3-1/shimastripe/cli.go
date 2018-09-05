@@ -62,7 +62,12 @@ func (c *CLI) Action(wordList []string) error {
 L:
 	for {
 		select {
-		case userInput := <-ch:
+		case userInput, ok := <-ch:
+
+			if !ok {
+				break L // channel close
+			}
+
 			if userInput == answerWord {
 				counter += 1
 
