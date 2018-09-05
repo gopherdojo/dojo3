@@ -8,6 +8,6 @@ import (
 )
 
 func main() {
-	cli := &shimastripe.CLI{InStream: os.Stdin, OutStream: os.Stdout, ErrStream: os.Stderr, Interval: 1 * time.Minute}
+	cli := &shimastripe.CLI{InStream: os.Stdin, OutStream: os.Stdout, ErrStream: os.Stderr, Interval: 1 * time.Minute, WordList: shimastripe.GetWordList()}
 	os.Exit(cli.Run(os.Args))
 }

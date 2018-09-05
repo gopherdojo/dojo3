@@ -12,6 +12,7 @@ type CLI struct {
 	InStream             io.Reader
 	OutStream, ErrStream io.Writer
 	Interval             time.Duration
+	WordList             []string
 }
 
 const (
@@ -19,16 +20,14 @@ const (
 	wordListError
 )
 
-var wordList = GetWordList()
-
 // Run command
 func (c *CLI) Run(args []string) int {
-	if len(wordList) < 1 {
+	if len(c.WordList) < 1 {
 		fmt.Fprintf(c.ErrStream, "Word list is insufficient.")
 		return wordListError
 	}
 
-	c.Action(wordList)
+	c.Action(c.WordList)
 	return success
 }
 
