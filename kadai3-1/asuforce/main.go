@@ -14,7 +14,7 @@ func main() {
 	i := input(os.Stdin)
 
 	bc := context.Background()
-	t := 10000 * time.Millisecond
+	t := 30000 * time.Millisecond
 	ctx, cancel := context.WithTimeout(bc, t)
 	defer cancel()
 
