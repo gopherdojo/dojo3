@@ -1,4 +1,3 @@
-// Command to convert several images extension.
 package main
 
 import (
