@@ -3,33 +3,52 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"time"
 )
 
-func main() {
-	words := []string{"hoge", "fuga", "piyo"}
-	stdin := bufio.NewScanner(os.Stdin)
-	score := 0
+var questions = []string{"hoge", "fuga", "piyo"}
 
-	rand.Seed(time.Now().UnixNano())
+func main() {
+	i := input(os.Stdin)
+
+	result := 0
+	q := makeQuestion()
+	fmt.Println("Type it:", q)
 
 	for {
-		theme := words[rand.Intn(3)]
-		fmt.Println("Type it:", theme)
-
-		for stdin.Scan() {
-			answer := stdin.Text()
-			if theme == answer {
-				score++
-				fmt.Println("ok")
-			} else {
-				fmt.Printf("got: %v, want: %v\n", answer, theme)
+		select {
+		case answer := <-i:
+			if answer == q {
+				result++
 			}
-			fmt.Println("Your score:", score)
-
-			break
+			fmt.Println("Your score:", result)
+			q = makeQuestion()
+			fmt.Println("Type it:", q)
+		case <-time.After(5 * time.Second):
+			fmt.Println("Time up !")
+			fmt.Println("Your final score:", result)
+			return
 		}
 	}
+}
+
+func makeQuestion() string {
+	rand.Seed(time.Now().UnixNano())
+	q := questions[rand.Intn(len(questions))]
+	return q
+}
+
+func input(r io.Reader) <-chan string {
+	ch := make(chan string)
+	go func() {
+		std := bufio.NewScanner(r)
+		for std.Scan() {
+			ch <- std.Text()
+		}
+		close(ch)
+	}()
+	return ch
 }
