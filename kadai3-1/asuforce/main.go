@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"math/rand"
@@ -14,10 +15,14 @@ var questions = []string{"hoge", "fuga", "piyo"}
 func main() {
 	i := input(os.Stdin)
 
+	bc := context.Background()
+	t := 10000 * time.Millisecond
+	ctx, cancel := context.WithTimeout(bc, t)
+	defer cancel()
+
 	result := 0
 	q := makeQuestion()
 	fmt.Println("Type it:", q)
-
 	for {
 		select {
 		case answer := <-i:
@@ -27,7 +32,7 @@ func main() {
 			fmt.Println("Your score:", result)
 			q = makeQuestion()
 			fmt.Println("Type it:", q)
-		case <-time.After(5 * time.Second):
+		case <-ctx.Done():
 			fmt.Println("Time up !")
 			fmt.Println("Your final score:", result)
 			return
