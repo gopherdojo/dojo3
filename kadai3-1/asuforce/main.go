@@ -10,8 +10,6 @@ import (
 	"time"
 )
 
-var questions = []string{"hoge", "fuga", "piyo"}
-
 func main() {
 	i := input(os.Stdin)
 
