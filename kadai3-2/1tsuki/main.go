@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"time"
 )
 
 var writer io.Writer
@@ -26,28 +27,27 @@ func main() {
 func run(strArgs []string) int {
 	var (
 		parallel int
-		// args     []string
+		args     []string
 	)
 	flags := flag.NewFlagSet("pget", flag.ContinueOnError)
 	flags.IntVar(&parallel, "p", 6, "number of download pipelines")
 	flags.Parse(strArgs)
-	// args = flags.Args()
+	args = flags.Args()
 
-	// rawUrl := args[0]
-	rawUrl := "https://www.recruit.co.jp/index"
+	rawUrl := args[0]
 	url, err := url.Parse(rawUrl)
 	if err != nil {
-		printf("error parsing url: %v", err)
+		printf("error parsing url: %v\n", err)
 		return exitCodeInvalidOption
 	}
 
-	filename, err := downloader.Download(url)
-	if err != nil {
-		printf("error downloading file: %v", err)
+	d := downloader.NewDownloader(writer)
+	if err := d.Download(url, parallel, 1*time.Minute); err != nil {
+		printf("error downloading file: %v\n", err)
 		return exitCodeError
 	}
 
-	printf("downloaded file: %s", filename)
+	printf("downloaded file\n")
 	return exitCodeOK
 }
 
