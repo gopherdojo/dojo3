@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"golang.org/x/sync/errgroup"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -25,22 +24,27 @@ func NewDownloader(writer io.Writer) (*Downloader) {
 }
 
 func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration) (error) {
-	d.printf("Downloading file %s in %d parallel\n", url.String(), parallel)
+	d.printf("Download %s in %d parallel with timeout %s \n",
+		url.String(),
+		parallel,
+		timeout)
+
+	// get target filesize
 	byteLength, err := contentSize(url)
 	if err != nil {
 		return err
 	}
+	d.printf("target file size: %d", byteLength)
 
+	// start parallel download with Goroutines
 	bc := context.Background()
 	ctx, cancel := context.WithTimeout(bc, timeout)
 	defer cancel()
-
 	eg, ctx := errgroup.WithContext(ctx)
-
 	for i := 0; i < parallel; i++ {
 		r := NewRangeDownload(url, byteLength, parallel, i)
 		eg.Go(func() error {
-			return r.Download(ctx)
+			return r.Run(ctx)
 		})
 	}
 
@@ -49,12 +53,12 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 		return err
 	}
 
-	// concat files
+	// concatenate split files
 	if err := d.concatenate(url, parallel); err != nil {
 		return err
 	}
 
-	// remove temp files
+	// remove temp files on success
 	d.printf("deleting all temp files\n")
 	for j := 0; j < parallel; j++ {
 		err := os.Remove(partialFileName(url, j))
@@ -90,7 +94,7 @@ func NewRangeDownload(url *url.URL, byteLength, parallel, i int) *RangeDownload 
 	}
 }
 
-func (r *RangeDownload) Download(ctx context.Context) error {
+func (r *RangeDownload) Run(ctx context.Context) error {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", r.url.String(), nil)
 	if err != nil {
@@ -99,6 +103,7 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 
 	req.Header.Add("Range", fmt.Sprintf("bytes=%d-%d", r.min, r.max-1))
 	req.WithContext(ctx)
+
 	errCh := make(chan error, 1)
 	go func() {
 		resp, err := client.Do(req)
@@ -107,13 +112,14 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 		}
 		defer resp.Body.Close()
 
-		reader, err := ioutil.ReadAll(resp.Body)
+		// copy into file
+		out, err := os.OpenFile(r.path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			errCh <- err
 		}
-		body := string(reader)
-		ioutil.WriteFile(r.path, []byte(string(body)), 0x777)
+		defer out.Close()
 
+		io.Copy(out, resp.Body)
 		errCh <- nil
 	}()
 
@@ -123,7 +129,6 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 			return err
 		}
 	case <-ctx.Done():
-		<-errCh
 		return ctx.Err()
 	}
 
