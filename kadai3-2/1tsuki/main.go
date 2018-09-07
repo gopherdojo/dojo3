@@ -25,11 +25,11 @@ func main() {
 }
 func run(strArgs []string) int {
 	var (
-		pararrel int
+		parallel int
 		// args     []string
 	)
 	flags := flag.NewFlagSet("pget", flag.ContinueOnError)
-	flags.IntVar(&pararrel, "p", 6, "number of download pipelines")
+	flags.IntVar(&parallel, "p", 6, "number of download pipelines")
 	flags.Parse(strArgs)
 	// args = flags.Args()
 
@@ -41,14 +41,13 @@ func run(strArgs []string) int {
 		return exitCodeInvalidOption
 	}
 
-	filepath, err := downloader.Download(url)
+	filename, err := downloader.Download(url)
 	if err != nil {
 		printf("error downloading file: %v", err)
 		return exitCodeError
 	}
 
-	printf("downloaded file: %s", filepath)
-
+	printf("downloaded file: %s", filename)
 	return exitCodeOK
 }
 
