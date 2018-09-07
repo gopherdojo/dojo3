@@ -12,22 +12,21 @@ import (
 	"time"
 
 	"github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/color"
-	"github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/envutil"
+	"github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/opt"
 	"github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/wording"
 )
 
 func main() {
-	err := execute(os.Stdout, 15, "./weapons.txt")
+	options := opt.Parse(os.Args[1:]...)
+	err := execute(os.Stdout, options)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func execute(w io.Writer, defaultTimeout int, path string) error {
-	timeout, err := envutil.GetIntEnvOrElse("TIMEOUT", defaultTimeout)
-	if err != nil {
-		return err
-	}
+func execute(w io.Writer, options *opt.Options) error {
+	path := options.Path
+	timeout := options.Timeout
 
 	words, err := wording.NewWorder(path).Words()
 	if err != nil {

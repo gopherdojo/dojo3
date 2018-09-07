@@ -6,13 +6,17 @@ import (
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/opt"
 )
 
 func TestMain_execute(t *testing.T) {
 	t.Parallel()
 
+	options := &opt.Options{Timeout: 1, Path: "weapons.txt"}
+
 	var buf bytes.Buffer
-	err := execute(&buf, 1, "./weapons.txt")
+	err := execute(&buf, options)
 	if err != nil {
 		t.Fatalf("err %s", err)
 	}
@@ -21,9 +25,11 @@ func TestMain_execute(t *testing.T) {
 func TestMain_execute_NonExistentPath(t *testing.T) {
 	t.Parallel()
 
+	options := &opt.Options{Timeout: 1, Path: "./non-existent-path"}
+
 	var err error
 	var buf bytes.Buffer
-	err = execute(&buf, 1, "./non-existent-path")
+	err = execute(&buf, options)
 	actual := err.Error()
 	expected := "open ./non-existent-path: no such file or directory"
 	if actual != expected {
