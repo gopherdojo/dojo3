@@ -56,9 +56,9 @@
 				
 				<option value="file0">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/color/color.go (100.0%)</option>
 				
-				<option value="file1">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/envutil/envutil.go (100.0%)</option>
+				<option value="file1">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/main.go (93.0%)</option>
 				
-				<option value="file2">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/main.go (93.0%)</option>
+				<option value="file2">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/opt/opt.go (100.0%)</option>
 				
 				<option value="file3">github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/wording/worder.go (100.0%)</option>
 				
@@ -109,24 +109,7 @@ func (c Color) Code() string <span class="cov10" title="4">{
 }
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package envutil
-
-import (
-        "os"
-        "strconv"
-)
-
-// GetIntEnvOrElse returns numeric-converted value if an environment variable of the specified key exists,
-// and if not, returns the specified default value.
-func GetIntEnvOrElse(key string, defaultValue int) (int, error) <span class="cov10" title="3">{
-        if s, ok := os.LookupEnv(key); ok </span><span class="cov6" title="2">{
-                return strconv.Atoi(s)
-        }</span>
-        <span class="cov1" title="1">return defaultValue, nil</span>
-}
-</pre>
-		
-		<pre class="file" id="file2" style="display: none">package main
+		<pre class="file" id="file1" style="display: none">package main
 
 import (
         "bufio"
@@ -140,24 +123,23 @@ import (
         "time"
 
         "github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/color"
-        "github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/envutil"
+        "github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/opt"
         "github.com/gopherdojo/dojo3/kadai3-1/hioki-daichi/wording"
 )
 
 func main() <span class="cov0" title="0">{
-        err := execute(os.Stdout, 15, "./weapons.txt")
+        options := opt.Parse(os.Args[1:]...)
+        err := execute(os.Stdout, options)
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatal(err)
         }</span>
 }
 
-func execute(w io.Writer, defaultTimeout int, path string) error <span class="cov5" title="2">{
-        timeout, err := envutil.GetIntEnvOrElse("TIMEOUT", defaultTimeout)
-        if err != nil </span><span class="cov0" title="0">{
-                return err
-        }</span>
+func execute(w io.Writer, options *opt.Options) error <span class="cov5" title="2">{
+        path := options.Path
+        timeout := options.Timeout
 
-        <span class="cov5" title="2">words, err := wording.NewWorder(path).Words()
+        words, err := wording.NewWorder(path).Words()
         if err != nil </span><span class="cov1" title="1">{
                 return err
         }</span>
@@ -255,6 +237,32 @@ func printWithBalloon(w io.Writer, c color.Color, s string) <span class="cov10" 
         fmt.Fprintf(w, "\x1b["+c.Code()+"m%s\x1b[0m\n", "＞　"+s+"　＜")
         fmt.Fprintf(w, "\x1b["+c.Code()+"m%s\x1b[0m\n", "￣Y^"+strings.Repeat("Y^", l/2)+"Y^￣")
         fmt.Fprintln(w)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package opt
+
+import (
+        "flag"
+        "os"
+)
+
+// Options has Timeout and Path.
+type Options struct {
+        Timeout int
+        Path    string
+}
+
+// Parse parses the command line option and returns Options.
+func Parse(args ...string) *Options <span class="cov10" title="3">{
+        flg := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
+        timeout := flg.Int("timeout", 15, "Time limit in this typing game")
+        path := flg.String("path", "./weapons.txt", "File path in which a list of words used for this typing game is described")
+
+        flg.Parse(args)
+
+        return &amp;Options{Timeout: *timeout, Path: *path}
 }</span>
 </pre>
 		
