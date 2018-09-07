@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"math/rand"
@@ -9,10 +10,13 @@ import (
 	"time"
 )
 
-var questions = []string{"hoge", "fuga", "piyo"}
-
 func main() {
 	i := input(os.Stdin)
+
+	bc := context.Background()
+	t := 30000 * time.Millisecond
+	ctx, cancel := context.WithTimeout(bc, t)
+	defer cancel()
 
 	result := 0
 	q := makeQuestion()
@@ -23,13 +27,15 @@ func main() {
 		case answer := <-i:
 			if answer == q {
 				result++
+				fmt.Println("○")
+			} else {
+				fmt.Println("×")
 			}
-			fmt.Println("Your score:", result)
 			q = makeQuestion()
 			fmt.Println("Type it:", q)
-		case <-time.After(5 * time.Second):
+		case <-ctx.Done():
 			fmt.Println("Time up !")
-			fmt.Println("Your final score:", result)
+			fmt.Println("Your score:", result)
 			return
 		}
 	}
