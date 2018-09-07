@@ -3,6 +3,7 @@ package pget
 import (
 	"context"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -23,28 +24,8 @@ func NewDownloader(writer io.Writer) (*Downloader) {
 	}
 }
 
-type Range struct {
-	min, max int
-}
-
-func NewRange(length, parallel, i int) *Range {
-	lenSub := length / parallel
-	diff := length % parallel
-
-	min := lenSub * i
-	max := lenSub * (i + 1)
-	if i == parallel-1 {
-		max += diff
-	}
-
-	return &Range{
-		min: min,
-		max: max,
-	}
-}
-
 func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration) (error) {
-	d.printf("Downloading file %s with %d parallel\n", url.String(), parallel)
+	d.printf("Downloading file %s in %d parallel\n", url.String(), parallel)
 	byteLength, err := contentSize(url)
 	if err != nil {
 		return err
@@ -54,20 +35,18 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	ctx, cancel := context.WithTimeout(bc, timeout)
 	defer cancel()
 
-	errCh := make(chan error, parallel)
+	eg, ctx := errgroup.WithContext(ctx)
+
 	for i := 0; i < parallel; i++ {
-		r := NewRange(byteLength, parallel, i)
-		go func(r *Range, i int) {
-			errCh <- d.rangeDownload(ctx, url, r, partialFileName(url, i))
-		}(r, i)
+		r := NewRangeDownload(url, byteLength, parallel, i)
+		eg.Go(func() error {
+			return r.Download(ctx)
+		})
 	}
 
 	// wait for all Goroutines
-	for c := 0; c < cap(errCh); c++ {
-		err := <-errCh
-		if err != nil {
-			return err
-		}
+	if err := eg.Wait(); err != nil {
+		return err
 	}
 
 	// concat files
@@ -86,10 +65,34 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	return nil
 }
 
-func (d *Downloader) rangeDownload(ctx context.Context, url *url.URL, r *Range, path string) error {
-	d.printf("Start downloading byte range %d...%d\n", r.min, r.max)
+type RangeDownload struct {
+	url  *url.URL
+	min  int
+	max  int
+	path string
+}
+
+func NewRangeDownload(url *url.URL, byteLength, parallel, i int) *RangeDownload {
+	lenSub := byteLength / parallel
+	diff := byteLength % parallel
+
+	min := lenSub * i
+	max := lenSub * (i + 1)
+	if i == parallel-1 {
+		max += diff
+	}
+
+	return &RangeDownload{
+		url:  url,
+		min:  min,
+		max:  max,
+		path: partialFileName(url, i),
+	}
+}
+
+func (r *RangeDownload) Download(ctx context.Context) error {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url.String(), nil)
+	req, err := http.NewRequest("GET", r.url.String(), nil)
 	if err != nil {
 		return err
 	}
@@ -109,8 +112,7 @@ func (d *Downloader) rangeDownload(ctx context.Context, url *url.URL, r *Range, 
 			errCh <- err
 		}
 		body := string(reader)
-		ioutil.WriteFile(path, []byte(string(body)), 0x777)
-		d.printf("saved file %s\n", path)
+		ioutil.WriteFile(r.path, []byte(string(body)), 0x777)
 
 		errCh <- nil
 	}()

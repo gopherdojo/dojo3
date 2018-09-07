@@ -27,10 +27,12 @@ func main() {
 func run(strArgs []string) int {
 	var (
 		parallel int
+		rawTime  int
 		args     []string
 	)
 	flags := flag.NewFlagSet("pget", flag.ContinueOnError)
 	flags.IntVar(&parallel, "p", 6, "number of download pipelines")
+	flags.IntVar(&rawTime, "t", 60, "timeout limit in seconds")
 	flags.Parse(strArgs)
 	args = flags.Args()
 
@@ -42,7 +44,7 @@ func run(strArgs []string) int {
 	}
 
 	d := pget.NewDownloader(writer)
-	if err := d.Download(url, parallel, 1*time.Minute); err != nil {
+	if err := d.Download(url, parallel, time.Duration(rawTime)*time.Second); err != nil {
 		printf("error downloading file: %v\n", err)
 		return exitCodeError
 	}
