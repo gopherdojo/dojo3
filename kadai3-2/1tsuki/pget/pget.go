@@ -3,6 +3,7 @@ package pget
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 	"io"
 	"net/http"
@@ -59,7 +60,7 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	for _, path := range partialFilePaths(url, parallel) {
 		err := os.Remove(path)
 		if err != nil {
-			return err
+			return errors.Wrap(err, fmt.Sprintf("failed to remove partial file: %s", path))
 		}
 	}
 	return nil
@@ -123,14 +124,14 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 		// download
 		resp, err := client.Do(req)
 		if err != nil {
-			errCh <- err
+			errCh <- errors.Wrap(err, fmt.Sprintf("failed to download partial file: %s", r.url))
 		}
 		defer resp.Body.Close()
 
 		// write into
 		out, err := os.OpenFile(r.savePath(), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			errCh <- err
+			errCh <- errors.Wrap(err, fmt.Sprintf("failed to write partial file: %s", r.savePath()))
 		}
 		defer out.Close()
 
@@ -145,7 +146,7 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 			return err
 		}
 	case <-ctx.Done():
-		return ctx.Err()
+		return errors.Wrap(ctx.Err(), "context has closed during download")
 	}
 
 	return nil
@@ -160,7 +161,7 @@ func joinPartials(url *url.URL, parallel int) error {
 
 	out, err := os.Create(dst)
 	if err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("failed to create out file: %s", dst))
 	}
 	defer out.Close()
 
@@ -175,12 +176,12 @@ func joinPartials(url *url.URL, parallel int) error {
 func joinPartial(src string, out *os.File) error {
 	in, err := os.Open(src)
 	if err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("failed to open partial file: %s", src))
 	}
 	defer in.Close()
 
 	if _, err := io.Copy(out, in); err != nil {
-		return err
+		return errors.Wrap(err, fmt.Sprintf("failed to join file: %s", src))
 	}
 
 	return nil
@@ -201,12 +202,12 @@ func partialFilePath(url *url.URL, parallel, i int) string {
 func contentSize(url *url.URL) (int, error) {
 	res, err := http.Head(url.String())
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, fmt.Sprintf("failed to request head: %s", url))
 	}
 	maps := res.Header
 	length, err := strconv.Atoi(maps["Content-Length"][0])
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, fmt.Sprintf("failed to parse Content-Length: %v", maps))
 	}
 	return length, nil
 }
