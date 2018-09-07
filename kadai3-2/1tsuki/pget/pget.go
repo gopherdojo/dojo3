@@ -24,27 +24,23 @@ func NewDownloader(writer io.Writer) (*Downloader) {
 }
 
 func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration) (error) {
-	d.printf("Download %s in %d parallel with timeout %s \n",
-		url.String(),
-		parallel,
-		timeout)
+	d.printf("Downloading %s in %d parallel with timeout %s\n", url.String(), parallel, timeout)
 
-	// get target filesize
+	// get target file size
 	byteLength, err := contentSize(url)
 	if err != nil {
 		return err
 	}
-	d.printf("target file size: %d", byteLength)
+	d.printf("target file size: %d\n", byteLength)
 
 	// start parallel download with Goroutines
-	bc := context.Background()
-	ctx, cancel := context.WithTimeout(bc, timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(ctx)
 	for i := 0; i < parallel; i++ {
 		r := NewRangeDownload(url, byteLength, parallel, i)
 		eg.Go(func() error {
-			return r.Run(ctx)
+			return r.Download(ctx)
 		})
 	}
 
@@ -52,16 +48,16 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	if err := eg.Wait(); err != nil {
 		return err
 	}
+	d.printf("download complete\n")
 
-	// concatenate split files
-	if err := d.concatenate(url, parallel); err != nil {
+	// join partials into one file
+	if err := joinPartials(url, parallel); err != nil {
 		return err
 	}
 
-	// remove temp files on success
-	d.printf("deleting all temp files\n")
-	for j := 0; j < parallel; j++ {
-		err := os.Remove(partialFileName(url, j))
+	// remove all partials
+	for _, path := range partialFilePaths(url, parallel) {
+		err := os.Remove(path)
 		if err != nil {
 			return err
 		}
@@ -69,32 +65,50 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	return nil
 }
 
-type RangeDownload struct {
-	url  *url.URL
-	min  int
-	max  int
-	path string
+func (d *Downloader) printf(format string, a ... interface{}) {
+	fmt.Fprintf(d.writer, format, a...)
 }
 
-func NewRangeDownload(url *url.URL, byteLength, parallel, i int) *RangeDownload {
+type RangeDownload struct {
+	url              *url.URL
+	min, max         int
+	parallel, worker int
+}
+
+func NewRangeDownload(url *url.URL, byteLength int, parallel, i int) *RangeDownload {
+	var (
+		min, max int
+	)
+
 	lenSub := byteLength / parallel
 	diff := byteLength % parallel
 
-	min := lenSub * i
-	max := lenSub * (i + 1)
+	filePath := partialFilePath(url, parallel, i)
+	stat, err := os.Stat(filePath)
+	if err != nil && os.IsNotExist(err) {
+		min = lenSub * i
+	} else {
+		// FIXME stat.Size() returns int64
+		// TODO resume detection
+		min = int(stat.Size())
+	}
+
+	min = lenSub * i
+	max = lenSub * (i + 1)
 	if i == parallel-1 {
 		max += diff
 	}
 
 	return &RangeDownload{
-		url:  url,
-		min:  min,
-		max:  max,
-		path: partialFileName(url, i),
+		url:      url,
+		min:      min,
+		max:      max,
+		parallel: parallel,
+		worker:   i,
 	}
 }
 
-func (r *RangeDownload) Run(ctx context.Context) error {
+func (r *RangeDownload) Download(ctx context.Context) error {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", r.url.String(), nil)
 	if err != nil {
@@ -106,14 +120,15 @@ func (r *RangeDownload) Run(ctx context.Context) error {
 
 	errCh := make(chan error, 1)
 	go func() {
+		// download
 		resp, err := client.Do(req)
 		if err != nil {
 			errCh <- err
 		}
 		defer resp.Body.Close()
 
-		// copy into file
-		out, err := os.OpenFile(r.path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		// write into
+		out, err := os.OpenFile(r.savePath(), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			errCh <- err
 		}
@@ -123,6 +138,7 @@ func (r *RangeDownload) Run(ctx context.Context) error {
 		errCh <- nil
 	}()
 
+	// wait for complete or abort on ctx.Done()
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -135,13 +151,12 @@ func (r *RangeDownload) Run(ctx context.Context) error {
 	return nil
 }
 
-func (d *Downloader) printf(format string, a ... interface{}) {
-	fmt.Fprintf(d.writer, format, a...)
+func (r *RangeDownload) savePath() string {
+	return partialFilePath(r.url, r.parallel, r.worker)
 }
 
-func (d *Downloader) concatenate(url *url.URL, parallel int) error {
+func joinPartials(url *url.URL, parallel int) error {
 	dst := filepath.Base(url.EscapedPath())
-	d.printf("concatenating files to %s\n", dst)
 
 	out, err := os.Create(dst)
 	if err != nil {
@@ -150,18 +165,14 @@ func (d *Downloader) concatenate(url *url.URL, parallel int) error {
 	defer out.Close()
 
 	for i := 0; i < parallel; i++ {
-		if err := joinPartialFile(partialFileName(url, i), out); err != nil {
+		if err := joinPartial(partialFilePath(url, parallel, i), out); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func partialFileName(url *url.URL, i int) string {
-	return filepath.Base(url.EscapedPath()) + strconv.Itoa(i)
-}
-
-func joinPartialFile(src string, out *os.File) error {
+func joinPartial(src string, out *os.File) error {
 	in, err := os.Open(src)
 	if err != nil {
 		return err
@@ -173,6 +184,18 @@ func joinPartialFile(src string, out *os.File) error {
 	}
 
 	return nil
+}
+
+func partialFilePaths(url *url.URL, parallel int) []string {
+	names := make([]string, parallel)
+	for i := 0; i < parallel; i++ {
+		names[i] = partialFilePath(url, parallel, i)
+	}
+	return names
+}
+
+func partialFilePath(url *url.URL, parallel, i int) string {
+	return fmt.Sprintf("%s_%dof%d", filepath.Base(url.EscapedPath()), i+1, parallel)
 }
 
 func contentSize(url *url.URL) (int, error) {
