@@ -14,34 +14,40 @@ import (
 	"time"
 )
 
+// Downloader provides split download feature via http Range header
 type Downloader struct {
 	writer io.Writer
 }
 
+
+// NewDownloader returns new instance of Downloader
 func NewDownloader(writer io.Writer) (*Downloader) {
 	return &Downloader{
 		writer: writer,
 	}
 }
 
+// Download starts downloading a file
 func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration) (error) {
-	d.printf("Downloading %s in %d parallel with timeout %s\n", url.String(), parallel, timeout)
-
 	// get target file size
+	d.printf("Acquiring file size of %s ...", url.String())
 	byteLength, err := contentSize(url)
 	if err != nil {
 		return err
 	}
-	d.printf("target file size: %d\n", byteLength)
+	d.printf("done: %d\n", byteLength)
 
 	// start parallel download with Goroutines
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(ctx)
+	d.printf("downloading in %d parallel with timeout %s\n", parallel, timeout)
 	for i := 0; i < parallel; i++ {
-		r := NewRangeDownload(url, byteLength, parallel, i)
+		filePath := partialFilePath(url, parallel, i)
+		start, end := calcRange(byteLength, parallel, i, filePath)
+		w := newWorker(url, start, end, filePath, d.writer)
 		eg.Go(func() error {
-			return r.Download(ctx)
+			return w.run(ctx)
 		})
 	}
 
@@ -49,20 +55,24 @@ func (d *Downloader) Download(url *url.URL, parallel int, timeout time.Duration)
 	if err := eg.Wait(); err != nil {
 		return err
 	}
-	d.printf("download complete\n")
+	d.printf("all goroutines has finished\n")
 
 	// join partials into one file
+	d.printf("joining partials...")
 	if err := joinPartials(url, parallel); err != nil {
 		return err
 	}
+	d.printf("done\n")
 
 	// remove all partials
+	d.printf("removing partials...")
 	for _, path := range partialFilePaths(url, parallel) {
 		err := os.Remove(path)
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("failed to remove partial file: %s", path))
 		}
 	}
+	d.printf("done\n")
 	return nil
 }
 
@@ -70,53 +80,50 @@ func (d *Downloader) printf(format string, a ... interface{}) {
 	fmt.Fprintf(d.writer, format, a...)
 }
 
-type RangeDownload struct {
-	url              *url.URL
-	min, max         int
-	parallel, worker int
-}
 
-func NewRangeDownload(url *url.URL, byteLength int, parallel, i int) *RangeDownload {
-	var (
-		min, max int
-	)
-
+func calcRange(byteLength, parallel, i int, filePath string) (start, end int) {
 	lenSub := byteLength / parallel
 	diff := byteLength % parallel
 
-	filePath := partialFilePath(url, parallel, i)
-	stat, err := os.Stat(filePath)
-	if err != nil && os.IsNotExist(err) {
-		min = lenSub * i
-	} else {
-		// FIXME stat.Size() returns int64
-		// TODO resume detection
-		min = int(stat.Size())
-	}
-
-	min = lenSub * i
-	max = lenSub * (i + 1)
+	start = lenSub * i
+	end = lenSub * (i + 1)
 	if i == parallel-1 {
-		max += diff
+		start += diff
 	}
 
-	return &RangeDownload{
+	// resume download if partial file already exists
+	if stat, err := os.Stat(filePath); err == nil {
+		start += int(stat.Size())
+	}
+
+	return start, end
+}
+
+type worker struct {
+	url          *url.URL
+	start, end   int
+	filePath 	 string
+	writer       io.Writer
+}
+
+func newWorker(url *url.URL, start, end int, filePath string, writer io.Writer) *worker {
+	return &worker{
 		url:      url,
-		min:      min,
-		max:      max,
-		parallel: parallel,
-		worker:   i,
+		start:    start,
+		end:      end,
+		filePath: filePath,
+		writer:   writer,
 	}
 }
 
-func (r *RangeDownload) Download(ctx context.Context) error {
+func (r *worker) run(ctx context.Context) error {
+	r.printf("  started downloading partial: %s\n", r.filePath)
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", r.url.String(), nil)
 	if err != nil {
 		return err
 	}
-
-	req.Header.Add("Range", fmt.Sprintf("bytes=%d-%d", r.min, r.max-1))
+	req.Header.Add("Range", fmt.Sprintf("bytes=%d-%d", r.start, r.end-1))
 	req.WithContext(ctx)
 
 	errCh := make(chan error, 1)
@@ -124,36 +131,37 @@ func (r *RangeDownload) Download(ctx context.Context) error {
 		// download
 		resp, err := client.Do(req)
 		if err != nil {
-			errCh <- errors.Wrap(err, fmt.Sprintf("failed to download partial file: %s", r.url))
+			errCh <- errors.Wrap(err, fmt.Sprintf("failed to download partial file: %s\n", r.url))
 		}
 		defer resp.Body.Close()
 
 		// write into
-		out, err := os.OpenFile(r.savePath(), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		out, err := os.OpenFile(r.filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			errCh <- errors.Wrap(err, fmt.Sprintf("failed to write partial file: %s", r.savePath()))
+			errCh <- errors.Wrap(err, fmt.Sprintf("failed to write partial file: %s", r.filePath))
 		}
 		defer out.Close()
 
 		io.Copy(out, resp.Body)
+
+		r.printf("  finished downloading partial: %s\n", r.filePath)
 		errCh <- nil
 	}()
 
-	// wait for complete or abort on ctx.Done()
 	select {
-	case err := <-errCh:
+	case err := <-errCh: // wait for complete
 		if err != nil {
 			return err
 		}
-	case <-ctx.Done():
+	case <-ctx.Done(): // abort on ctx.Done()
 		return errors.Wrap(ctx.Err(), "context has closed during download")
 	}
 
 	return nil
 }
 
-func (r *RangeDownload) savePath() string {
-	return partialFilePath(r.url, r.parallel, r.worker)
+func (r *worker) printf(format string, a... interface{}) {
+	fmt.Fprintf(r.writer, format, a...)
 }
 
 func joinPartials(url *url.URL, parallel int) error {

@@ -49,7 +49,7 @@ func run(strArgs []string) int {
 		return exitCodeError
 	}
 
-	printf("downloaded file\n")
+	printf("Complete!\n")
 	return exitCodeOK
 }
 
