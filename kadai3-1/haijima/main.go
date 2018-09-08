@@ -1,11 +1,13 @@
 package main
 
 import (
-	"os"
 	"github.com/gopherdojo/dojo3/kadai3-1/haijima/typing"
+	"os"
+	"time"
 )
 
 func main() {
+	timerCh := time.After(15 * time.Second)
 	words := []string{"hello", "world", "gopher"}
-	typing.Exec(os.Stdin, os.Stdout, words, 15)
+	typing.Exec(os.Stdin, os.Stdout, timerCh, words)
 }
