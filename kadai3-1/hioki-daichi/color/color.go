@@ -1,10 +1,16 @@
 package color
 
+// Color deals with color.
 type Color int
 
 const (
+	// Green represents green color.
 	Green = iota
+
+	// Red represents red color.
 	Red
+
+	// Cyan represents cyan color.
 	Cyan
 )
 
