@@ -40,8 +40,6 @@ func (c *CLI) Run(args []string) int {
 	path := flags.Arg(0)
 	c.Word = word.NewWordFile(path)
 
-	println(limit)
-
 	if err := c.play(path, limit); err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
 		return ExitCodeProcessError
