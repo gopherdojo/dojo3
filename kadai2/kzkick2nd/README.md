@@ -25,3 +25,7 @@
 ```
 $ go run main.go [-i (jpg|png)] [-o (jpg|png)] <path/to/dir>
 ```
+
+TODO
+- ファイルテスト複製削除式に
+- 全体リファクター
