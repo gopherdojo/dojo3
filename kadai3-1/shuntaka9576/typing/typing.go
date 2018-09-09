@@ -49,7 +49,9 @@ func (t *typing) Run(ctx context.Context, duration time.Duration) {
 	select {
 	case <-ctx.Done():
 		fmt.Println("Finished!!!")
-		fmt.Fprintf(os.Stdout, "%v/%v", t.result.correct, t.result.correct+t.result.uncorrect)
+		printColor("************* result *************",color.Blue)
+		printColor(fmt.Sprintf("%v/%v", t.result.correct, t.result.correct+t.result.uncorrect), color.Blue)
+		printColor("**********************************",color.Blue)
 	}
 }
 
@@ -78,5 +80,5 @@ func (t *typing) typingGame(ctx context.Context, inputCh chan string) {
 }
 
 func printColor(stdout string, color color.Color) {
-	fmt.Printf("\x1b["+color.Code()+"%s"+"\x1b[0m\n", stdout)
+	fmt.Printf("\x1b["+color.Code()+"m"+"%s"+"\x1b[0m\n", stdout)
 }
