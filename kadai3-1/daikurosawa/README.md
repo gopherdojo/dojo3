@@ -68,5 +68,7 @@ $ godoc -http=:6060
 
 <!-- markdownlint-enable MD014 -->
 
-You can access to read the documentation. See this link:
+You can access to read the documentation.
+
+See this link:
 [http://localhost:6060/pkg/github.com/gopherdojo/dojo3/kadai3-1/daikurosawa/](http://localhost:6060/pkg/github.com/gopherdojo/dojo3/kadai3-1/daikurosawa/)
