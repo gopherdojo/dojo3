@@ -23,6 +23,7 @@ type CLI struct {
 	InStream             io.Reader
 	OutStream, ErrStream io.Writer
 	word.Word
+	ch <-chan string
 }
 
 // Run command
@@ -39,6 +40,7 @@ func (c *CLI) Run(args []string) int {
 
 	path := flags.Arg(0)
 	c.Word = word.NewWordFile(path)
+	c.ch = c.scan()
 
 	if err := c.play(path, limit); err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
@@ -52,7 +54,6 @@ func (c *CLI) play(path string, limit time.Duration) error {
 	if err := c.Generate(); err != nil {
 		return err
 	}
-	ch := c.scan()
 	cnt := 0
 	word, err := c.GetWord()
 	if err != nil {
@@ -64,7 +65,7 @@ func (c *CLI) play(path string, limit time.Duration) error {
 LOOP:
 	for {
 		select {
-		case input := <-ch:
+		case input := <-c.ch:
 			next, err := c.verify(input, word, &cnt)
 			if err != nil {
 				return err
