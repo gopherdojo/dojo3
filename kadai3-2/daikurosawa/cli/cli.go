@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/gopherdojo/dojo3/kadai3-2/daikurosawa/download"
@@ -14,7 +15,7 @@ import (
 const (
 	ExitCodeOK = iota
 	ExitCodeParseFlagError
-	ExitCodeParseUrlError
+	ExitCodeInvalidArgsError
 	ExitCodeProcessError
 )
 
@@ -39,14 +40,30 @@ func (c *CLI) Run(args []string) int {
 		return ExitCodeParseFlagError
 	}
 
-	rawUrl := flags.Arg(0)
+	if len(flags.Args()) != 2 {
+		fmt.Fprintln(c.ErrStream, "need two arguments")
+		return ExitCodeInvalidArgsError
+	}
+
+	dirName := flags.Arg(0)
+	info, err := os.Stat(dirName)
+	if err != nil {
+		fmt.Fprintln(c.ErrStream, err.Error())
+		return ExitCodeInvalidArgsError
+	}
+	if info.IsDir() == false {
+		fmt.Fprintf(c.ErrStream, "%s is not directory\n", dirName)
+		return ExitCodeInvalidArgsError
+	}
+
+	rawUrl := flags.Arg(1)
 	url, err := url.Parse(rawUrl)
 	if err != nil {
 		fmt.Fprintln(c.ErrStream, err.Error())
-		return ExitCodeParseUrlError
+		return ExitCodeInvalidArgsError
 	}
 
-	dl := download.NewDownloader(c.OutStream, url, parallel, timeout)
+	dl := download.NewDownloader(c.OutStream, url, dirName, parallel, timeout)
 	if err := dl.Download(); err != nil {
 		return ExitCodeProcessError
 	}
