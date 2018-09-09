@@ -1,7 +1,8 @@
 package main
 
-import "fmt"
+import "github.com/gopherdojo/dojo3/kadai3-1/gosagawa/typingGame"
 
 func main() {
-	fmt.Println("vim-go")
+
+	typingGame.Start()
 }
