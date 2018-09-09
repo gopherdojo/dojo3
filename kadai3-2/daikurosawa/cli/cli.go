@@ -26,12 +26,12 @@ type CLI struct {
 // Run command.
 func (c *CLI) Run(args []string) int {
 	var (
-		parallel int
+		parallel int64
 		timeout  time.Duration
 	)
 	flags := flag.NewFlagSet("range-get", flag.ContinueOnError)
 	flags.SetOutput(c.ErrStream)
-	flags.IntVar(&parallel, "parallel", 5, "parallel count")
+	flags.Int64Var(&parallel, "parallel", 5, "parallel count")
 	flags.DurationVar(&timeout, "timeout", 300*time.Second, "time out")
 
 	if err := flags.Parse(args[1:]); err != nil {
