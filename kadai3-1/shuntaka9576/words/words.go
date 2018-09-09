@@ -5,20 +5,21 @@ import (
 	"io"
 )
 
-type word struct {
-	input, expected string
+type Word struct {
+	Input, Expected string
 }
 
-type words []word
+type Words []Word
 
-func New(reader io.Reader) (wlist words, err error) {
+func New(reader io.Reader) (wlist Words, err error) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		var w word
-		w.input, w.expected = scanner.Text(), scanner.Text()
+		var w Word
+		w.Input, w.Expected = scanner.Text(), scanner.Text()
 		wlist = append(wlist, w)
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
+	return
 }

@@ -1,23 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"time"
+
+	"github.com/gopherdojo/dojo3/kadai3-1/shuntaka9576/typing"
 	"github.com/gopherdojo/dojo3/kadai3-1/shuntaka9576/words"
 )
 
 func main() {
-	file, err := os.OpenFile("word.txt", os.O_RDONLY, 0666)
+	file, err := os.OpenFile("words.txt", os.O_RDONLY, 0666)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
 	}
 
-	typingWords,err := words.New(file)
+	typingWords, err := words.New(file)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v", err)
 	}
+	game := typing.New().SetWords(typingWords)
 
-	//game := typing.New().Set(typingWords)
-	//game.Run()
+	ctx := context.Background()
+	game.Run(ctx, time.Second*30)
 }
