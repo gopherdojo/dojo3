@@ -7,3 +7,15 @@
   - golang.org/x/sync/errgourpパッケージなどを使ってみる
 - キャンセルが発生した場合の実装を行う
 
+##install
+
+```
+dep ensure
+```
+
+##usage
+
+```
+go run main.go
+```
+
