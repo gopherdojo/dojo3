@@ -3,9 +3,7 @@ package typing
 import (
 	"context"
 	"time"
-
 	"fmt"
-
 	"bufio"
 	"os"
 
@@ -13,12 +11,6 @@ import (
 
 	"github.com/gopherdojo/dojo3/kadai3-1/shuntaka9576/color"
 	"github.com/gopherdojo/dojo3/kadai3-1/shuntaka9576/words"
-)
-
-const (
-	red    = "\x1b[31m%s\x1b[0m"
-	green  = "\x1b[32m%s\x1b[0m"
-	yellow = "\x1b[32m%s\x1b[0m"
 )
 
 type result struct {
@@ -49,9 +41,9 @@ func (t *typing) Run(ctx context.Context, duration time.Duration) {
 	select {
 	case <-ctx.Done():
 		fmt.Println("Finished!!!")
-		printColor("************* result *************",color.Blue)
+		printColor("************* result *************", color.Blue)
 		printColor(fmt.Sprintf("%v/%v", t.result.correct, t.result.correct+t.result.uncorrect), color.Blue)
-		printColor("**********************************",color.Blue)
+		printColor("**********************************", color.Blue)
 	}
 }
 
