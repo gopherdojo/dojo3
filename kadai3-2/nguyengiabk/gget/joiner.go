@@ -7,19 +7,22 @@ import (
 )
 
 // Join joins multiple parts of a file to 1 file
-func Join(parts []string, output string) error {
-	sort.Strings(parts)
+func (g *GGet) Join() error {
+	sort.Strings(g.partFiles)
 
-	outputFile, err := os.OpenFile(output, os.O_CREATE|os.O_WRONLY, defaultFileMode)
+	outputFile, err := os.OpenFile(g.fileName, os.O_CREATE|os.O_WRONLY, defaultFileMode)
 	if err != nil {
 		return err
 	}
 	defer outputFile.Close()
 
-	for _, part := range parts {
+	for _, part := range g.partFiles {
 		if err = copy(part, outputFile); err != nil {
 			return err
 		}
+	}
+	for _, name := range g.partFiles {
+		os.Remove(name)
 	}
 	return nil
 }
