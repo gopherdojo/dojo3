@@ -1,11 +1,14 @@
 package download
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -27,7 +30,7 @@ type Downloader struct {
 	dirName   string
 	parallel  int64
 	timeout   time.Duration
-	resCh     <-chan map[int]string
+	tempDir   string
 }
 
 // Create new Downloader struct
@@ -52,20 +55,14 @@ func (d *Downloader) Download() error {
 	fmt.Fprintf(d.outStream, "> Content-Length: %v\n", len)
 
 	byteRanges := d.calculationRange(len)
-	timer := time.NewTimer(d.timeout)
 
-	if err := d.rangeDownload(byteRanges); err != nil {
+	resMap, err := d.rangeDownload(byteRanges)
+	if err != nil {
 		return err
 	}
 
-	for {
-		select {
-		case resMap := <-d.resCh:
-			// TODO
-			println(resMap)
-		case <-timer.C:
-			return errors.New(fmt.Sprintf("timeout: %s", d.timeout))
-		}
+	if err := d.merge(resMap); err != nil {
+		return err
 	}
 
 	return nil
@@ -130,11 +127,16 @@ func (d *Downloader) sendHTTPRequest(byteRange string) (*http.Response, error) {
 	return client.Do(req)
 }
 
-func (d *Downloader) rangeDownload(byteRanges []string) error {
-	resCh := make(chan map[int]string)
-	d.resCh = resCh
+func (d *Downloader) rangeDownload(byteRanges []string) (map[int]string, error) {
+	tempDir, err := ioutil.TempDir(d.dirName, "temp")
+	if err != nil {
+		return nil, errors.Wrap(err, "create temp directory.")
+	}
+	d.tempDir = tempDir
 
-	var eg errgroup.Group
+	ctx, cancel := context.WithTimeout(context.Background(), d.timeout)
+	defer cancel()
+	eg, ctx := errgroup.WithContext(ctx)
 	resMap := make(map[int]string)
 
 	for i, byteRange := range byteRanges {
@@ -149,7 +151,7 @@ func (d *Downloader) rangeDownload(byteRanges []string) error {
 
 			fmt.Fprintf(d.outStream, "> %s "+green, byteRange, "download success")
 
-			fileName, err := d.writeTempFile(res)
+			fileName, err := d.writeTempFile(res, tempDir)
 			if err != nil {
 				return err
 			}
@@ -159,15 +161,14 @@ func (d *Downloader) rangeDownload(byteRanges []string) error {
 		})
 	}
 	if err := eg.Wait(); err != nil {
-		return err
+		return nil, err
 	}
 
-	resCh <- resMap
-	return nil
+	return resMap, nil
 }
 
-func (d *Downloader) writeTempFile(res *http.Response) (string, error) {
-	temp, err := ioutil.TempFile(d.dirName, "temp")
+func (d *Downloader) writeTempFile(res *http.Response, tempDir string) (string, error) {
+	temp, err := ioutil.TempFile(tempDir, "temp")
 	if err != nil {
 		return "", errors.Wrap(err, "failed create temp file.")
 	}
@@ -184,4 +185,42 @@ func (d *Downloader) writeTempFile(res *http.Response) (string, error) {
 	}
 
 	return temp.Name(), nil
+}
+
+func (d *Downloader) merge(resMap map[int]string) error {
+	_, fileName := path.Split(d.url.String())
+	file, err := os.OpenFile(d.tempDir+fileName, os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		return errors.Wrap(err, "failed create file.")
+	}
+	defer func() {
+		file.Close()
+		os.RemoveAll(d.tempDir)
+	}()
+
+	for i := 0; i < len(resMap); i++ {
+		if res, ok := resMap[i]; ok {
+			if err := d.mergeFile(file, res); err != nil {
+				return err
+			}
+		} else {
+			return errors.New("not found range download response.")
+		}
+	}
+
+	return nil
+}
+
+func (*Downloader) mergeFile(file *os.File, tempFile string) error {
+	temp, err := os.Open(tempFile)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("failed open temp file. file: %s", tempFile))
+	}
+	defer temp.Close()
+	if _, err := io.Copy(file, temp); err != nil {
+		return errors.Wrap(err,
+			fmt.Sprintf("failed merge file. file: %s, temp_file: %s", file.Name(), tempFile))
+	}
+
+	return nil
 }
