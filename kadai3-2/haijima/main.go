@@ -72,11 +72,7 @@ func Exec(url string, w io.Writer, num int) error {
 }
 
 func acceptsRangeRequest(url string) (int, bool) {
-	req, err := http.NewRequest("HEAD", url, nil)
-	if err != nil {
-		return 0, false
-	}
-	resp, err := new(http.Client).Do(req)
+	resp, err := http.Head(url)
 	if err != nil {
 		return 0, false
 	}
@@ -97,7 +93,7 @@ func download(url string, h map[string]string, w io.Writer) error {
 	for k, v := range h {
 		req.Header.Set(k, v)
 	}
-	resp, err := new(http.Client).Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return errors.WithStack(err)
 	}
