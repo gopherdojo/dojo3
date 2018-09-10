@@ -3,25 +3,29 @@ package xget
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
-	"golang.org/x/net/context/ctxhttp"
-	"golang.org/x/sync/errgroup"
 	"io"
 	"net/http"
 	netURL "net/url"
 	"os"
 	"path"
 	"runtime"
+
+	"github.com/pkg/errors"
+	"golang.org/x/net/context/ctxhttp"
+	"golang.org/x/sync/errgroup"
 )
 
 var (
+	// MinChunkSize is minimum chunk size
 	MinChunkSize = int64(1024)
 )
 
+// Option for client setting
 type Option struct {
 	Procs int
 }
 
+// Client is API for parallel download
 type Client struct {
 	url   string
 	procs int
@@ -38,6 +42,7 @@ type chunk struct {
 	last  int64
 }
 
+// NewClient constructs Client
 func NewClient(url string, opt Option) (*Client, error) {
 	c := Client{}
 
@@ -66,6 +71,7 @@ func (c *Client) setMaxProcs() {
 	}
 }
 
+// Run execute parallel download with context
 func (c *Client) Run(ctx context.Context) error {
 	c.setMaxProcs()
 	if err := c.download(ctx); err != nil {
@@ -189,6 +195,7 @@ func chunkDownload(ctx context.Context, chunk chunk, path string, url string) er
 
 	_, err = io.Copy(output, res.Body)
 	if err != nil {
+		os.Remove(path)
 		return errors.Wrap(err, fmt.Sprintf("failed to copy %s", path))
 	}
 
