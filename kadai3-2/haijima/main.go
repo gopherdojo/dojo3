@@ -41,8 +41,6 @@ func Exec(url string, w io.Writer, num int) error {
 	if num > 1 && ok {
 		b := length/num + 1
 		eg, ctx := errgroup.WithContext(context.Background())
-		ctx, cancel := context.WithCancel(ctx)
-		defer cancel()
 
 		// Range access
 		tmpFiles := make([]string, num)
@@ -56,18 +54,18 @@ func Exec(url string, w io.Writer, num int) error {
 				defer tmpFile.Close()
 				tmpFiles[i] = tmpFile.Name()
 				header := map[string]string{"Range": fmt.Sprintf("bytes=%v-%v", i*b, (i+1)*b-1)}
-				return download(url, header, tmpFile)
+				return download(ctx, url, header, tmpFile)
 			})
 		}
 		if err := eg.Wait(); err != nil {
-			cancel()
 			return errors.WithStack(err)
 		}
 
 		// Concatenate partial files
 		return concat(w, tmpFiles)
 	} else {
-		return download(url, nil, w)
+		ctx, _ := context.WithCancel(context.Background())
+		return download(ctx, url, nil, w)
 	}
 }
 
@@ -85,7 +83,7 @@ func acceptsRangeRequest(url string) (int, bool) {
 	return length, unit == "bytes"
 }
 
-func download(url string, h map[string]string, w io.Writer) error {
+func download(ctx context.Context, url string, h map[string]string, w io.Writer) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return errors.WithStack(err)
@@ -93,7 +91,7 @@ func download(url string, h map[string]string, w io.Writer) error {
 	for k, v := range h {
 		req.Header.Set(k, v)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return errors.WithStack(err)
 	}
