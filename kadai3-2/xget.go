@@ -91,7 +91,7 @@ func (c *Client) download(ctx context.Context) error {
 		chunkPaths[i] = path
 
 		eg.Go(func() error {
-			return chunkDownload(_chunk, path, plan.url)
+			return chunkDownload(ctx, _chunk, path, plan.url)
 		})
 	}
 	if err := eg.Wait(); err != nil {
@@ -124,7 +124,7 @@ func (c *Client) plan(ctx context.Context) (*plan, error) {
 
 	current := int64(0)
 	remainSize := res.ContentLength
-	chunkSize := res.ContentLength / int64(c.procs) + 1
+	chunkSize := res.ContentLength/int64(c.procs) + 1
 
 	if chunkSize < MinChunkSize {
 		chunkSize = MinChunkSize
