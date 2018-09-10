@@ -188,6 +188,8 @@ func (d *Downloader) writeTempFile(res *http.Response, tempDir string) (string, 
 }
 
 func (d *Downloader) merge(resMap map[int]string) error {
+	fmt.Fprintf(d.outStream, "> merge file...\n")
+
 	_, fileName := path.Split(d.url.String())
 	file, err := os.OpenFile(d.tempDir+fileName, os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
@@ -207,6 +209,9 @@ func (d *Downloader) merge(resMap map[int]string) error {
 			return errors.New("not found range download response.")
 		}
 	}
+
+	fmt.Fprintf(d.outStream, "> "+green, "complete!")
+	fmt.Fprintf(d.outStream, "> output: %s\n", file.Name())
 
 	return nil
 }
