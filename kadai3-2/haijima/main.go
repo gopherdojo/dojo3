@@ -43,7 +43,15 @@ func Exec(url string, w io.Writer, num int) error {
 		eg, ctx := errgroup.WithContext(context.Background())
 
 		// Range access
-		tmpFiles := make([]string, num)
+		tmpFiles := make([]io.Reader, num)
+		defer func() {
+			for _, tmpFile := range tmpFiles {
+				if f, ok := tmpFile.(io.ReadCloser); ok {
+					f.Close()
+				}
+			}
+		}()
+
 		for i := 0; i < num; i++ {
 			i := i
 			eg.Go(func() error {
@@ -51,8 +59,7 @@ func Exec(url string, w io.Writer, num int) error {
 				if err != nil {
 					return errors.WithStack(err)
 				}
-				defer tmpFile.Close()
-				tmpFiles[i] = tmpFile.Name()
+				tmpFiles[i] = tmpFile
 				header := map[string]string{"Range": fmt.Sprintf("bytes=%v-%v", i*b, (i+1)*b-1)}
 				return download(ctx, url, header, tmpFile)
 			})
@@ -104,18 +111,10 @@ func download(ctx context.Context, url string, h map[string]string, w io.Writer)
 	return nil
 }
 
-// TODO: io.Reader使いたい
-func concat(dst io.Writer, srcs []string) error {
+func concat(dst io.Writer, srcs []io.Reader) error {
 	for _, src := range srcs {
 		err := func() error {
-			part, err := os.Open(src)
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			defer os.Remove(src)
-			defer part.Close()
-
-			_, err = io.Copy(dst, part)
+			_, err := io.Copy(dst, src)
 			if err != nil {
 				return errors.WithStack(err)
 			}
