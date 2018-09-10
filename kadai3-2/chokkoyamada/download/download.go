@@ -17,7 +17,7 @@ type Download struct {
 	Client *http.Client
 }
 
-func new(url string) *Download {
+func New(url string) *Download {
 	return &Download{
 		URL:    url,
 		Client: &http.Client{},
@@ -34,12 +34,13 @@ func (d *Download) GetContent(ctx context.Context, w io.WriterAt) (*Range, error
 		return nil, fmt.Errorf("Could not download %s: %s", d.URL, err)
 	}
 	log.Printf("Total %d bytes", complete.Length())
-	eg, ctx := errGroup.WithContext(ctx)
+	eg, ctx := errgroup.WithContext(ctx)
 	parts := complete.Split(4)
 	for _, part := range parts {
 		part := part
 		eg.Go(func() error {
 			log.Printf("Get %d-%d bytes of content", part.Start, part.End)
+
 			c, err := d.GetPartialContent(ctx, part)
 			if err != nil {
 				return fmt.Errorf("Could not get partial content: %s", err)
@@ -48,11 +49,11 @@ func (d *Download) GetContent(ctx context.Context, w io.WriterAt) (*Range, error
 			if _, err := io.Copy(NewRangeWriter(w, c.ContentRange.Partial), c.Body); err != nil {
 				return fmt.Errorf("Could not write partial content: %s", err)
 			}
-			log.Printf("Wrote %D-%d bytes of content", part.Start, part, End)
+			log.Printf("Wrote %D-%d bytes of content", part.Start, part.End)
 			return nil
 		})
 	}
-	if err != eg.Wait(); err != nil {
+	if err := eg.Wait(); err != nil {
 		return nil, err
 	}
 	return complete, nil
@@ -76,7 +77,7 @@ type PartialContentResponse struct {
 	ContentRange *ContentRange
 }
 
-func (d *Download) GerPartialContent(ctx context.Context, rng Range) (*PartialContentResponse, error) {
+func (d *Download) GetPartialContent(ctx context.Context, rng Range) (*PartialContentResponse, error) {
 	req, err := http.NewRequest("GET", d.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("Could not create a request for &s: %s", d.URL, err)
@@ -92,9 +93,9 @@ func (d *Download) GerPartialContent(ctx context.Context, rng Range) (*PartialCo
 
 	switch res.StatusCode {
 	case http.StatusPartialContent:
-		crng, err := ParseCotentRange(res.Header.Get("Content-Range"))
+		crng, err := ParseContentRange(res.Header.Get("Content-Range"))
 		if err!= nil {
-			res.Body.Close
+			res.Body.Close()
 			return nil, fmt.Errorf("Invalid Content-Range header: %s", err)
 		}
 		return &PartialContentResponse{res, crng}, nil

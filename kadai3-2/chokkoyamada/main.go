@@ -1,4 +1,4 @@
-package chokkoyamada
+package main
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"log"
 	"context"
 
-	"github.com/gopherdojo/dojo3/kadai3-2/chokkoyamada/download"
+	"./download"
 )
 
 func main() {
