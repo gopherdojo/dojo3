@@ -55,7 +55,6 @@ func main() {
 			}
 		}
 	}
-
 }
 
 func input(r io.Reader) <-chan string {
