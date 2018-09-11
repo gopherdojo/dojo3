@@ -5,7 +5,7 @@ type Color int
 
 const (
 	// Green represents green color.
-	Green = iota
+	Green Color = iota
 
 	// Red represents red color.
 	Red
