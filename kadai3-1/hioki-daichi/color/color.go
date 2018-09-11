@@ -5,13 +5,13 @@ type Color int
 
 const (
 	// Green represents green color.
-	Green Color = iota
+	Green Color = 0
 
 	// Red represents red color.
-	Red
+	Red Color = 1
 
 	// Cyan represents cyan color.
-	Cyan
+	Cyan Color = 2
 )
 
 // Code returns ANSI escape code.
