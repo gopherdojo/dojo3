@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/datehelper/datehelper.go (100.0%)</option>
+				
+				<option value="file1">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/form/rootform.go (100.0%)</option>
+				
+				<option value="file2">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/fortune/fortune.go (100.0%)</option>
+				
+				<option value="file3">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/jsonhelper/jsonhelper.go (100.0%)</option>
+				
+				<option value="file4">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/main.go (90.5%)</option>
+				
+				<option value="file5">github.com/gopherdojo/dojo3/kadai4/hioki-daichi/person/person.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">/*
+Package datehelper is a collection of convenient functions for manipulating dates.
+*/
+package datehelper
+
+import "time"
+
+// for testing
+var nowFunc = time.Now
+var loadLocationFunc = time.LoadLocation
+
+// IsDuringTheNewYear returns whether the current date is the New Year or not.
+func IsDuringTheNewYear() bool <span class="cov10" title="6">{
+        loc, err := loadLocationFunc("Asia/Tokyo")
+        if err != nil </span><span class="cov1" title="1">{
+                panic(err)</span>
+        }
+
+        <span class="cov9" title="5">_, month, day := nowFunc().In(loc).Date()
+        if month == time.January &amp;&amp; (day == 1 || day == 2 || day == 3) </span><span class="cov6" title="3">{
+                return true
+        }</span>
+        <span class="cov4" title="2">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">/*
+Package form provides methods to generate models from Form and Form from Request.
+*/
+package form
+
+import (
+        "net/http"
+
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/fortune"
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/person"
+)
+
+// RootForm has name.
+type RootForm struct {
+        name string
+}
+
+// NewRootForm returns a form for the route of "/".
+func NewRootForm(req *http.Request) *RootForm <span class="cov10" title="2">{
+        f := &amp;RootForm{}
+        nameParam := req.URL.Query().Get("name")
+        if nameParam != "" </span><span class="cov1" title="1">{
+                f.name = nameParam
+        }</span> else<span class="cov1" title="1"> {
+                f.name = "Gopher"
+        }</span>
+        <span class="cov10" title="2">return f</span>
+}
+
+// NewPerson generates a person according to the content of form.
+func (f *RootForm) NewPerson(ftn fortune.Fortune) *person.Person <span class="cov1" title="1">{
+        return person.NewPerson(f.name, ftn)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">/*
+Package fortune is a package that manages processing around fortune.
+*/
+package fortune
+
+import (
+        "math/rand"
+)
+
+// Fortune means 運勢
+type Fortune string
+
+const (
+        // Daikichi means "大吉"
+        Daikichi Fortune = "大吉"
+
+        // Chukichi means "中吉"
+        Chukichi Fortune = "中吉"
+
+        // Shokichi means "小吉"
+        Shokichi Fortune = "小吉"
+
+        // Kichi means "吉"
+        Kichi Fortune = "吉"
+
+        // Suekichi means "末吉"
+        Suekichi Fortune = "末吉"
+
+        // Kyo means "凶"
+        Kyo Fortune = "凶"
+
+        // Daikyo means "大凶"
+        Daikyo Fortune = "大凶"
+)
+
+// DrawFortune draws a fortune.
+func DrawFortune() Fortune <span class="cov10" title="7">{
+        fs := AllFortunes()
+        return fs[rand.Intn(len(fs))]
+}</span>
+
+// AllFortunes returns all fortunes.
+func AllFortunes() []Fortune <span class="cov10" title="7">{
+        return []Fortune{Daikichi, Chukichi, Shokichi, Kichi, Suekichi, Kyo, Daikyo}
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">/*
+Package jsonhelper is a collection of convenient functions for manipulating JSON.
+*/
+package jsonhelper
+
+import (
+        "bytes"
+        "encoding/json"
+        "io"
+)
+
+// ToJSON converts v to JSON.
+func ToJSON(v interface{}) (string, error) <span class="cov10" title="2">{
+        var buf bytes.Buffer
+        encoder := newEncoderFunc(&amp;buf)
+        if err := encoder.Encode(v); err != nil </span><span class="cov1" title="1">{
+                return "", err
+        }</span>
+        <span class="cov1" title="1">return buf.String(), nil</span>
+}
+
+// for testing
+type encoder interface {
+        Encode(v interface{}) error
+}
+
+// for testing
+var newEncoderFunc = func(w io.Writer) encoder <span class="cov1" title="1">{
+        return json.NewEncoder(w)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+        "math/rand"
+        "net/http"
+        "time"
+
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/datehelper"
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/form"
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/fortune"
+        "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/jsonhelper"
+)
+
+// for testing
+var nowFunc = time.Now
+var isDuringTheNewYearFunc = datehelper.IsDuringTheNewYear
+var toJSONFunc = jsonhelper.ToJSON
+
+func init() <span class="cov1" title="1">{
+        rand.Seed(nowFunc().UnixNano())
+}</span>
+
+func main() <span class="cov0" title="0">{
+        http.HandleFunc("/", handler)
+        http.ListenAndServe(":8080", nil)
+}</span>
+
+func handler(w http.ResponseWriter, r *http.Request) <span class="cov10" title="12">{
+        w.Header().Set("Content-Type", "application/json; charset=utf-8")
+        w.Header().Set("X-Content-Type-Options", "nosniff")
+
+        var ftn fortune.Fortune
+        if isDuringTheNewYearFunc() </span><span class="cov4" title="3">{
+                ftn = fortune.Daikichi
+        }</span> else<span class="cov8" title="9"> {
+                ftn = fortune.DrawFortune()
+        }</span>
+
+        <span class="cov10" title="12">p := form.NewRootForm(r).NewPerson(ftn)
+
+        p.Validate()
+
+        var v interface{}
+        if len(p.Errors) &gt; 0 </span><span class="cov1" title="1">{
+                w.WriteHeader(http.StatusBadRequest)
+                v = map[string][]string{"errors": p.Errors}
+        }</span> else<span class="cov9" title="11"> {
+                v = p
+        }</span>
+
+        <span class="cov10" title="12">json, err := toJSONFunc(v)
+        if err != nil </span><span class="cov1" title="1">{
+                log.Println(err)
+                http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        }</span>
+
+        <span class="cov10" title="12">fmt.Fprint(w, json)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">/*
+Package person is a package that manages processing around person.
+*/
+package person
+
+import "github.com/gopherdojo/dojo3/kadai4/hioki-daichi/fortune"
+
+// Person has Name and Fortune.
+type Person struct {
+        Name    string          `json:"name"`
+        Fortune fortune.Fortune `json:"fortune"`
+        Errors  []string        `json:"-"`
+}
+
+// NewPerson generates a new person.
+func NewPerson(n string, f fortune.Fortune) *Person <span class="cov10" title="2">{
+        return &amp;Person{
+                Name:    n,
+                Fortune: f,
+        }
+}</span>
+
+// Validate validates its own fields.
+func (p *Person) Validate() <span class="cov1" title="1">{
+        if len(p.Name) &gt; 32 </span><span class="cov1" title="1">{
+                p.Errors = append(p.Errors, "Name is too long (maximum is 32 characters)")
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
