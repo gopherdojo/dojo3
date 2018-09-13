@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/gopherdojo/dojo3/kadai4/gosagawa/omikuzi"
 
 func main() {
-	fmt.Println("vim-go")
+	omikuzi.Draw()
 }
