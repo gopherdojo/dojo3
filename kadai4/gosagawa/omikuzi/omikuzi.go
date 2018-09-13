@@ -33,22 +33,51 @@ const (
 //Omikuzi おみくじ構造体
 type Omikuzi struct {
 	RandomGenerater RandomGenerater
+	Time            time.Time
 	OmikuziPattern  []Fortune
 }
 
 //Draw おみくじを引く
 func (o *Omikuzi) Draw() Fortune {
-	return o.OmikuziPattern[o.RandomGenerater.Get()]
+	m := int(o.Time.Month())
+	d := o.Time.Day()
+
+	var r Fortune
+	if isShogatsu(m, d) {
+		r = Daikichi
+	} else {
+		r = o.OmikuziPattern[o.RandomGenerater.Get()]
+	}
+	return r
+}
+
+func isShogatsu(m int, d int) bool {
+	if m == 1 && d >= 1 && d <= 3 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func init() {
-	OmikuziPattern = []Fortune{Kyo, Kichi, Kichi, Chukichi, Chukichi, Daikichi}
+	OmikuziPattern = []Fortune{
+		Kyo,
+		Kichi,
+		Kichi,
+		Chukichi,
+		Chukichi,
+		Daikichi,
+	}
 }
 
 //Draw おみくじを引く
 func Draw() {
 
-	o := Omikuzi{RandomGenerater: &random{}, OmikuziPattern: OmikuziPattern}
+	o := Omikuzi{
+		RandomGenerater: &random{},
+		Time:            time.Now(),
+		OmikuziPattern:  OmikuziPattern,
+	}
 	s := o.Draw()
 	println(s)
 }
