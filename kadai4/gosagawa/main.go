@@ -15,8 +15,10 @@ type OmikuziResult struct {
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
-
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Println("Error:", err)
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
