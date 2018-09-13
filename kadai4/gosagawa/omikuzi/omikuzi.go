@@ -1,6 +1,7 @@
 package omikuzi
 
 import (
+	"log"
 	"math/rand"
 	"time"
 )
@@ -84,7 +85,16 @@ func Draw() string {
 type random struct{}
 
 func (r *random) Get() int {
-	t := time.Now().UnixNano()
-	rand.Seed(t)
+
+	//XXX 同じ日であれば同じ結果を出すため、当日の00:00のUNIXタイムを取得する。
+	//もっといいやり方があるかも
+	day := time.Now()
+	layout := "2006-01-02"
+	dayformated := day.Format(layout)
+	t, err := time.Parse(layout, dayformated)
+	if err != nil {
+		log.Println("Error:", err)
+	}
+	rand.Seed(t.Unix())
 	return rand.Intn(len(OmikuziPattern))
 }
