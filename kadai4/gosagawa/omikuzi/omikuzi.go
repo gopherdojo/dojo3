@@ -31,6 +31,8 @@ const (
 	Kyo Fortune = "凶"
 )
 
+const TimeLayout = "2006-01-02"
+
 //Omikuzi おみくじ構造体
 type Omikuzi struct {
 	RandomGenerater RandomGenerater
@@ -74,27 +76,44 @@ func init() {
 //Draw おみくじを引く
 func Draw() string {
 
+	now := time.Now()
+
+	//XXX 1日で結果を固定するように当日の00:00を取得するためフォーマット化し、
+	//またtime.Timeに戻してている。
+	//別のいいやり方がないか検討していた。
+	timeFormated := now.Format(TimeLayout)
+	targetTime, err := time.Parse(TimeLayout, timeFormated)
+	if err != nil {
+		log.Println("error:", err)
+	}
+
 	o := Omikuzi{
-		RandomGenerater: &random{},
-		Time:            time.Now(),
+		RandomGenerater: &random{TargetTime: targetTime},
+		Time:            targetTime,
+		OmikuziPattern:  OmikuziPattern,
+	}
+	return string(o.Draw())
+}
+func DrawByDate(targetDate string) string {
+
+	targetTime, err := time.Parse(TimeLayout, targetDate)
+	if err != nil {
+		log.Println("error:", err)
+	}
+
+	o := Omikuzi{
+		RandomGenerater: &random{TargetTime: targetTime},
+		Time:            targetTime,
 		OmikuziPattern:  OmikuziPattern,
 	}
 	return string(o.Draw())
 }
 
-type random struct{}
+type random struct {
+	TargetTime time.Time
+}
 
 func (r *random) Get() int {
-
-	//XXX 同じ日であれば同じ結果を出すため、当日の00:00のUNIXタイムを取得する。
-	//もっといいやり方があるかも
-	day := time.Now()
-	layout := "2006-01-02"
-	dayformated := day.Format(layout)
-	t, err := time.Parse(layout, dayformated)
-	if err != nil {
-		log.Println("Error:", err)
-	}
-	rand.Seed(t.Unix())
+	rand.Seed(r.TargetTime.Unix())
 	return rand.Intn(len(OmikuziPattern))
 }

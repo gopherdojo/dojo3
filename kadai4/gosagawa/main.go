@@ -15,13 +15,19 @@ type OmikuziResult struct {
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/hoge", handlerHoge)
 	http.ListenAndServe(":8080", nil)
 
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	data := &OmikuziResult{Result: omikuzi.Draw()}
+
+	date := r.FormValue("date")
+	var data OmikuziResult
+	if date != "" {
+		data = &OmikuziResult{Result: omikuzi.Draw()}
+	} else {
+		data = &OmikuziResult{Result: omikuzi.DrawByDate(date)}
+	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if err := json.NewEncoder(w).Encode(data); err != nil {
