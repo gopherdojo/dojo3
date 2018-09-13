@@ -71,15 +71,14 @@ func init() {
 }
 
 //Draw おみくじを引く
-func Draw() {
+func Draw() string {
 
 	o := Omikuzi{
 		RandomGenerater: &random{},
 		Time:            time.Now(),
 		OmikuziPattern:  OmikuziPattern,
 	}
-	s := o.Draw()
-	println(s)
+	return string(o.Draw())
 }
 
 type random struct{}

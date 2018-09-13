@@ -1,7 +1,28 @@
 package main
 
-import "github.com/gopherdojo/dojo3/kadai4/gosagawa/omikuzi"
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/gopherdojo/dojo3/kadai4/gosagawa/omikuzi"
+)
+
+type OmikuziResult struct {
+	Result string `json:"result"`
+}
 
 func main() {
-	omikuzi.Draw()
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
+
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	data := &OmikuziResult{Result: omikuzi.Draw()}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		log.Println("Error:", err)
+	}
 }
