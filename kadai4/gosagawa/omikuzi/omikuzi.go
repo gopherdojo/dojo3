@@ -31,6 +31,7 @@ const (
 	Kyo Fortune = "凶"
 )
 
+//TimeLayout 日付レイアウト
 const TimeLayout = "2006-01-02"
 
 //Omikuzi おみくじ構造体
@@ -57,9 +58,8 @@ func (o *Omikuzi) Draw() Fortune {
 func isShogatsu(m int, d int) bool {
 	if m == 1 && d >= 1 && d <= 3 {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func init() {
@@ -94,6 +94,8 @@ func Draw() string {
 	}
 	return string(o.Draw())
 }
+
+//DrawByDate 日付でおみくじを引く
 func DrawByDate(targetDate string) string {
 
 	targetTime, err := time.Parse(TimeLayout, targetDate)

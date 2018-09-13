@@ -8,6 +8,7 @@ import (
 	"github.com/gopherdojo/dojo3/kadai4/gosagawa/omikuzi"
 )
 
+//OmikuziResult おみくじの実行結果
 type OmikuziResult struct {
 	Result string `json:"result"`
 }
