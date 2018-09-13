@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -14,6 +15,7 @@ type OmikuziResult struct {
 
 func main() {
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/hoge", handlerHoge)
 	http.ListenAndServe(":8080", nil)
 
 }
@@ -25,4 +27,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(data); err != nil {
 		log.Println("Error:", err)
 	}
+}
+
+func handlerHoge(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello, net/http!")
 }
