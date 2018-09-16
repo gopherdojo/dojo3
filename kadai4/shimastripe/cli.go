@@ -5,19 +5,21 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"time"
 )
 
 const success = iota
 
 type CLI struct {
+	Clock Clock
 }
 
-func init() {
-	rand.Seed(time.Now().Unix())
+// Generate a seed only once
+func (c *CLI) generateSeed() {
+	rand.Seed(c.Clock.Now().Unix())
 }
 
-func handler(w http.ResponseWriter, req *http.Request) {
+// handler
+func (c *CLI) handler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	respBody := &FortuneRepository{Fortune: DrawRandomly()}
@@ -28,8 +30,10 @@ func handler(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Run a server
 func (c *CLI) Run(args []string) int {
-	http.HandleFunc("/", handler)
+	c.generateSeed()
+	http.HandleFunc("/", c.handler)
 	http.ListenAndServe(":8080", nil)
 	return success
 }
