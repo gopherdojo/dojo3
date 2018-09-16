@@ -40,7 +40,7 @@ func (c *CLI) handler(w http.ResponseWriter, req *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(respBody); err != nil {
 		log.Printf("Encode error: %v\n", err)
-		http.Error(w, "Internal server error.", http.StatusInternalServerError)
+		http.Error(w, "{\"result\":\"Internal server error\"}\n", http.StatusInternalServerError)
 	}
 }
 
