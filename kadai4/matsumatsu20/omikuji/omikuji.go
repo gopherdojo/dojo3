@@ -24,16 +24,20 @@ const (
 	daikyo   = "大凶"
 )
 
-var luck = []string{daikichi, kichi, chukichi, shokichi, suekichi, kyo, daikyo}
+var(
+	luck                  = []string{daikichi, kichi, chukichi, shokichi, suekichi, kyo, daikyo}
+	isNewYearsHolidayFunc = dateUtil.IsNewYearsHoliday
+	fetchKujiFunc         = fetchKuji
+)
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	var result string
 
-	if dateUtil.IsNewYearsHoliday() {
+	if isNewYearsHolidayFunc() {
 		result = daikichi
 	} else {
 		rand.Seed(time.Now().UnixNano())
-		result = luck[rand.Intn(len(luck))]
+		result = fetchKujiFunc()
 	}
 
 	res := &response{Status: 200, Result: result}
@@ -42,4 +46,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	if err := encoder.Encode(res); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func fetchKuji() string {
+	rand.Seed(time.Now().UnixNano())
+	return luck[rand.Intn(len(luck))]
 }
