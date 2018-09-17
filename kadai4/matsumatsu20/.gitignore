@@ -7,7 +7,7 @@
 *.dll
 *.so
 *.dylib
-matsuda
+matsukuji
 
 # Test binary, build with `go test -c`
 *.test
