@@ -1,12 +1,13 @@
 package omikuji
 
 import (
-	"net/http"
-	"math/rand"
-	"time"
-	"github.com/gopherdojo/dojo3/kadai4/matsumatsu20/dateUtil"
 	"encoding/json"
 	"log"
+	"math/rand"
+	"net/http"
+	"time"
+
+	"github.com/gopherdojo/dojo3/kadai4/matsumatsu20/dateUtil"
 )
 
 type response struct {
@@ -24,7 +25,7 @@ const (
 	daikyo   = "大凶"
 )
 
-var(
+var (
 	luck                  = []string{daikichi, kichi, chukichi, shokichi, suekichi, kyo, daikyo}
 	isNewYearsHolidayFunc = dateUtil.IsNewYearsHoliday
 	fetchKujiFunc         = fetchKuji

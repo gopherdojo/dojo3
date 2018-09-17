@@ -1,8 +1,8 @@
 package dateUtil
 
 import (
-	"time"
 	"log"
+	"time"
 )
 
 var timeNow = time.Now()

@@ -1,18 +1,18 @@
 package omikuji
 
 import (
-	"testing"
-	"net/http/httptest"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestHandler(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(Handler))
 	defer ts.Close()
 
-	cases := []struct{
+	cases := []struct {
 		luck              string
 		isNewYearsHoliday bool
 		expected          response
@@ -36,7 +36,7 @@ func TestHandler(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		body, err  := ioutil.ReadAll(res.Body)
+		body, err := ioutil.ReadAll(res.Body)
 
 		if err != nil {
 			t.Fatal(err)

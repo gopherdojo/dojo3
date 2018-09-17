@@ -1,9 +1,9 @@
 package dateUtil
 
 import (
+	"log"
 	"testing"
 	"time"
-	"log"
 )
 
 func TestIsNewYearsHoliday(t *testing.T) {
@@ -12,7 +12,7 @@ func TestIsNewYearsHoliday(t *testing.T) {
 		log.Println(err)
 	}
 
-	cases := []struct{
+	cases := []struct {
 		year     int
 		month    time.Month
 		day      int
@@ -26,7 +26,7 @@ func TestIsNewYearsHoliday(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		timeNow = time.Date(c.year, c.month, c.day, 0,0,0,0, jst)
+		timeNow = time.Date(c.year, c.month, c.day, 0, 0, 0, 0, jst)
 		actual := IsNewYearsHoliday()
 
 		if actual != c.expected {
