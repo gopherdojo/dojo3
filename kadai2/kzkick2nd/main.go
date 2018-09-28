@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/converter"
-	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/option"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/parser"
 	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/seeker"
 )
 
@@ -32,7 +32,7 @@ type Config struct {
 }
 
 func (c *Config) Run() error {
-	a, err := option.Parse(c.Args)
+	a, err := parser.Parse(c.Args)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package option
+package parser
 
 import (
 	"flag"
