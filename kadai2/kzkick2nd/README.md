@@ -26,6 +26,9 @@
 $ go run main.go [-i (jpg|png)] [-o (jpg|png)] <path/to/dir>
 ```
 
-TODO
-- ファイルテスト複製削除式に
-- 全体リファクター
+## TODO
+- デバッグの仕方 delv
+    - gopath通しなおし => fishは相性よくないかな fish解除、zsh初期化、xonshへ変更
+- Newメソッドを生やすconstructs
+- テスト
+    - テスト用のtmpフォルダ生成して削除

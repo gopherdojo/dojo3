@@ -1,33 +1,60 @@
 package main
 
 import (
-	"flag"
-	"log"
+	"fmt"
+	"io"
+	"os"
 
-	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/cli"
+	"github.com/kzkick2nd/golang-sandbox/img-convert/converter"
+	"github.com/kzkick2nd/golang-sandbox/img-convert/option"
+	"github.com/kzkick2nd/golang-sandbox/img-convert/seeker"
 )
 
 func main() {
-	var dir string
-	var inputExt string
-	var outputExt string
-
-	// FIXME validationどうやる？（表記揺れ、拡張子間違い、PATH間違い、複数Dir）
-
-	flag.StringVar(&inputExt, "i", "jpg", "input format (jpg | png)")
-	flag.StringVar(&outputExt, "o", "png", "output format (jpg | png)")
-	flag.Parse()
-	dir = flag.Arg(0)
-
-	// FIXME 並列処理にできない？
-
-	w := cli.Worker{
-		Input:  inputExt,
-	  Output: outputExt,
+	c := Config{
+		Out:  os.Stdout,
+		Args: os.Args,
 	}
-	err := w.Run(dir)
+
+	// TODO loggerの追加
+
+	err := c.Run()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+
+type Config struct {
+	Out  io.Writer
+	Args []string
+}
+
+func (c *Config) Run() error {
+	a, err := option.Parse(c.Args)
+	if err != nil {
+		return err
 	}
 
+	d := seeker.Dest{
+		Dir: a.Dir,
+		Ext: a.Decoder,
+	}
+	p, err := d.Seek()
+	if err != nil {
+		return err
+	}
+
+	q := converter.Queue{
+		Log:     c.Out,
+		Src:     p,
+		Encoder: a.Encoder,
+	}
+	err = q.Run()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
