@@ -1,3 +1,6 @@
+/*
+Package parser is parsing Args for converter.
+*/
 package parser
 
 import (
@@ -8,12 +11,14 @@ import (
 	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/encoder"
 )
 
+// Args is parsed os.Args for convert source.
 type Args struct {
 	Dir     string
 	Decoder decoder.Decoder
 	Encoder encoder.Encoder
 }
 
+// Parse args with flag and contruct.
 func Parse(s []string) (Args, error) {
 
 	f := flag.NewFlagSet(s[0], flag.ExitOnError)
@@ -29,6 +34,7 @@ func Parse(s []string) (Args, error) {
 	}, nil
 }
 
+// validDir check dir exist.
 func validDir(s string) string {
 	if _, err := os.Stat(s); os.IsNotExist(err) {
 		return ""
@@ -36,6 +42,7 @@ func validDir(s string) string {
 	return s
 }
 
+// identify Decoder.
 func identifyDecoder(s *string) decoder.Decoder {
 	switch *s {
 	case "jpg", "jpeg":
@@ -47,6 +54,7 @@ func identifyDecoder(s *string) decoder.Decoder {
 	}
 }
 
+// identify Encoder.
 func identifyEncoder(s *string) encoder.Encoder {
 	switch *s {
 	case "jpg", "jpeg":

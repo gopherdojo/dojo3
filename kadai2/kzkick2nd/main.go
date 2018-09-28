@@ -26,11 +26,13 @@ func main() {
 	os.Exit(0)
 }
 
+// Config has logger output and command args.
 type Config struct {
 	Out  io.Writer
 	Args []string
 }
 
+// Run converting.
 func (c *Config) Run() error {
 	a, err := parser.Parse(c.Args)
 	if err != nil {
