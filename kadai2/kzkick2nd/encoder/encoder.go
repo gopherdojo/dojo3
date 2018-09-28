@@ -6,6 +6,6 @@ import (
 )
 
 type Encoder interface {
-	Run(io.Writer, image.Image) error
 	Ext() string
+	Run(io.Writer, image.Image) error
 }

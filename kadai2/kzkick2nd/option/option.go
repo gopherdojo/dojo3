@@ -4,14 +4,13 @@ import (
 	"flag"
 	"os"
 
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/decoder"
 	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/encoder"
 )
 
-// TODO 各プロパティも文字列ではなく構造体に
-
 type Args struct {
 	Dir     string
-	Decoder string
+	Decoder decoder.Decoder
 	Encoder encoder.Encoder
 }
 
@@ -25,10 +24,9 @@ func Parse(s []string) (Args, error) {
 
 	return Args{
 		Dir:     validDir(dir),
-		Decoder: validDecoder(from),
-		Encoder: validEncoder(to),
+		Decoder: identifyDecoder(from),
+		Encoder: identifyEncoder(to),
 	}, nil
-
 }
 
 func validDir(s string) string {
@@ -38,18 +36,18 @@ func validDir(s string) string {
 	return s
 }
 
-func validDecoder(s *string) string {
+func identifyDecoder(s *string) decoder.Decoder {
 	switch *s {
 	case "jpg", "jpeg":
-		return ".jpg"
+		return &decoder.Jpg{}
 	case "png":
-		return ".png"
+		return &decoder.Png{}
 	default:
-		return ".jpg"
+		return &decoder.Jpg{}
 	}
 }
 
-func validEncoder(s *string) encoder.Encoder {
+func identifyEncoder(s *string) encoder.Encoder {
 	switch *s {
 	case "jpg", "jpeg":
 		return &encoder.Jpg{}

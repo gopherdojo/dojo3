@@ -39,7 +39,7 @@ func (c *Config) Run() error {
 
 	d := seeker.Dest{
 		Dir: a.Dir,
-		Ext: a.Decoder,
+		Ext: a.Decoder.Ext(),
 	}
 	p, err := d.Seek()
 	if err != nil {
@@ -50,6 +50,7 @@ func (c *Config) Run() error {
 		Log:     c.Out,
 		Src:     p,
 		Encoder: a.Encoder,
+		Decoder: a.Decoder,
 	}
 	err = q.Run()
 	if err != nil {

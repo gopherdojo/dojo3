@@ -3,6 +3,7 @@ package seeker
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Dest struct {
@@ -19,8 +20,7 @@ func (d *Dest) Seek() ([]string, error) {
 		if info.IsDir() {
 			return nil
 		}
-		// TODO 大文字小文字と表記揺れも対応したい
-		if filepath.Ext(path) == d.Ext {
+		if strings.ToLower(filepath.Ext(path)) == "."+d.Ext {
 			d.Paths = append(d.Paths, path)
 		}
 		return nil

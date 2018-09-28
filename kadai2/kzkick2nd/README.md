@@ -32,3 +32,4 @@ $ go run main.go [-i (jpg|png)] [-o (jpg|png)] <path/to/dir>
 - Newメソッドを生やすconstructs
 - テスト
     - テスト用のtmpフォルダ生成して削除
+- コードコメント

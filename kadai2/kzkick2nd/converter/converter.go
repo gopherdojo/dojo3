@@ -1,11 +1,11 @@
 package converter
 
 import (
-	"image"
 	"io"
 	"os"
 	"path/filepath"
 
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/decoder"
 	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/encoder"
 )
 
@@ -13,6 +13,7 @@ type Queue struct {
 	Log     io.Writer
 	Src     []string
 	Encoder encoder.Encoder
+	Decoder decoder.Decoder
 }
 
 func (q *Queue) Run() error {
@@ -33,7 +34,7 @@ func (q *Queue) convert(i int) error {
 	}
 	defer f.Close()
 
-	m, _, err := image.Decode(f)
+	m, err := q.Decoder.Run(f)
 	if err != nil {
 		return err
 	}
