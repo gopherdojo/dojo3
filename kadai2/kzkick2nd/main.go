@@ -5,9 +5,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/kzkick2nd/golang-sandbox/img-convert/converter"
-	"github.com/kzkick2nd/golang-sandbox/img-convert/option"
-	"github.com/kzkick2nd/golang-sandbox/img-convert/seeker"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/converter"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/option"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/seeker"
 )
 
 func main() {

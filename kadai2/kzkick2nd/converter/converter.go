@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kzkick2nd/golang-sandbox/img-convert/encoder"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/encoder"
 )
 
 type Queue struct {

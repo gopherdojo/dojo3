@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	"github.com/kzkick2nd/golang-sandbox/img-convert/encoder"
+	"github.com/gopherdojo/dojo3/kadai2/kzkick2nd/encoder"
 )
 
 // TODO 各プロパティも文字列ではなく構造体に
