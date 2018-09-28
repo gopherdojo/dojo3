@@ -37,7 +37,7 @@ func (c *Config) Run() error {
 		return err
 	}
 
-	d := seeker.Dest{
+	d := seeker.Target{
 		Dir: a.Dir,
 		Ext: a.Decoder.Ext(),
 	}

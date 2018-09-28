@@ -6,24 +6,24 @@ import (
 	"strings"
 )
 
-type Dest struct {
+type Target struct {
 	Dir   string
 	Ext   string
 	Paths []string
 }
 
-func (d *Dest) Seek() ([]string, error) {
-	err := filepath.Walk(d.Dir, func(path string, info os.FileInfo, err error) error {
+func (t *Target) Seek() ([]string, error) {
+	err := filepath.Walk(t.Dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if info.IsDir() {
 			return nil
 		}
-		if strings.ToLower(filepath.Ext(path)) == "."+d.Ext {
-			d.Paths = append(d.Paths, path)
+		if strings.ToLower(filepath.Ext(path)) == "."+t.Ext {
+			t.Paths = append(t.Paths, path)
 		}
 		return nil
 	})
-	return d.Paths, err
+	return t.Paths, err
 }
