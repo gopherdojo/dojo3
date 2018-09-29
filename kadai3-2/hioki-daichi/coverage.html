@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/gopherdojo/dojo3/kadai3-2/hioki-daichi/downloading/downloading.go (94.7%)</option>
+				
+				<option value="file1">github.com/gopherdojo/dojo3/kadai3-2/hioki-daichi/opt/opt.go (100.0%)</option>
+				
+				<option value="file2">github.com/gopherdojo/dojo3/kadai3-2/hioki-daichi/termination/termination.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">/*
+Package downloading provides download function.
+*/
+package downloading
+
+import (
+        "context"
+        "crypto/rand"
+        "errors"
+        "fmt"
+        "io"
+        "io/ioutil"
+        "net/http"
+        "net/url"
+        "os"
+        "path"
+        "path/filepath"
+        "sync"
+        "time"
+
+        "github.com/gopherdojo/dojo3/kadai3-2/hioki-daichi/opt"
+        "github.com/gopherdojo/dojo3/kadai3-2/hioki-daichi/termination"
+        "golang.org/x/sync/errgroup"
+)
+
+var (
+        errResponseDoesNotIncludeAcceptRangesHeader = errors.New("response does not include Accept-Ranges header")
+        errValueOfAcceptRangesHeaderIsNotBytes      = errors.New("the value of Accept-Ranges header is not bytes")
+        errNoContent                                = errors.New("no content")
+)
+
+// Downloader has the information for the download.
+type Downloader struct {
+        outStream   io.Writer
+        url         *url.URL
+        parallelism int
+        output      string
+        timeout     time.Duration
+}
+
+// NewDownloader generates Downloader based on Options.
+func NewDownloader(w io.Writer, opts *opt.Options) *Downloader <span class="cov9" title="12">{
+        return &amp;Downloader{
+                outStream:   w,
+                url:         opts.URL,
+                parallelism: opts.Parallelism,
+                output:      opts.Output,
+                timeout:     opts.Timeout,
+        }
+}</span>
+
+// Download performs parallel download.
+func (d *Downloader) Download(ctx context.Context) error <span class="cov7" title="8">{
+        ctx, cancel := context.WithTimeout(ctx, d.timeout)
+        defer cancel()
+
+        contentLength, err := d.getContentLength(ctx)
+        if err != nil </span><span class="cov4" title="3">{
+                return err
+        }</span>
+
+        <span class="cov6" title="5">rangeHeaders := d.toRangeHeaders(contentLength)
+
+        tempDir, err := ioutil.TempDir("", "parallel-download")
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov6" title="5">clean := func() </span><span class="cov6" title="5">{ os.RemoveAll(tempDir) }</span>
+        <span class="cov6" title="5">defer clean()
+        termination.CleanFunc(clean)
+
+        filenames, err := d.parallelDownload(ctx, rangeHeaders, tempDir)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov5" title="4">filename, err := d.concat(filenames, tempDir)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov5" title="4">fmt.Fprintf(d.outStream, "rename %q to %q\n", filename, d.output)
+
+        err = os.Rename(filename, d.output)
+        if err != nil </span><span class="cov1" title="1">{
+                return err
+        }</span>
+
+        <span class="cov4" title="3">fmt.Fprintf(d.outStream, "completed: %q\n", d.output)
+
+        return nil</span>
+}
+
+// getContentLength returns the value of Content-Length received by making a HEAD request.
+func (d *Downloader) getContentLength(ctx context.Context) (int, error) <span class="cov8" title="9">{
+        fmt.Fprintf(d.outStream, "start HEAD request to get Content-Length\n")
+
+        req, err := http.NewRequest("HEAD", d.url.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov8" title="9">req = req.WithContext(ctx)
+
+        resp, err := http.DefaultClient.Do(req)
+        if err != nil </span><span class="cov1" title="1">{
+                return 0, err
+        }</span>
+
+        <span class="cov7" title="8">err = d.validateAcceptRangesHeader(resp)
+        if err != nil </span><span class="cov3" title="2">{
+                return 0, err
+        }</span>
+
+        <span class="cov6" title="6">contentLength := int(resp.ContentLength)
+
+        fmt.Fprintf(d.outStream, "got: Content-Length: %d\n", contentLength)
+
+        if contentLength &lt; 1 </span><span class="cov1" title="1">{
+                return 0, errNoContent
+        }</span>
+
+        <span class="cov6" title="5">return contentLength, nil</span>
+}
+
+// validateAcceptRangesHeader validates the following.
+// - The presence of an Accept-Ranges header
+// - The value of the Accept-Ranges header is "bytes"
+func (d *Downloader) validateAcceptRangesHeader(resp *http.Response) error <span class="cov7" title="8">{
+        acceptRangesHeader := resp.Header.Get("Accept-Ranges")
+
+        fmt.Fprintf(d.outStream, "got: Accept-Ranges: %s\n", acceptRangesHeader)
+
+        if acceptRangesHeader == "" </span><span class="cov1" title="1">{
+                return errResponseDoesNotIncludeAcceptRangesHeader
+        }</span>
+
+        <span class="cov7" title="7">if acceptRangesHeader != "bytes" </span><span class="cov1" title="1">{
+                return errValueOfAcceptRangesHeaderIsNotBytes
+        }</span>
+
+        <span class="cov6" title="6">return nil</span>
+}
+
+// toRangeHeaders converts the value of Content-Length to the value of Range header.
+func (d *Downloader) toRangeHeaders(contentLength int) []string <span class="cov6" title="5">{
+        parallelism := d.parallelism
+
+        // 1 &lt;= parallelism &lt;= Content-Length
+        if parallelism &lt; 1 </span><span class="cov1" title="1">{
+                parallelism = 1
+        }</span>
+        <span class="cov6" title="5">if contentLength &lt; parallelism </span><span class="cov1" title="1">{
+                parallelism = contentLength
+        }</span>
+
+        <span class="cov6" title="5">unitLength := contentLength / parallelism
+        remainingLength := contentLength % parallelism
+
+        rangeHeaders := make([]string, 0)
+
+        cntr := 0
+        for n := parallelism; n &gt; 0; n-- </span><span class="cov9" title="15">{
+                min := cntr
+                max := cntr + unitLength - 1
+
+                // Add the remaining length to the last chunk
+                if n == 1 &amp;&amp; remainingLength != 0 </span><span class="cov3" title="2">{
+                        max += remainingLength
+                }</span>
+
+                <span class="cov9" title="15">rangeHeaders = append(rangeHeaders, fmt.Sprintf("bytes=%d-%d", min, max))
+
+                cntr += unitLength</span>
+        }
+
+        <span class="cov6" title="5">return rangeHeaders</span>
+}
+
+// parallelDownload downloads in parallel for each specified rangeHeaders and saves it in the specified dir.
+func (d *Downloader) parallelDownload(ctx context.Context, rangeHeaders []string, dir string) (map[int]string, error) <span class="cov6" title="5">{
+        filenames := map[int]string{}
+
+        filenameCh := make(chan map[int]string)
+        errCh := make(chan error)
+
+        for i, rangeHeader := range rangeHeaders </span><span class="cov9" title="15">{
+                go d.partialDownloadAndSendToChannel(ctx, i, rangeHeader, filenameCh, errCh, dir)
+        }</span>
+
+        <span class="cov6" title="5">eg, ctx := errgroup.WithContext(ctx)
+        var mu sync.Mutex
+        for i := 0; i &lt; len(rangeHeaders); i++ </span><span class="cov9" title="15">{
+                eg.Go(func() error </span><span class="cov9" title="15">{
+                        select </span>{
+                        case &lt;-ctx.Done():<span class="cov6" title="6">
+                                return ctx.Err()</span>
+                        case m := &lt;-filenameCh:<span class="cov7" title="7">
+                                for k, v := range m </span><span class="cov7" title="7">{
+                                        mu.Lock()
+                                        filenames[k] = v
+                                        mu.Unlock()
+                                }</span>
+                                <span class="cov7" title="7">return nil</span>
+                        case err := &lt;-errCh:<span class="cov3" title="2">
+                                return err</span>
+                        }
+                })
+        }
+
+        <span class="cov6" title="5">if err := eg.Wait(); err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov5" title="4">return filenames, nil</span>
+}
+
+// partialDownloadAndSendToChannel performs partialDownload and sends it to the appropriate channel according to the result.
+func (d *Downloader) partialDownloadAndSendToChannel(ctx context.Context, i int, rangeHeader string, filenameCh chan&lt;- map[int]string, errCh chan&lt;- error, dir string) <span class="cov9" title="15">{
+        filename, err := d.partialDownload(ctx, rangeHeader, dir)
+        if err != nil </span><span class="cov7" title="8">{
+                errCh &lt;- err
+                return
+        }</span>
+
+        <span class="cov7" title="7">filenameCh &lt;- map[int]string{i: filename}
+
+        return</span>
+}
+
+// partialDownload sends a partial request with the specified rangeHeader,
+// and saves the response body in the file under the specified dir,
+// and returns the filename.
+func (d *Downloader) partialDownload(ctx context.Context, rangeHeader string, dir string) (string, error) <span class="cov10" title="16">{
+        req, err := http.NewRequest("GET", d.url.String(), nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov10" title="16">req = req.WithContext(ctx)
+
+        req.Header.Set("Range", rangeHeader)
+
+        fmt.Fprintf(d.outStream, "start GET request with header: \"Range: %s\"\n", rangeHeader)
+
+        resp, err := http.DefaultClient.Do(req)
+        if err != nil </span><span class="cov6" title="6">{
+                return "", err
+        }</span>
+        <span class="cov8" title="10">defer resp.Body.Close()
+
+        if resp.StatusCode != http.StatusPartialContent </span><span class="cov3" title="2">{
+                return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+        }</span>
+
+        <span class="cov7" title="8">fp, err := os.Create(path.Join(dir, randomHexStr()))
+        if err != nil </span><span class="cov1" title="1">{
+                return "", err
+        }</span>
+
+        <span class="cov7" title="7">_, err = io.Copy(fp, resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov7" title="7">filename := fp.Name()
+
+        fmt.Fprintf(d.outStream, "downloaded: %q\n", filename)
+
+        return filename, nil</span>
+}
+
+// concat concatenates the files in order based on the mapping of the specified filenames,
+// and creates the concatenated file under the specified dir,
+// and returns the filename.
+func (d *Downloader) concat(filenames map[int]string, dir string) (string, error) <span class="cov6" title="6">{
+        fp, err := os.Create(filepath.Join(dir, randomHexStr()))
+        if err != nil </span><span class="cov1" title="1">{
+                return "", err
+        }</span>
+        <span class="cov6" title="5">defer fp.Close()
+
+        filename := fp.Name()
+
+        fmt.Fprintf(d.outStream, "concatenate downloaded files to tempfile: %q\n", filename)
+
+        for i := 0; i &lt; len(filenames); i++ </span><span class="cov7" title="8">{
+                src, err := os.Open(filenames[i])
+                if err != nil </span><span class="cov1" title="1">{
+                        return "", err
+                }</span>
+
+                <span class="cov7" title="7">_, err = io.Copy(fp, src)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+        }
+
+        <span class="cov5" title="4">return filename, nil</span>
+}
+
+// randomHexStr returns a random hex string of length 10.
+// 10 is a length which does not duplicate enough.
+func randomHexStr() string <span class="cov9" title="14">{
+        b := make([]byte, 5)
+        _, err := rand.Read(b)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov9" title="14">return fmt.Sprintf("%x", b)</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">/*
+Package opt deals with CLI options.
+*/
+package opt
+
+import (
+        "errors"
+        "flag"
+        "net/url"
+        "path"
+        "time"
+)
+
+var errExist = errors.New("file already exists")
+
+// Options has the options required for parallel-download.
+type Options struct {
+        Parallelism int
+        Output      string
+        URL         *url.URL
+        Timeout     time.Duration
+}
+
+// Parse parses args and returns Options.
+func Parse(args ...string) (*Options, error) <span class="cov10" title="5">{
+        flg := flag.NewFlagSet("parallel-download", flag.ExitOnError)
+
+        parallelism := flg.Int("p", 8, "Download files in parallel according to the specified number.")
+        output := flg.String("o", "", "Save the downloaded file in the specified path. (Overwrite if duplicates.)")
+        timeout := flg.Duration("t", 30*time.Second, "Terminate when the specified value has elapsed since download started.")
+
+        flg.Parse(args)
+
+        u, err := url.ParseRequestURI(flg.Arg(0))
+        if err != nil </span><span class="cov1" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="4">if *output == "" </span><span class="cov7" title="3">{
+                _, filename := path.Split(u.Path)
+
+                // Inspired by the --default-page option of wget
+                if filename == "" </span><span class="cov1" title="1">{
+                        filename = "index.html"
+                }</span>
+
+                <span class="cov7" title="3">*output = filename</span>
+        }
+
+        <span class="cov8" title="4">return &amp;Options{
+                Parallelism: *parallelism,
+                Output:      *output,
+                URL:         u,
+                Timeout:     *timeout,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">/*
+Package termination deals with Ctrl+C termination.
+*/
+package termination
+
+import (
+        "context"
+        "fmt"
+        "io"
+        "os"
+        "os/signal"
+        "syscall"
+)
+
+var cleanFns []func()
+
+// for testing
+var osExit = os.Exit
+
+// Listen listens signals.
+func Listen(ctx context.Context, w io.Writer) (context.Context, func()) <span class="cov8" title="1">{
+        ctx, cancel := context.WithCancel(ctx)
+
+        ch := make(chan os.Signal, 2)
+        signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+        go func() </span><span class="cov8" title="1">{
+                &lt;-ch
+                fmt.Fprintln(w, "\rCtrl+C pressed in Terminal")
+                cancel()
+                for _, f := range cleanFns </span><span class="cov8" title="1">{
+                        f()
+                }</span>
+                <span class="cov8" title="1">osExit(0)</span>
+        }()
+
+        <span class="cov8" title="1">return ctx, cancel</span>
+}
+
+// CleanFunc registers clean function.
+func CleanFunc(f func()) <span class="cov8" title="1">{
+        cleanFns = append(cleanFns, f)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
