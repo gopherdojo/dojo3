@@ -16,8 +16,6 @@ func main() {
 		Args: os.Args,
 	}
 
-	// TODO loggerの追加
-
 	err := c.Run()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

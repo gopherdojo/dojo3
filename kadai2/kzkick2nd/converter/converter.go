@@ -4,6 +4,7 @@ Package converter converts image. open and decode then encode.
 package converter
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -55,6 +56,8 @@ func (q *Queue) convert(i int) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Fprintf(q.Log, "converted: %s => %s\n", s, p)
 
 	err = d.Close()
 	if err != nil {
