@@ -37,7 +37,7 @@ func Parse(s []string) (Args, error) {
 // validDir check dir exist.
 func validDir(s string) string {
 	if _, err := os.Stat(s); os.IsNotExist(err) {
-		return ""
+		return "./"
 	}
 	return s
 }
