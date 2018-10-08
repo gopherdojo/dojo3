@@ -25,10 +25,10 @@ $ go run main.go [-i (jpg|png)] [-o (jpg|png)] <path/to/dir>
         インターフェースを満たすならば構造体に関わらず組み合わせて利用できる。
         io.Copy()が好例。利用者としては共通メソッドで覚える事が少なくなり、楽に利用できる。
 
-## TODO
-- デバッグの仕方 delv
-    - gopath通しなおし => fishは相性よくないかな fish解除、zsh初期化、xonshへ変更
+## TODO:
 - コードコメントの改善
 - Newメソッドを生やすconstructs
-- テストの追加
-- テストファイルはtmpフォルダ生成して削除する
+- テストの改善
+    - converterは出力ファイルパスを返す形の方がテストしやすい
+    - 複雑なtempファイル群を自動生成したい
+    - encoderとdecoderのテスト追加
