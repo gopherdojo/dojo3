@@ -1,11 +1,28 @@
 package seeker
 
 import (
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 func TestSeek(t *testing.T) {
+
+	dir, err := ioutil.TempDir("", "tempdir")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// TODO: 複雑なディレクトリ構成を生成したい
+	content := []byte("temporary file's content")
+	tmpfn := filepath.Join(dir, "tmpfile.jpg")
+	if err := ioutil.WriteFile(tmpfn, content, 0666); err != nil {
+		log.Fatal(err)
+	}
+
 	cases := map[string]struct {
 		dir           string
 		ext           string
@@ -13,12 +30,11 @@ func TestSeek(t *testing.T) {
 		expectedErr   error
 	}{
 		"default option": {
-			dir:           "../testdata",
+			dir:           dir,
 			ext:           "jpg",
-			expectedPaths: []string{"../testdata/1px.jpg", "../testdata/1px_2.jpg", "../testdata/subdir/sub-dir-1px.jpg"},
+			expectedPaths: []string{tmpfn},
 			expectedErr:   nil,
 		},
-		// TODO: create test temp dir on testing seek()
 	}
 
 	for n, c := range cases {
@@ -43,4 +59,7 @@ func TestSeek(t *testing.T) {
 
 		})
 	}
+
+	// FIXME: 前後処理挟み込んでいる事を表現したい
+	os.RemoveAll(dir)
 }
