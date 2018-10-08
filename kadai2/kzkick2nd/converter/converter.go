@@ -57,6 +57,7 @@ func (q *Queue) convert(i int) error {
 		return err
 	}
 
+	// FIXME: 出力ファイルのスライスを出した方が良い。テストも楽。
 	fmt.Fprintf(q.Log, "converted: %s => %s\n", s, p)
 
 	err = d.Close()
