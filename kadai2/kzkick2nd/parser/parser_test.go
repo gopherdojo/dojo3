@@ -22,9 +22,27 @@ func TestParse(t *testing.T) {
 			expectedEncoder: &encoder.Png{},
 			expectedErr:     nil,
 		},
-		// with full args
-		// jpg => png, png => jpg
-		// with err
+		"with full args(jpg => png)": {
+			osargs:          []string{"cmd", "-i=jpg", "-o=png", "../testdata"},
+			expectedDir:     "../testdata",
+			expectedDecoder: &decoder.Jpg{},
+			expectedEncoder: &encoder.Png{},
+			expectedErr:     nil,
+		},
+		"with full args(png => jpg)": {
+			osargs:          []string{"cmd", "-i=png", "-o=jpg", "../testdata"},
+			expectedDir:     "../testdata",
+			expectedDecoder: &decoder.Png{},
+			expectedEncoder: &encoder.Jpg{},
+			expectedErr:     nil,
+		},
+		"not exist dir (default path)": {
+			osargs:          []string{"cmd", "./hoge"},
+			expectedDir:     "./",
+			expectedDecoder: &decoder.Jpg{},
+			expectedEncoder: &encoder.Png{},
+			expectedErr:     nil,
+		},
 	}
 
 	for n, c := range cases {

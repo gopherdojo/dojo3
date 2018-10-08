@@ -27,6 +27,7 @@ func Parse(s []string) (Args, error) {
 	f.Parse(s[1:])
 	dir := f.Arg(0)
 
+	// TODO: 無いディレクトリのエラー追加
 	return Args{
 		Dir:     validDir(dir),
 		Decoder: identifyDecoder(from),
